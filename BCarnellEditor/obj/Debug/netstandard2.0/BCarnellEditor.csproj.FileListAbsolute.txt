@@ -1,0 +1,5 @@
+C:\Users\alex1\source\repos\BCarnellEditor\obj\Debug\netstandard2.0\BCarnellEditor.csproj.AssemblyReference.cache
+C:\Users\alex1\source\repos\BCarnellEditor\obj\Debug\netstandard2.0\BCarnellEditor.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\alex1\source\repos\BCarnellEditor\obj\Debug\netstandard2.0\BCarnellEditor.AssemblyInfoInputs.cache
+C:\Users\alex1\source\repos\BCarnellEditor\obj\Debug\netstandard2.0\BCarnellEditor.AssemblyInfo.cs
+C:\Users\alex1\source\repos\BCarnellEditor\obj\Debug\netstandard2.0\BCarnellEditor.csproj.CoreCompileInputs.cache

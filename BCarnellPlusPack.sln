@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34511.84
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBTimes", "..\New-Baldis-Basics-Times\BBTimes.csproj", "{26B390DB-B0EF-4AF6-928D-71079ECBC822}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BCarnellEditor", "BCarnellEditor\BCarnellEditor.csproj", "{302390B9-04EB-4210-8A3D-113886B9CBFF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BCarnellTimes", "BCarnellTimes\BCarnellTimes.csproj", "{4D7A96C3-B131-4596-9ACE-900B7A53B9E5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BCarnellChars", "BCarnellChars\BCarnellChars.csproj", "{99FB493D-0820-405F-A89C-53BBF789FCD0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Cheat|Any CPU = Cheat|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{26B390DB-B0EF-4AF6-928D-71079ECBC822}.Cheat|Any CPU.ActiveCfg = Cheat|Any CPU
+		{26B390DB-B0EF-4AF6-928D-71079ECBC822}.Cheat|Any CPU.Build.0 = Cheat|Any CPU
+		{26B390DB-B0EF-4AF6-928D-71079ECBC822}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26B390DB-B0EF-4AF6-928D-71079ECBC822}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26B390DB-B0EF-4AF6-928D-71079ECBC822}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26B390DB-B0EF-4AF6-928D-71079ECBC822}.Release|Any CPU.Build.0 = Release|Any CPU
+		{302390B9-04EB-4210-8A3D-113886B9CBFF}.Cheat|Any CPU.ActiveCfg = Debug|Any CPU
+		{302390B9-04EB-4210-8A3D-113886B9CBFF}.Cheat|Any CPU.Build.0 = Debug|Any CPU
+		{302390B9-04EB-4210-8A3D-113886B9CBFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{302390B9-04EB-4210-8A3D-113886B9CBFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{302390B9-04EB-4210-8A3D-113886B9CBFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{302390B9-04EB-4210-8A3D-113886B9CBFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D7A96C3-B131-4596-9ACE-900B7A53B9E5}.Cheat|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D7A96C3-B131-4596-9ACE-900B7A53B9E5}.Cheat|Any CPU.Build.0 = Debug|Any CPU
+		{4D7A96C3-B131-4596-9ACE-900B7A53B9E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D7A96C3-B131-4596-9ACE-900B7A53B9E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D7A96C3-B131-4596-9ACE-900B7A53B9E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D7A96C3-B131-4596-9ACE-900B7A53B9E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99FB493D-0820-405F-A89C-53BBF789FCD0}.Cheat|Any CPU.ActiveCfg = Debug|Any CPU
+		{99FB493D-0820-405F-A89C-53BBF789FCD0}.Cheat|Any CPU.Build.0 = Debug|Any CPU
+		{99FB493D-0820-405F-A89C-53BBF789FCD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99FB493D-0820-405F-A89C-53BBF789FCD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99FB493D-0820-405F-A89C-53BBF789FCD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99FB493D-0820-405F-A89C-53BBF789FCD0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3289EFEB-B444-4DF5-88BC-94857B4E2CB2}
+	EndGlobalSection
+EndGlobal
