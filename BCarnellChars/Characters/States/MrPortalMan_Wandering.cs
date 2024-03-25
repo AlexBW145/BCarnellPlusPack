@@ -69,12 +69,14 @@ namespace BCarnellChars.Characters.States
         public override void OnStateTriggerStay(Collider other)
         {
             base.OnStateTriggerEnter(other);
-            if (other.CompareTag("NPC") || other.tag == "Player") {
+            if (other.CompareTag("NPC") || other.CompareTag("Player")) {
                 portalMan.TeleportAnIdiot(other.GetComponent<Entity>());
                 if (other.GetComponent<Entity>() == currentTarget)
                     currentTarget = null;
                 currentAteFood++;
             }
+            else if (other.GetComponent<Entity>())
+                portalMan.TeleportAnIdiot(other.GetComponent<Entity>());
         }
     }
 }

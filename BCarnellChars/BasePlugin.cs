@@ -551,7 +551,8 @@ namespace BCarnellChars
             securedYellowSwingingDoor.name = "SecuredLockDoor";
             securedYellowSwingingDoor.SetMainTexture(AssetLoader.TextureFromMod(this, "Texture2D", "SwingDoor_SecuredLocked.png"));
             //inflockedSwingDoor.GetComponent<SecuredSwingingDoor>().doorOverlay = securedYellowSwingingDoor;
-            inflockedSwingDoor.GetComponent<PropagatedAudioManager>().enabled = false;
+            inflockedSwingDoor.SetActive(false);
+            inflockedSwingDoor.GetComponent<AudioManager>().enabled = false;
             DontDestroyOnLoad(inflockedSwingDoor);
             CoinDoorBuilder builder = Instantiate(Resources.FindObjectsOfTypeAll<CoinDoorBuilder>().ToList().Find(x => x.name == "CoinDoorBuilder"));
             builder.gameObject.name = "Inf Secured Swinging Door Builder";

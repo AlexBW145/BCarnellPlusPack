@@ -123,11 +123,11 @@ namespace BCarnellChars.Characters
 
         public void TeleportAnIdiot(Entity idiot)
         {
-            if (idiot.CompareTag("NPC")) {
+            if (!idiot.CompareTag("Player")) {
                 audMan.PlaySingle(teleport);
                 if (idiot.GetComponent<AudioManager>() != null) idiot.GetComponent<AudioManager>().PlaySingle(teleport);
             }
-            else if (idiot.tag == "Player")
+            else
                 CoreGameManager.Instance.audMan.PlaySingle(teleport);
             int random = UnityEngine.Random.Range(0, portals.Count);
             idiot.transform.position = portals[random].position + Vector3.back * 5f;
@@ -141,7 +141,7 @@ namespace BCarnellChars.Characters
             audMan.PlaySingle(teleport);
             audMan.PlaySingle(audFulfilled);
             StartCoroutine(hideFade());
-            baseTrigger[0].enabled = true;
+            baseTrigger[0].enabled = false;
             behaviorStateMachine.ChangeState(new MrPortalMan_Cooldown(this, UnityEngine.Random.RandomRangeInt(40, 80)));
             navigationStateMachine.ChangeState(new NavigationState_DoNothing(this, 0));
             navigator.maxSpeed = 0;

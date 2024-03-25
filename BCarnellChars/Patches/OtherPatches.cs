@@ -13,15 +13,27 @@ using UnityEngine.SceneManagement;
 
 namespace BCarnellChars.Patches
 {
+    [HarmonyPatch]
+    class MakeEmActive
+    {
+        [HarmonyPatch(typeof(CoinDoorBuilder), "Build")]
+        static void Prefix(ref SwingDoor ___doorPre)
+        {
+            if (!___doorPre.gameObject.activeSelf)
+                ___doorPre.gameObject.SetActive(true);
+        }
+    }
+
     [HarmonyPatch(typeof(FloodEvent), "Initialize")]
     class BasementDirtyWaterFill
     {
-        static void Prefix(ref float ___height, ref float ___volume)
+        static void Prefix(ref float ___height, ref float ___volume, ref float ___riseSpeed)
         {
             if (BaseGameManager.Instance.levelObject.name == "Basement1")
             {
                 ___height = 10.1f;
                 ___volume = 3f;
+                ___riseSpeed = 3f;
             }
         }
     }
@@ -54,7 +66,8 @@ namespace BCarnellChars.Patches
                 gl.gameObject.SetActive(true);
                 __instance.gameObject.SetActive(false);
                 gl.CheckSeed();
-                gl.Initialize(1);                gl.SetMode((int)Mode.Free);
+                gl.Initialize(1);
+                gl.SetMode((int)Mode.Main);
                 ElevatorScreen evl = SceneManager.GetActiveScene().GetRootGameObjects().Where(x => x.name == "ElevatorScreen").First().GetComponent<ElevatorScreen>();
                 gl.AssignElevatorScreen(evl);
                 evl.gameObject.SetActive(true);

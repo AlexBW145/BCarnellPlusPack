@@ -1,4 +1,6 @@
-﻿using BepInEx;
+﻿using BBTimes.CreatorHelpers;
+using BBTimes.Helpers;
+using BepInEx;
 using HarmonyLib;
 using MTM101BaldAPI;
 using MTM101BaldAPI.Registers;
@@ -18,6 +20,13 @@ namespace BCarnellTimes
             Harmony harmony = new Harmony("alexbw145.baldiplus.bcarnelltimes");
             harmony.PatchAllConditionals();
             LoadingEvents.RegisterOnAssetsLoaded(PostLoad, true);
+            GeneratorManagement.Register(this, GenerationModType.Addend, (floorName, floorNum, ld) =>
+            {
+                if (floorName == "B1" && floorNum == -1 && ld.name == "Basement1")
+                {
+                    ld.forcedSpecialHallBuilders = [..ld.forcedSpecialHallBuilders, ObjectBuilderMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Obstacle>("Vent")).value];
+                }
+            });
         }
 
         private void PostLoad()

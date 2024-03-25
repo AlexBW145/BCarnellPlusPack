@@ -3,6 +3,7 @@ using HarmonyLib;
 using MTM101BaldAPI;
 using MTM101BaldAPI.Registers;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
@@ -51,9 +52,25 @@ namespace BCarnellChars.Patches
             if (!___disabled && __instance.items[__instance.selectedItem].itemType == EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey"))
             {
                 MonoBehaviour.Instantiate(__instance.items[__instance.selectedItem].item).Use(__instance.pm);
+                __instance.StartCoroutine(delay(__instance.pm));
                 return false;
             }
             return true;
+        }
+
+        // Just wanna make sure because some mods patches the ItemManager and I don't want any problems.
+        static IEnumerator delay(PlayerManager instance)
+        {
+            float time = 0.1f;
+            int slot = instance.itm.selectedItem;
+            while (time >= 0f)
+            {
+                time -= Time.deltaTime * instance.ec.EnvironmentTimeScale;
+                yield return null;
+            }
+            if (instance.itm.items[slot].itemType != EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey"))
+                instance.itm.SetItem(ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey")).value, slot);
+            yield break;
         }
     }
 }
