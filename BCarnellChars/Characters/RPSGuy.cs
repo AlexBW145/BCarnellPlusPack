@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using BCarnellChars.Characters.States;
+using BCarnellChars.OtherStuff;
 
 namespace BCarnellChars.Characters
 {
@@ -35,8 +36,8 @@ namespace BCarnellChars.Characters
         public bool Dead => isDead;
         private bool playing = false;
         public bool Playing => playing;
-        private int streakInitial = 15;
-        private int streakPoints;
+        private readonly int streakInitial = 15;
+        private int streakPoints = 15;
         public int StreakPoints => streakPoints;
 
         public bool ItemFits(Items item)
@@ -108,23 +109,17 @@ namespace BCarnellChars.Characters
             navigator.SetSpeed(normSpeed);
         }
 
-        public void JumpropeHit()
-        {
-            //audMan.PlaySingle(audOops);
-        }
-
-        public void Count(int jumps)
-        {
-            //audMan.PlaySingle(audCount[jumps - 1]);
-        }
-
         public void EndRPS(bool won)
         {
             if (won)
             {
+                CoreGameManager.Instance.AddPoints(streakPoints, curRPS.player.playerNumber, true);
+                if (!GlobalCam.Instance.TransitionActive) GlobalCam.Instance.Transition(UiTransition.Dither, 0.01666667f);
                 audMan.PlaySingle(audCongrats);
                 streakPoints += streakInitial;
             }
+            else if (!GlobalCam.Instance.TransitionActive || isDead)
+                curRPS.Destroy();
             if (!isDead)
             {
                 navigator.maxSpeed = normSpeed;
@@ -132,12 +127,12 @@ namespace BCarnellChars.Characters
                 behaviorStateMachine.ChangeState(new RPSGuy_Cooldown(this, this, initialCooldown));
             }
             playing = false;
-            curRPS.Destroy();
         }
 
         // What a waste...
         public void Losah()
         {
+            if (!GlobalCam.Instance.TransitionActive) GlobalCam.Instance.Transition(UiTransition.Dither, 0.01666667f);
             audMan.PlaySingle(audYouLose);
             streakPoints = streakInitial;
         }
@@ -173,9 +168,7 @@ namespace BCarnellChars.Characters
         {
             playing = true;
             if (curRPS != null)
-            {
                 Destroy(curRPS);
-            }
             // IF PLAYTIME IS PLAYIN' WITH PLAYER, MAKE HER SAD BCUS SHE WAS INTERRUPTED!!
             if (player.jumpropes.Count > 0)
             {
@@ -184,6 +177,7 @@ namespace BCarnellChars.Characters
             }
             curRPS = Instantiate(rpsPre);
             curRPS.gameObject.SetActive(true);
+            if (!GlobalCam.Instance.TransitionActive) GlobalCam.Instance.FadeIn(UiTransition.Dither, 0.01666667f);
             curRPS.player = player;
             curRPS.rps = this;
             navigator.maxSpeed = 0f;

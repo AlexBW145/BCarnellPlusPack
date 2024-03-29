@@ -300,10 +300,66 @@ namespace BCarnellChars
             Destroy(rockpaperscissors.GetComponent<Jumprope>());
             Destroy(rockpaperscissors.transform.Find("RopeCanvas").gameObject);
             Destroy(rockpaperscissors.transform.Find("TextCanvas").transform.Find("Count").gameObject);
-            rockpaperscissors.AddComponent<RockPaperScissors>();
+            RawImage raw = rockpaperscissors.transform.Find("TextCanvas").gameObject.AddComponent<RawImage>();
+            raw.color = new Color(0f,0f,0f,0.50f);
             DontDestroyOnLoad(rockpaperscissors);
             rockpaperscissors.SetActive(false);
-            rpsguy.rpsPre = rockpaperscissors.GetComponent<RockPaperScissors>();
+            Image uhf = new GameObject("Border", typeof(Image)).GetComponent<Image>();
+            uhf.gameObject.layer = LayerMask.NameToLayer("UI");
+            uhf.transform.SetParent(rockpaperscissors.transform.Find("TextCanvas").transform);
+            uhf.transform.localPosition = Vector3.zero;
+            uhf.sprite = AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "UI", "RPS_border.png"), 1f);
+            uhf.transform.SetAsFirstSibling();
+            uhf.rectTransform.sizeDelta = new Vector2(rockpaperscissors.transform.Find("TextCanvas").GetComponent<RectTransform>().sizeDelta.x, uhf.rectTransform.sizeDelta.y + 40);
+            GameObject me = new GameObject("Player", typeof(RawImage));
+            me.layer = LayerMask.NameToLayer("UI");
+            me.transform.SetParent(rockpaperscissors.transform.Find("TextCanvas").transform);
+            me.GetComponent<RectTransform>().anchorMin = new Vector2(0f, 0.5f);
+            me.GetComponent<RectTransform>().anchorMax = new Vector2(0f, 0.5f);
+            me.GetComponent<RectTransform>().pivot = new Vector2(0f, 0.5f);
+            me.transform.localScale = Vector3.one * 0.5f;
+            me.GetComponent<RectTransform>().anchoredPosition = new Vector3(40, 0, 0);
+            me.GetComponent<RawImage>().texture = AssetLoader.TextureFromMod(this, "Texture2D", "UI", "RPS_Player.png");
+            GameObject them = new GameObject("Opponent", typeof(RawImage));
+            them.transform.SetParent(rockpaperscissors.transform.Find("TextCanvas").transform);
+            them.layer = LayerMask.NameToLayer("UI");
+            them.GetComponent<RectTransform>().anchorMin = new Vector2(1f, 0.5f);
+            them.GetComponent<RectTransform>().anchorMax = new Vector2(1f, 0.5f);
+            them.GetComponent<RectTransform>().pivot = new Vector2(1f, 0.5f);
+            them.transform.localScale = Vector3.one * 0.5f;
+            them.GetComponent<RectTransform>().anchoredPosition = new Vector3(-40, 0, 0);
+            them.GetComponent<RawImage>().texture = AssetLoader.TextureFromMod(this, "Texture2D", "UI", "RPS_RPSGuy.png");
+            GameObject iChose = new GameObject("Player_Chose", typeof(Image));
+            iChose.layer = LayerMask.NameToLayer("UI");
+            iChose.transform.SetParent(rockpaperscissors.transform.Find("TextCanvas").transform);
+            iChose.GetComponent<RectTransform>().anchorMin = new Vector2(0f, 0.5f);
+            iChose.GetComponent<RectTransform>().anchorMax = new Vector2(0f, 0.5f);
+            iChose.GetComponent<RectTransform>().pivot = new Vector2(0f, 0.5f);
+            iChose.transform.localScale = Vector3.one * 0.8f;
+            iChose.GetComponent<RectTransform>().anchoredPosition = new Vector3(110, 0, 0);
+            iChose.GetComponent<Image>().sprite = Resources.FindObjectsOfTypeAll<Sprite>().ToList().Find(x => x.name == "Transparent");
+            GameObject theyChoose = new GameObject("Opponent_Chose", typeof(Image));
+            theyChoose.layer = LayerMask.NameToLayer("UI");
+            theyChoose.transform.SetParent(rockpaperscissors.transform.Find("TextCanvas").transform);
+            theyChoose.GetComponent<RectTransform>().anchorMin = new Vector2(1f, 0.5f);
+            theyChoose.GetComponent<RectTransform>().anchorMax = new Vector2(1f, 0.5f);
+            theyChoose.GetComponent<RectTransform>().pivot = new Vector2(1f, 0.5f);
+            theyChoose.transform.localScale = Vector3.one * 0.8f;
+            theyChoose.GetComponent<RectTransform>().anchoredPosition = new Vector3(-110, 0, 0);
+            theyChoose.GetComponent<Image>().sprite = Resources.FindObjectsOfTypeAll<Sprite>().ToList().Find(x => x.name == "Transparent");
+            rockpaperscissors.transform.Find("TextCanvas").gameObject.GetComponentInChildren<TMP_Text>().alignment = TextAlignmentOptions.Center;
+            rpsguy.rpsPre = rockpaperscissors.AddComponent<RockPaperScissors>();
+            rpsguy.rpsPre.hitTie = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "Hit 15.wav"), "Nothing", SoundType.Effect, Color.white);
+            rpsguy.rpsPre.hitTie.subtitle = false;
+            rpsguy.rpsPre.hitWin = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "Hit 7.wav"), "Nothing", SoundType.Effect, Color.white);
+            rpsguy.rpsPre.hitWin.subtitle = false;
+            rpsguy.rpsPre.hitLose = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "Hit 14.wav"), "Nothing", SoundType.Effect, Color.white);
+            rpsguy.rpsPre.hitLose.subtitle = false;
+            rpsguy.rpsPre.chosenSprites.AddRange([
+                AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "UI", "RPS_Rock.png"), 1f),
+                AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "UI", "RPS_Paper.png"), 1f),
+                AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "UI", "RPS_Scissors.png"), 1f)
+            ]);
 
             var errorbot = ObjectCreators.CreateNPC<ERRORBOT>("ERROR-BOT_ITEM-STEALER", EnumExtensions.ExtendEnum<Character>("ERRORBOT"), ObjectCreators.CreatePosterObject(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "ERRORBOT_ITEMSTEALER", "PRI_errorbot.png"), []), usesHeatMap: true, spawnableRooms: [RoomCategory.Hall]);
             AccessTools.DeclaredField(typeof(Navigator), "avoidRooms").SetValue(errorbot.Navigator, true);
@@ -551,7 +607,7 @@ namespace BCarnellChars
             securedYellowSwingingDoor.name = "SecuredLockDoor";
             securedYellowSwingingDoor.SetMainTexture(AssetLoader.TextureFromMod(this, "Texture2D", "SwingDoor_SecuredLocked.png"));
             //inflockedSwingDoor.GetComponent<SecuredSwingingDoor>().doorOverlay = securedYellowSwingingDoor;
-            inflockedSwingDoor.SetActive(false);
+            //inflockedSwingDoor.SetActive(false);
             inflockedSwingDoor.GetComponent<AudioManager>().enabled = false;
             DontDestroyOnLoad(inflockedSwingDoor);
             CoinDoorBuilder builder = Instantiate(Resources.FindObjectsOfTypeAll<CoinDoorBuilder>().ToList().Find(x => x.name == "CoinDoorBuilder"));

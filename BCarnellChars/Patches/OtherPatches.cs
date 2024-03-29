@@ -13,17 +13,6 @@ using UnityEngine.SceneManagement;
 
 namespace BCarnellChars.Patches
 {
-    [HarmonyPatch]
-    class MakeEmActive
-    {
-        [HarmonyPatch(typeof(CoinDoorBuilder), "Build")]
-        static void Prefix(ref SwingDoor ___doorPre)
-        {
-            if (!___doorPre.gameObject.activeSelf)
-                ___doorPre.gameObject.SetActive(true);
-        }
-    }
-
     [HarmonyPatch(typeof(FloodEvent), "Initialize")]
     class BasementDirtyWaterFill
     {
@@ -33,7 +22,7 @@ namespace BCarnellChars.Patches
             {
                 ___height = 10.1f;
                 ___volume = 3f;
-                ___riseSpeed = 3f;
+                ___riseSpeed = 1.5f;
             }
         }
     }

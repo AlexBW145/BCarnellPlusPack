@@ -17,10 +17,10 @@ namespace BCarnellChars.OtherStuff
         private void Start()
         {
             swingDoor = gameObject.GetComponent<SwingDoor>();
-            if (swingDoor == null)
+            if (swingDoor == null || swingDoor.ec == null)
                 return;
-            if (swingDoor.ec != null)
-                gameObject.GetComponent<AudioManager>().enabled = true;
+                
+            gameObject.GetComponent<AudioManager>().enabled = true;
 
             if (originalOverlays.Length == 0)
             {

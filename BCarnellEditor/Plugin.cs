@@ -1,5 +1,6 @@
 ﻿using BaldiLevelEditor;
 using BCarnellChars;
+using BCarnellChars.OtherStuff;
 using BepInEx;
 using HarmonyLib;
 using MTM101BaldAPI;
