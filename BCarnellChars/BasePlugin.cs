@@ -301,7 +301,7 @@ namespace BCarnellChars
             Destroy(rockpaperscissors.transform.Find("RopeCanvas").gameObject);
             Destroy(rockpaperscissors.transform.Find("TextCanvas").transform.Find("Count").gameObject);
             RawImage raw = rockpaperscissors.transform.Find("TextCanvas").gameObject.AddComponent<RawImage>();
-            raw.color = new Color(0f,0f,0f,0.50f);
+            raw.color = new Color(0f,0f,0f,0.50f); // Initial Color
             DontDestroyOnLoad(rockpaperscissors);
             rockpaperscissors.SetActive(false);
             Image uhf = new GameObject("Border", typeof(Image)).GetComponent<Image>();
@@ -309,7 +309,7 @@ namespace BCarnellChars
             uhf.transform.SetParent(rockpaperscissors.transform.Find("TextCanvas").transform);
             uhf.transform.localPosition = Vector3.zero;
             uhf.sprite = AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "UI", "RPS_border.png"), 1f);
-            uhf.transform.SetAsFirstSibling();
+            uhf.transform.SetAsFirstSibling(); // IT COVERS, SHIT IT INTO THE FIRST SIBLING!!
             uhf.rectTransform.sizeDelta = new Vector2(rockpaperscissors.transform.Find("TextCanvas").GetComponent<RectTransform>().sizeDelta.x, uhf.rectTransform.sizeDelta.y + 40);
             GameObject me = new GameObject("Player", typeof(RawImage));
             me.layer = LayerMask.NameToLayer("UI");
@@ -318,7 +318,7 @@ namespace BCarnellChars
             me.GetComponent<RectTransform>().anchorMax = new Vector2(0f, 0.5f);
             me.GetComponent<RectTransform>().pivot = new Vector2(0f, 0.5f);
             me.transform.localScale = Vector3.one * 0.5f;
-            me.GetComponent<RectTransform>().anchoredPosition = new Vector3(40, 0, 0);
+            me.GetComponent<RectTransform>().anchoredPosition = new Vector3(40, 0, 0); // Pro tip: anchoredPosition helps.
             me.GetComponent<RawImage>().texture = AssetLoader.TextureFromMod(this, "Texture2D", "UI", "RPS_Player.png");
             GameObject them = new GameObject("Opponent", typeof(RawImage));
             them.transform.SetParent(rockpaperscissors.transform.Find("TextCanvas").transform);
@@ -327,7 +327,7 @@ namespace BCarnellChars
             them.GetComponent<RectTransform>().anchorMax = new Vector2(1f, 0.5f);
             them.GetComponent<RectTransform>().pivot = new Vector2(1f, 0.5f);
             them.transform.localScale = Vector3.one * 0.5f;
-            them.GetComponent<RectTransform>().anchoredPosition = new Vector3(-40, 0, 0);
+            them.GetComponent<RectTransform>().anchoredPosition = new Vector3(-40, 0, 0); // Pro tip: anchoredPosition helps.
             them.GetComponent<RawImage>().texture = AssetLoader.TextureFromMod(this, "Texture2D", "UI", "RPS_RPSGuy.png");
             GameObject iChose = new GameObject("Player_Chose", typeof(Image));
             iChose.layer = LayerMask.NameToLayer("UI");
@@ -336,7 +336,7 @@ namespace BCarnellChars
             iChose.GetComponent<RectTransform>().anchorMax = new Vector2(0f, 0.5f);
             iChose.GetComponent<RectTransform>().pivot = new Vector2(0f, 0.5f);
             iChose.transform.localScale = Vector3.one * 0.8f;
-            iChose.GetComponent<RectTransform>().anchoredPosition = new Vector3(110, 0, 0);
+            iChose.GetComponent<RectTransform>().anchoredPosition = new Vector3(110, 0, 0); // Pro tip: anchoredPosition helps.
             iChose.GetComponent<Image>().sprite = Resources.FindObjectsOfTypeAll<Sprite>().ToList().Find(x => x.name == "Transparent");
             GameObject theyChoose = new GameObject("Opponent_Chose", typeof(Image));
             theyChoose.layer = LayerMask.NameToLayer("UI");
@@ -345,7 +345,7 @@ namespace BCarnellChars
             theyChoose.GetComponent<RectTransform>().anchorMax = new Vector2(1f, 0.5f);
             theyChoose.GetComponent<RectTransform>().pivot = new Vector2(1f, 0.5f);
             theyChoose.transform.localScale = Vector3.one * 0.8f;
-            theyChoose.GetComponent<RectTransform>().anchoredPosition = new Vector3(-110, 0, 0);
+            theyChoose.GetComponent<RectTransform>().anchoredPosition = new Vector3(-110, 0, 0); // Pro tip: anchoredPosition helps.
             theyChoose.GetComponent<Image>().sprite = Resources.FindObjectsOfTypeAll<Sprite>().ToList().Find(x => x.name == "Transparent");
             rockpaperscissors.transform.Find("TextCanvas").gameObject.GetComponentInChildren<TMP_Text>().alignment = TextAlignmentOptions.Center;
             rpsguy.rpsPre = rockpaperscissors.AddComponent<RockPaperScissors>();
@@ -424,6 +424,7 @@ namespace BCarnellChars
             AccessTools.DeclaredField(typeof(Navigator), "preciseTarget").SetValue(siegecart.Navigator, false);
             AccessTools.DeclaredField(typeof(Navigator), "autoRotate").SetValue(siegecart.Navigator, false);
             AccessTools.DeclaredField(typeof(Navigator), "decelerate").SetValue(siegecart.Navigator, true);
+            AccessTools.DeclaredField(typeof(Looker), "hasFov").SetValue(siegecart.looker, true);
             siegecart.Navigator.maxSpeed = 15f;
             siegecart.Navigator.accel = 15f;
             AccessTools.DeclaredField(typeof(NPC), "ignoreBelts").SetValue(siegecart, true);
@@ -518,6 +519,7 @@ namespace BCarnellChars
             ball.SetActive(false);
             ball.GetComponent<Entity>().SetActive(false);
             ball.layer = LayerMask.NameToLayer("StandardEntities"); // No wonder why it keeps setting to default...
+            ball.transform.Find("RendereBase").GetComponentInChildren<SpriteRenderer>().sprite = AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "StupidBall.png"), 48f);
 
             var portalman = ObjectCreators.CreateNPC<MrPortalMan>("Mr. Portal Man", EnumExtensions.ExtendEnum<Character>("MrPortalMan"), ObjectCreators.CreatePosterObject(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "Mr. Portal Man", "PRI_portalman.png"), []), usesHeatMap: true, spawnableRooms: [RoomCategory.Hall]);
             AccessTools.DeclaredField(typeof(Looker), "hasFov").SetValue(portalman.looker, false);
@@ -860,6 +862,12 @@ namespace BCarnellChars
             //Resources.FindObjectsOfTypeAll<SceneObject>().ToList().Find(x => x.name == "MainLevel_1").nextLevel = sBasement;
 
 #if DEBUG
+            lBasement.potentialNPCs.Add(
+                new WeightedNPC()
+                {
+                    selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("RPSGuy")).value,
+                    weight = 150
+                });
             /*var hi = 0;
             while (hi < 99)
             {

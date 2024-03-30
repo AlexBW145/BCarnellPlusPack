@@ -17,7 +17,7 @@ namespace BCarnellChars.Patches
             {
                 RPSGuy rps = GameObject.FindObjectOfType<RPSGuy>();
                 if (rps.Playing && !(Jumprope)AccessTools.DeclaredField(typeof(Playtime), "currentJumprope").GetValue(__instance))
-                    rps.EndRPS(false);
+                    rps.EndRPS(false, true);
             }
         }
     }

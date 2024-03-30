@@ -19,7 +19,7 @@ namespace BCarnellChars.Characters.States
         public override void PlayerLost(PlayerManager player)
         {
             base.PlayerLost(player);
-            rpsGuy.EndRPS(false);
+            rpsGuy.EndRPS(false, true);
         }
 
         public override void OnStateTriggerEnter(Collider other)

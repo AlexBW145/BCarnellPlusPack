@@ -20,7 +20,7 @@ namespace BCarnellTimes
     [HarmonyPatch(typeof(Hammer), "Use")]
     class ActLikeBHammer
     {
-        static bool Prefix(Hammer __instance, PlayerManager pm)
+        static bool Prefix(Hammer __instance, PlayerManager pm, ref bool __result)
         {
             if (pm.ec.Npcs.Find(x => x.Character == EnumExtensions.GetFromExtendedName<Character>("RPSGuy")))
             {
@@ -29,6 +29,7 @@ namespace BCarnellTimes
                 {
                     component2.fuckingDies();
                     MonoBehaviour.Destroy(__instance.gameObject);
+                    __result = true;
                     return false;
                 }
             }

@@ -15,7 +15,7 @@ namespace BCarnellChars.OtherStuff
     {
         private void Awake()
         {
-            // Apparently, this is too errorish with GetComponentInChildren<T>(), meaning that it'll fail to find.
+            // Apparently, this is too errorish with just gameObject.GetComponentInChildren<T>(), meaning that it'll fail to find if the children is in the parent's children.
             textCanvas = transform.Find("TextCanvas").GetComponent<Canvas>();
             textScaler = transform.Find("TextCanvas").GetComponent<CanvasScaler>();
             instructionsTmp = textCanvas.transform.Find("Instructions").GetComponent<TMP_Text>();
@@ -66,16 +66,17 @@ namespace BCarnellChars.OtherStuff
             transform.rotation = player.transform.rotation;
             if (CoreGameManager.Instance.Paused || checkDelay > 0 || !instructionsTmp.gameObject.activeSelf)
                 return;
+            // Why not enums? Because this old code is reused!
             if (!pickedChoice)
             {
                 opponentChoice = Mathf.RoundToInt(UnityEngine.Random.Range(0f, 2f)); //Pick a random type between 0 and 2
 
                 // Cannot use switch statements over this
-                if (Singleton<InputManager>.Instance.GetDigitalInput("Interact", true))
+                if (Singleton<InputManager>.Instance.GetDigitalInput("Interact", true)) // Rock
                     playerChoice = 0;
-                else if (Singleton<InputManager>.Instance.GetDigitalInput("Run", true))
+                else if (Singleton<InputManager>.Instance.GetDigitalInput("Run", true)) // Paper
                     playerChoice = 1;
-                else if (Singleton<InputManager>.Instance.GetDigitalInput("LookBack", true))
+                else if (Singleton<InputManager>.Instance.GetDigitalInput("LookBack", true)) // Scissors
                     playerChoice = 2;
 
                 if (Singleton<InputManager>.Instance.GetDigitalInput("Interact", true) || Singleton<InputManager>.Instance.GetDigitalInput("Run", true)
@@ -96,8 +97,8 @@ namespace BCarnellChars.OtherStuff
         {
             pickedChoice = true;
             StartCoroutine(CheckDelay(0.6f));
-            youChose.sprite = chosenSprites[playerChoice];
-            opponentChose.sprite = chosenSprites[opponentChoice];
+            youChose.sprite = chosenSprites[playerChoice]; // Feels more like...
+            opponentChose.sprite = chosenSprites[opponentChoice]; // Feels more optimized...
             instructionsTmp.text = LocalizationManager.Instance.GetLocalizedText("Hud_RPSGuy_Result" + playerChoice) + LocalizationManager.Instance.GetLocalizedText("Hud_RPSGuy_versus") + LocalizationManager.Instance.GetLocalizedText("Hud_RPSGuy_Result" + opponentChoice);
             if (playerChoice == 0 & opponentChoice == 0 || playerChoice == 1 & opponentChoice == 1 || playerChoice == 2 & opponentChoice == 2)
                 CoreGameManager.Instance.audMan.PlaySingle(hitTie);
@@ -126,7 +127,7 @@ namespace BCarnellChars.OtherStuff
                 opponent.gameObject.SetActive(false);
                 youChose.gameObject.SetActive(false);
                 opponentChose.gameObject.SetActive(false);
-                rps.EndRPS(true);
+                rps.EndRPS(true, false);
                 StartCoroutine(Fade(textCanvas.GetComponent<RawImage>(), false, transitionTime, () =>
                 {
                     Destroy();
@@ -142,7 +143,7 @@ namespace BCarnellChars.OtherStuff
                 youChose.gameObject.SetActive(false);
                 opponentChose.gameObject.SetActive(false);
                 rps.Losah();
-                rps.EndRPS(false);
+                rps.EndRPS(false, false);
                 StartCoroutine(Fade(textCanvas.GetComponent<RawImage>(), false, transitionTime, () =>
                 {
                     Destroy();

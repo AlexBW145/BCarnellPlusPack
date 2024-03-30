@@ -109,7 +109,7 @@ namespace BCarnellChars.Characters
             navigator.SetSpeed(normSpeed);
         }
 
-        public void EndRPS(bool won)
+        public void EndRPS(bool won, bool destroyGame)
         {
             if (won)
             {
@@ -118,7 +118,7 @@ namespace BCarnellChars.Characters
                 audMan.PlaySingle(audCongrats);
                 streakPoints += streakInitial;
             }
-            else if (!GlobalCam.Instance.TransitionActive || isDead)
+            if (destroyGame)
                 curRPS.Destroy();
             if (!isDead)
             {
@@ -190,7 +190,7 @@ namespace BCarnellChars.Characters
         {
             if (isDead) return;
             isDead = true;
-            if (curRPS != null) EndRPS(false);
+            if (curRPS != null) EndRPS(false, true);
             behaviorStateMachine.ChangeState(new RPSGuy_Cooldown(this, this, 30f));
             audMan.FlushQueue(true);
             audMan.PlaySingle(audDestroyed);
