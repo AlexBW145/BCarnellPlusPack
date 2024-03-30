@@ -3,7 +3,7 @@
 It's a Baldi's Basics Plus BepInEx mod that ports most stuff from B. Carnell's Monumental Alphabet Class to Baldi's super schoolhouse!
 
 # And where's the download link?
-TBA
+[GameBanana](https://gamebanana.com/mods/502889)
 
 # Sure, how do I help?
 You don't, you cannot add in new stuff. The only way to help and that is limited to is balancing stuff. (Of course I'll need later help on creations that ain't even code based!)
