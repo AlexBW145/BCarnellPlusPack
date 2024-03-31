@@ -519,6 +519,7 @@ namespace BCarnellChars
             ball.SetActive(false);
             ball.GetComponent<Entity>().SetActive(false);
             ball.layer = LayerMask.NameToLayer("StandardEntities"); // No wonder why it keeps setting to default...
+            Destroy(ball.transform.Find("RendereBase").Find("Particles").gameObject);
             ball.transform.Find("RendereBase").GetComponentInChildren<SpriteRenderer>().sprite = AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "StupidBall.png"), 48f);
 
             var portalman = ObjectCreators.CreateNPC<MrPortalMan>("Mr. Portal Man", EnumExtensions.ExtendEnum<Character>("MrPortalMan"), ObjectCreators.CreatePosterObject(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "Mr. Portal Man", "PRI_portalman.png"), []), usesHeatMap: true, spawnableRooms: [RoomCategory.Hall]);
