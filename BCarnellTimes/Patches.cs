@@ -1,6 +1,7 @@
 ﻿using BBTimes;
 using BBTimes.CustomComponents;
 using BBTimes.CustomContent.CustomItems;
+using BBTimes.ModPatches.GeneratorPatches;
 using BBTimes.Plugin;
 using BCarnellChars.Characters;
 using BCarnellChars.ItemStuff;
@@ -11,6 +12,7 @@ using MTM101BaldAPI.Reflection;
 using MTM101BaldAPI.Registers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -57,6 +59,15 @@ namespace BCarnellTimes
                 }
             }
             return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(PostRoomCreation), "ExecutePostRoomTasks")]
+    class WelcomeToTheUnderground
+    {
+        static bool Prefix()
+        {
+            return PostRoomCreation.i.ld.name != "Basement1";
         }
     }
 }

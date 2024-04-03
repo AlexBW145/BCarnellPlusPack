@@ -10,6 +10,7 @@ using UnityEngine.UIElements;
 using System.Collections;
 using MTM101BaldAPI.Registers;
 using HarmonyLib;
+using MTM101BaldAPI.Reflection;
 
 namespace BCarnellChars.Characters
 {
@@ -22,6 +23,11 @@ namespace BCarnellChars.Characters
         private SoundObject[] audItemGet;
         private SoundObject audScan;
         private SoundObject bang;
+        private SoundObject splat;
+
+        // WELL, I GUESS THAT THIS BOT IS STUPIDLY ANNOYING... THEN MAKE IT STOP MOVING WHEN THE PLAYER IS LOOKING AT ITS POSITION! (And that's why camMask exists...)
+        public LayerMask regularMask => LayerMask.GetMask("Default", "Block Raycast", "Player", "Windows");
+        public LayerMask camMask => LayerMask.GetMask("Player");
 
         private void Awake()
         {
@@ -34,7 +40,16 @@ namespace BCarnellChars.Characters
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(BasePlugin.Instance, "AudioClip", "NPCs", "ERRORBOT_ITEMSTEALER", "ERB_minenow.wav"), "Vfx_ERRORBOT_MineNow", SoundType.Voice, new Color(0.8f, 0.1647059f, 0.2f)),
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(BasePlugin.Instance, "AudioClip", "NPCs", "ERRORBOT_ITEMSTEALER", "ERB_byetoneeds.wav"), "Vfx_ERRORBOT_ByeToNeeds", SoundType.Voice, new Color(0.8f, 0.1647059f, 0.2f))];
             audScan = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(BasePlugin.Instance, "AudioClip", "NPCs", "ERRORBOT_ITEMSTEALER", "ERB_scanforwants.wav"), "Vfx_ERRORBOT_ScanForWants", SoundType.Voice, new Color(0.8f, 0.1647059f, 0.2f));
-            bang = Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(b => b.name == "Bang");
+            bang = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(BasePlugin.Instance, "AudioClip", "NPCs", "ERRORBOT_ITEMSTEALER", "grappleImpact.wav"), "Sfx_Bang", SoundType.Effect, new Color(0.8f, 0.1647059f, 0.2f));
+            splat = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(BasePlugin.Instance, "AudioClip", "NPCs", "ERRORBOT_ITEMSTEALER", "bsodaImpact.wav"), "Sfx_Items_NoSquee", SoundType.Effect, new Color(0.8f, 0.1647059f, 0.2f));
+            bang.additionalKeys = new SubtitleTimedKey[]
+            {
+                new SubtitleTimedKey(){key = "Sfx_ERRORBOT_Malfunction", time = 0.34f},
+            };
+            splat.additionalKeys = new SubtitleTimedKey[]
+            {
+                new SubtitleTimedKey(){key = "Sfx_ERRORBOT_Malfunction", time = 0.34f},
+            };
         }
 
         private void Start()
@@ -51,6 +66,7 @@ namespace BCarnellChars.Characters
 
         public void StartCooldown()
         {
+            looker.ReflectionSetVariable("layerMask", regularMask);
             Teleport();
             audMan.SetLoop(false);
             audMan.FlushQueue(true);
@@ -101,8 +117,10 @@ namespace BCarnellChars.Characters
 
         public void BecomeEvil(bool hasItems, PlayerManager player)
         {
+            looker.ReflectionSetVariable("layerMask", regularMask);
             if (hasItems)
             {
+                looker.ReflectionSetVariable("layerMask", camMask);
                 navigator.maxSpeed = 25f;
                 behaviorStateMachine.ChangeState(new ERRORBOT_WithItemsMode(this, this, player));
             }
@@ -137,12 +155,13 @@ namespace BCarnellChars.Characters
         {
             if (other.CompareTag("GrapplingHook") || other.GetComponent<ITM_BSODA>()) // Pierced
             {
+                looker.ReflectionSetVariable("layerMask", regularMask);
                 spriteRenderer[1].color = other.GetComponent<ITM_BSODA>() ? Color.blue : Color.grey;
                 behaviorStateMachine.ChangeState(new ERRORBOT_Cooldown(this, this, UnityEngine.Random.RandomRangeInt(60, 120)));
                 navigationStateMachine.ChangeState(new NavigationState_DoNothing(this, 99));
                 navigator.maxSpeed = 0;
                 navigator.SetSpeed(0);
-                if (other.CompareTag("GrapplingHook")) audMan.PlaySingle(bang);
+                audMan.PlaySingle(other.GetComponent<ITM_BSODA>() ? splat : bang);
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Rewired;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -19,14 +20,15 @@ namespace BCarnellChars.Characters.States
             base.Update();
             float distance = (erbot.transform.position - player.transform.position).magnitude;
             erbot.navigationStateMachine.ChangeState(new NavigationState_TargetPlayer(erbot, 99, player.transform.position));
+            npc.looker.Raycast(player.transform, Mathf.Min(distance, Mathf.Min(npc.looker.distance, npc.ec.MaxRaycast)), Singleton<CoreGameManager>.Instance.GetPlayer(player.playerNumber), erbot.regularMask, out bool _noObstacles);
             if (distance >= 10f && !erbot.looker.IsVisible)
                 erbot.Navigator.SetSpeed(25f);
-            else if (distance < 15f && erbot.looker.IsVisible && !erbot.GetComponent<Entity>().Squished)
+            else if (_noObstacles && distance < 15f && erbot.looker.PlayerInSight() && erbot.looker.IsVisible && !erbot.GetComponent<Entity>().Squished) // _noObstacles is just the usual layer mask for lookers...
                 erbot.SayByeByeToYourItems(player);
             else
                 erbot.Navigator.SetSpeed(0f);
 
-            // Player's weak point is exposed, they are fucking dead.
+            // Player's weak point is exposed, they are fucking dead!
             if (!player.itm.HasItem() && distance >= 15f)
             {
                 erbot.Navigator.maxSpeed = 0f;

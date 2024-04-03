@@ -1,7 +1,11 @@
-﻿using System;
+﻿using BepInEx.Logging;
+using MTM101BaldAPI.Reflection;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.UI;
+using static UnityEngine.GraphicsBuffer;
 
 namespace BCarnellChars.Characters.States
 {
@@ -19,6 +23,7 @@ namespace BCarnellChars.Characters.States
         private Vector3 nextTarget;
         private Vector3 _rotation;
         private IntVector2 currentStandardTargetPos;
+        //private IntVector2 standardTargetPos;
 
         private float _angleDiff;
 
@@ -52,7 +57,7 @@ namespace BCarnellChars.Characters.States
                 npc.Navigator.SetSpeed(0f);
             }
             else if (unseenDelay > 0f && (nextTarget == Vector3.zero || IntVector2.GetGridPosition(nextTarget) == IntVector2.GetGridPosition(npc.Navigator.CurrentDestination))) {
-                TargetPosition(npc.ec.CellFromPosition(npc.transform.position).CenterWorldPosition);
+                TargetPosition(npc.ec.CellFromPosition(npc.transform.position).FloorWorldPosition);
                 npc.Navigator.maxSpeed = siegeCart.wanderSpeed + 2f;
             }
             else
@@ -110,23 +115,30 @@ namespace BCarnellChars.Characters.States
         {
             if (!player.Tagged)
             {
-                TargetPosition(npc.ec.CellFromPosition(npc.transform.position).CenterWorldPosition);
-                npc.Navigator.maxSpeed = siegeCart.wanderSpeed + 2f;
-                if (npc.Navigator.speed < 0.01f)
-                    npc.transform.LookAt(npc.ec.CellFromPosition(player.transform.position).CenterWorldPosition);
+                // This shitty code took me awhile to figure out the math...
+                Vector3 vector = player.transform.position - npc.transform.position;
+                if (npc.Navigator.speed < 0.01f && IntVector2.GetGridPosition(npc.transform.position) == IntVector2.GetGridPosition(npc.ec.CellFromPosition(npc.transform.position).FloorWorldPosition))
+                    TargetPosition(player.transform.position);
+                else
+                    TargetPosition(npc.ec.CellFromPosition(npc.transform.position).FloorWorldPosition);
                 if (shootyCooldown <= 0f)
                 {
                     unseenDelay = 1f;
-                    if (shootyFireTime < 4f && npc.Navigator.speed <= 0.01f && npc.ec.CellFromPosition(npc.transform.position).CenterWorldPosition == npc.ec.CellFromPosition(nextTarget).CenterWorldPosition)
+                    if (shootyFireTime < 4f && npc.Navigator.speed <= 1f)
                         shootyFireTime += Time.deltaTime * npc.TimeScale;
-                    else
+                    else if (npc.Navigator.speed < 0.01f
+                        && IntVector2.GetGridPosition(npc.transform.position) == IntVector2.GetGridPosition(npc.ec.CellFromPosition(npc.transform.position).FloorWorldPosition) &&
+                        Vector3.Angle(npc.transform.forward, vector) <= 11.25f && vector != Vector3.zero)
                     {
+                        npc.transform.LookAt(npc.ec.CellFromPosition(player.transform.position).CenterWorldPosition); // In case of grid snapping...
                         shootyFireTime = 0;
                         shootyCooldown = 7f;
                         siegeCart.Shoot();
                     }
                 }
             }
+            else if (unseenDelay > 0f)
+                unseenDelay = 0f;
         }
 
         private void LostPlayer()

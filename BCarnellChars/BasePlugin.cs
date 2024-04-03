@@ -424,7 +424,7 @@ namespace BCarnellChars
             AccessTools.DeclaredField(typeof(Navigator), "preciseTarget").SetValue(siegecart.Navigator, false);
             AccessTools.DeclaredField(typeof(Navigator), "autoRotate").SetValue(siegecart.Navigator, false);
             AccessTools.DeclaredField(typeof(Navigator), "decelerate").SetValue(siegecart.Navigator, true);
-            AccessTools.DeclaredField(typeof(Looker), "hasFov").SetValue(siegecart.looker, true);
+            //AccessTools.DeclaredField(typeof(Looker), "hasFov").SetValue(siegecart.looker, true);
             siegecart.Navigator.maxSpeed = 15f;
             siegecart.Navigator.accel = 15f;
             AccessTools.DeclaredField(typeof(NPC), "ignoreBelts").SetValue(siegecart, true);

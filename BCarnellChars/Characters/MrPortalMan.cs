@@ -123,6 +123,10 @@ namespace BCarnellChars.Characters
 
         public void TeleportAnIdiot(Entity idiot)
         {
+            if (idiot.CompareTag("GrapplingHook"))
+                idiot.GetComponent<ITM_GrapplingHook>().pressure = 9999f;
+            if (idiot.CompareTag("GrapplingHook") || idiot.GetComponent<Balloon>())
+                return;
             if (!idiot.CompareTag("Player")) {
                 audMan.PlaySingle(teleport);
                 if (idiot.GetComponent<AudioManager>() != null) idiot.GetComponent<AudioManager>().PlaySingle(teleport);
