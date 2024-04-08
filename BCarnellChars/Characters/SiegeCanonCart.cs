@@ -72,6 +72,7 @@ namespace BCarnellChars.Characters
             ball.transform.rotation = transform.rotation;
             ball.GetComponent<Entity>().Initialize(ec, transform.position);
             ball.GetComponent<Entity>().SetActive(true);
+            if (gameObject.GetComponent<Entity>().Squished) ball.GetComponent<Entity>().Squish((float)gameObject.GetComponent<Entity>().ReflectionGetVariable("squishTime"));
             audMan.PlaySingle(bang);
             animator.Play("Shoot", 1f);
         }

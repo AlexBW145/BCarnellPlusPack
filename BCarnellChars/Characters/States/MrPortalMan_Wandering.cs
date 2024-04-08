@@ -44,9 +44,9 @@ namespace BCarnellChars.Characters.States
                 portalMan.Questioning();
 
             if (currentTarget != null)
-                portalMan.navigationStateMachine.ChangeState(new NavigationState_TargetPosition(portalMan, 63, currentTarget.transform.position));
+                ChangeNavigationState(new NavigationState_TargetPosition(portalMan, 63, currentTarget.transform.position));
             else if (currentTarget == null && !portalMan.Navigator.HasDestination)
-                portalMan.navigationStateMachine.ChangeState(new NavigationState_WanderRandom(portalMan, 0));
+                ChangeNavigationState(new NavigationState_WanderRandom(portalMan, 0));
         }
 
         public override void PlayerSighted(PlayerManager player)

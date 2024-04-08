@@ -53,7 +53,7 @@ namespace BCarnellChars.Characters
             base.Initialize();
             //masking.enabled = false;
             behaviorStateMachine.ChangeState(new MrPortalMan_Cooldown(this, UnityEngine.Random.RandomRangeInt(40, 80)));
-            navigationStateMachine.ChangeState(new NavigationState_DoNothing(this, 0));
+            behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 0));
             navigator.maxSpeed = 0;
             navigator.SetSpeed(0);
             spriteRenderer[0].gameObject.SetActive(false);
@@ -127,12 +127,21 @@ namespace BCarnellChars.Characters
                 idiot.GetComponent<ITM_GrapplingHook>().pressure = 9999f;
             if (idiot.CompareTag("GrapplingHook") || idiot.GetComponent<Balloon>())
                 return;
-            if (!idiot.CompareTag("Player")) {
+            if (!idiot.CompareTag("Player"))
+            {
                 audMan.PlaySingle(teleport);
                 if (idiot.GetComponent<AudioManager>() != null) idiot.GetComponent<AudioManager>().PlaySingle(teleport);
             }
             else
+            {
                 CoreGameManager.Instance.audMan.PlaySingle(teleport);
+                if (FindObjectOfType<ITM_GrapplingHook>())
+                {
+                    ITM_GrapplingHook grapple = FindObjectOfType<ITM_GrapplingHook>();
+                    if (grapple.pressure < 9999f)
+                        grapple.pressure = 9999f;
+                }
+            }
             int random = UnityEngine.Random.Range(0, portals.Count);
             idiot.transform.position = portals[random].position + Vector3.back * 5f;
             idiot.transform.rotation = portals[random].rotation;
@@ -147,7 +156,7 @@ namespace BCarnellChars.Characters
             StartCoroutine(hideFade());
             baseTrigger[0].enabled = false;
             behaviorStateMachine.ChangeState(new MrPortalMan_Cooldown(this, UnityEngine.Random.RandomRangeInt(40, 80)));
-            navigationStateMachine.ChangeState(new NavigationState_DoNothing(this, 0));
+            behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 0));
             navigator.maxSpeed = 0;
             navigator.SetSpeed(0);
         }

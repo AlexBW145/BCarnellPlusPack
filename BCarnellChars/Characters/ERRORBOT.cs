@@ -71,7 +71,7 @@ namespace BCarnellChars.Characters
             audMan.SetLoop(false);
             audMan.FlushQueue(true);
             behaviorStateMachine.ChangeState(new ERRORBOT_Cooldown(this, this, UnityEngine.Random.RandomRangeInt(60, 120)));
-            navigationStateMachine.ChangeState(new NavigationState_DoNothing(this, 99));
+            behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 99));
             navigator.maxSpeed = 0;
             navigator.SetSpeed(0);
             spriteRenderer[1].color = Color.grey;
@@ -141,6 +141,13 @@ namespace BCarnellChars.Characters
             {
                 Principal pri = ec.Npcs.Find(p => p.Character == Character.Principal).GetComponent<Principal>();
                 pri.WhistleReact(transform.position);
+                if (!(bool)pri.ReflectionGetVariable("allKnowing"))
+                    pri.behaviorStateMachine.ChangeState(new Principal_ChasingPlayer(pri, player));
+                else
+                    pri.behaviorStateMachine.ChangeState(new Principal_ChasingPlayer_AllKnowing(pri, player));
+
+                pri.ReflectionSetVariable("targetedPlayer", player);
+                pri.Scold(player.ruleBreak);
             }
         }
 
@@ -158,7 +165,7 @@ namespace BCarnellChars.Characters
                 looker.ReflectionSetVariable("layerMask", regularMask);
                 spriteRenderer[1].color = other.GetComponent<ITM_BSODA>() ? Color.blue : Color.grey;
                 behaviorStateMachine.ChangeState(new ERRORBOT_Cooldown(this, this, UnityEngine.Random.RandomRangeInt(60, 120)));
-                navigationStateMachine.ChangeState(new NavigationState_DoNothing(this, 99));
+                behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 99));
                 navigator.maxSpeed = 0;
                 navigator.SetSpeed(0);
                 audMan.PlaySingle(other.GetComponent<ITM_BSODA>() ? splat : bang);
