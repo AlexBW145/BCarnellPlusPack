@@ -35,21 +35,13 @@ namespace BCarnellChars.Characters
             audMan.audioDevice = gameObject.AddComponent<AudioSource>();
             staticMan = gameObject.GetComponents<AudioManager>()[1];
 
-            audAlarm = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(BasePlugin.Instance, "AudioClip", "NPCs", "ERRORBOT_ITEMSTEALER", "ERB_alarm.wav"), "SFX_Items_AntiHearing", SoundType.Effect, new Color(0.8f, 0.1647059f, 0.2f));
+            audAlarm = BasePlugin.bcppAssets.Get<SoundObject>("ERRORBOT/Alarm");
             audItemGet = [
-                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(BasePlugin.Instance, "AudioClip", "NPCs", "ERRORBOT_ITEMSTEALER", "ERB_minenow.wav"), "Vfx_ERRORBOT_MineNow", SoundType.Voice, new Color(0.8f, 0.1647059f, 0.2f)),
-                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(BasePlugin.Instance, "AudioClip", "NPCs", "ERRORBOT_ITEMSTEALER", "ERB_byetoneeds.wav"), "Vfx_ERRORBOT_ByeToNeeds", SoundType.Voice, new Color(0.8f, 0.1647059f, 0.2f))];
-            audScan = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(BasePlugin.Instance, "AudioClip", "NPCs", "ERRORBOT_ITEMSTEALER", "ERB_scanforwants.wav"), "Vfx_ERRORBOT_ScanForWants", SoundType.Voice, new Color(0.8f, 0.1647059f, 0.2f));
-            bang = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(BasePlugin.Instance, "AudioClip", "NPCs", "ERRORBOT_ITEMSTEALER", "grappleImpact.wav"), "Sfx_Bang", SoundType.Effect, new Color(0.8f, 0.1647059f, 0.2f));
-            splat = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(BasePlugin.Instance, "AudioClip", "NPCs", "ERRORBOT_ITEMSTEALER", "bsodaImpact.wav"), "Sfx_Items_NoSquee", SoundType.Effect, new Color(0.8f, 0.1647059f, 0.2f));
-            bang.additionalKeys = new SubtitleTimedKey[]
-            {
-                new SubtitleTimedKey(){key = "Sfx_ERRORBOT_Malfunction", time = 0.34f},
-            };
-            splat.additionalKeys = new SubtitleTimedKey[]
-            {
-                new SubtitleTimedKey(){key = "Sfx_ERRORBOT_Malfunction", time = 0.34f},
-            };
+                BasePlugin.bcppAssets.Get<SoundObject>("ERRORBOT/MineNow"), BasePlugin.bcppAssets.Get<SoundObject>("ERRORBOT/ByeToNeeds")
+                ];
+            audScan = BasePlugin.bcppAssets.Get<SoundObject>("ERRORBOT/Scanning");
+            bang = BasePlugin.bcppAssets.Get<SoundObject>("ERRORBOT/Jammed");
+            splat = BasePlugin.bcppAssets.Get<SoundObject>("ERRORBOT/Sprayed");
         }
 
         private void Start()

@@ -101,11 +101,11 @@ namespace BCarnellChars.OtherStuff
             opponentChose.sprite = chosenSprites[opponentChoice]; // Feels more optimized...
             instructionsTmp.text = LocalizationManager.Instance.GetLocalizedText("Hud_RPSGuy_Result" + playerChoice) + LocalizationManager.Instance.GetLocalizedText("Hud_RPSGuy_versus") + LocalizationManager.Instance.GetLocalizedText("Hud_RPSGuy_Result" + opponentChoice);
             if (playerChoice == 0 & opponentChoice == 0 || playerChoice == 1 & opponentChoice == 1 || playerChoice == 2 & opponentChoice == 2)
-                CoreGameManager.Instance.audMan.PlaySingle(hitTie);
+                CoreGameManager.Instance.audMan.PlaySingle(hitSounds[0]);
             else if (playerChoice == 0 & opponentChoice == 2 || playerChoice == 2 & opponentChoice == 1 || playerChoice == 1 & opponentChoice == 0)
-                CoreGameManager.Instance.audMan.PlaySingle(hitWin);
+                CoreGameManager.Instance.audMan.PlaySingle(hitSounds[1]);
             else if (playerChoice == 0 & opponentChoice == 1 || playerChoice == 1 & opponentChoice == 2 || playerChoice == 2 & opponentChoice == 0)
-                CoreGameManager.Instance.audMan.PlaySingle(hitLose);
+                CoreGameManager.Instance.audMan.PlaySingle(hitSounds[2]);
         }
 
         private void checkRPS()
@@ -209,9 +209,7 @@ namespace BCarnellChars.OtherStuff
         public EnvironmentController ec;
         public PlayerManager player;
 
-        public SoundObject hitWin;
-        public SoundObject hitLose;
-        public SoundObject hitTie;
+        public List<SoundObject> hitSounds = new List<SoundObject>();
         public List<Sprite> chosenSprites = new List<Sprite>();
     }
 }

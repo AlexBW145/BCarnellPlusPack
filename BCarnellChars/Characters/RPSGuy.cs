@@ -54,12 +54,12 @@ namespace BCarnellChars.Characters
         {
             audMan = gameObject.GetComponents<PropagatedAudioManager>()[0];
             audMan.audioDevice = gameObject.AddComponent<AudioSource>();
-            alive = AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(BasePlugin.Instance, "Texture2D", "NPCs", "RPS Guy", "RPSDude.png"), 100);
-            dead = AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(BasePlugin.Instance, "Texture2D", "NPCs", "RPS Guy", "RPSDead.png"), 100);
+            alive = BasePlugin.bcppAssets.Get<Sprite>("RPSGuy/Alive");
+            dead = BasePlugin.bcppAssets.Get<Sprite>("RPSGuy/Dead");
 
-            audCongrats = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(BasePlugin.Instance, "AudioClip", "NPCs", "RPS Guy", "RPS_lose.wav"), "Vfx_RPS_lost", SoundType.Voice, new Color(0.7176471f, 0.6941177f, 0.6235294f));
-            audYouLose = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(BasePlugin.Instance, "AudioClip", "NPCs", "RPS Guy", "RPS_win.wav"), "Vfx_RPS_win", SoundType.Voice, new Color(0.7176471f, 0.6941177f, 0.6235294f));
-            audDestroyed = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(BasePlugin.Instance, "AudioClip", "NPCs", "RPS Guy", "RPS_dies.wav"), "Sfx_AppleCrunch", SoundType.Effect, Color.white);
+            audCongrats = BasePlugin.bcppAssets.Get<SoundObject>("RPSGuy/LostGame");
+            audYouLose = BasePlugin.bcppAssets.Get<SoundObject>("RPSGuy/WonGame");
+            audDestroyed = BasePlugin.bcppAssets.Get<SoundObject>("RPSGuy/Killed");
 
             spriteRenderer[0].sprite = alive;
         }

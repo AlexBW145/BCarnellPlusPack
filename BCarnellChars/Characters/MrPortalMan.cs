@@ -30,16 +30,21 @@ namespace BCarnellChars.Characters
             TileShape.Single
         };
 
-        //public MeshRenderer masking;
+        public Camera portalmanCam;
+        public Camera outputCamPre;
+        private Camera outputCam;
+        private Transform currentOutput;
 
         private void Awake()
         {
             audMan = gameObject.GetComponents<AudioManager>()[0];
 
-            audHungry = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(BasePlugin.Instance, "AudioClip", "NPCs", "Mr. Portal Man", "PTM_Intro.wav"), "Vfx_MrPortalMan_Intro", SoundType.Voice, new Color(1f, 0.6470588f, 0.1529412f));
-            audWhere = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(BasePlugin.Instance, "AudioClip", "NPCs", "Mr. Portal Man", "PTM_Questioning.wav"), "Vfx_MrPortalMan_WhereIs", SoundType.Voice, new Color(1f, 0.6470588f, 0.1529412f));
-            audFulfilled = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(BasePlugin.Instance, "AudioClip", "NPCs", "Mr. Portal Man", "PTM_End.wav"), "Vfx_MrPortalMan_Fulfilled", SoundType.Voice, new Color(1f, 0.6470588f, 0.1529412f));
+            audHungry = BasePlugin.bcppAssets.Get<SoundObject>("MrPortalMan/Hungry");
+            audWhere = BasePlugin.bcppAssets.Get<SoundObject>("MrPortalMan/WhereIs");
+            audFulfilled = BasePlugin.bcppAssets.Get<SoundObject>("MrPortalMan/Fullfilled");
             teleport = Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(b => b.name == "Teleport");
+
+            spriteRenderer[1].sprite = AssetLoader.SpriteFromTexture2D(Render(outputCamPre.targetTexture), 34f);
         }
 
         private void Start()
@@ -51,12 +56,17 @@ namespace BCarnellChars.Characters
         public override void Initialize()
         {
             base.Initialize();
-            //masking.enabled = false;
+            portalmanCam.enabled = true;
+            outputCam = Instantiate(outputCamPre, transform, false);
+            outputCam.gameObject.SetActive(true);
+            outputCam.enabled = true;
+            spriteRenderer[1].sprite = AssetLoader.SpriteFromTexture2D(Render(outputCam.targetTexture), 34f);
             behaviorStateMachine.ChangeState(new MrPortalMan_Cooldown(this, UnityEngine.Random.RandomRangeInt(40, 80)));
             behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 0));
             navigator.maxSpeed = 0;
             navigator.SetSpeed(0);
-            spriteRenderer[0].gameObject.SetActive(false);
+            foreach (SpriteRenderer render in spriteRenderer)
+                render.gameObject.SetActive(false);
             baseTrigger[0].enabled = false;
 
             List<RoomController> list = new List<RoomController>();
@@ -74,6 +84,14 @@ namespace BCarnellChars.Characters
                 SpawnBoard(list[index]);
                 list.RemoveAt(index);
             }
+        }
+
+        private void LateUpdate()
+        {
+            if (!gameObject.activeSelf || Time.timeScale == 0)
+                return;
+            Render(portalmanCam.targetTexture);
+            Render(outputCam.targetTexture);
         }
 
         private void SpawnBoard(RoomController room)
@@ -100,16 +118,16 @@ namespace BCarnellChars.Characters
 
         public void StartToDevour()
         {
-            //masking.enabled = true;
-            int random = UnityEngine.Random.Range(0, portals.Count);
-            transform.position = portals[random].position + Vector3.back * 5f;
-            transform.rotation = portals[random].rotation;
+            SwitchOutput();
+            transform.position = currentOutput.position + Vector3.back * 5f;
+            transform.rotation = currentOutput.rotation;
 
             audMan.PlaySingle(audHungry);
             behaviorStateMachine.ChangeState(new MrPortalMan_Wandering(this));
             navigator.maxSpeed = 18;
             navigator.SetSpeed(18);
-            spriteRenderer[0].gameObject.SetActive(true);
+            foreach (SpriteRenderer render in spriteRenderer)
+                render.gameObject.SetActive(true);
             baseTrigger[0].enabled = true;
             StartCoroutine(showFade());
         }
@@ -142,9 +160,9 @@ namespace BCarnellChars.Characters
                         grapple.pressure = 9999f;
                 }
             }
-            int random = UnityEngine.Random.Range(0, portals.Count);
-            idiot.transform.position = portals[random].position + Vector3.back * 5f;
-            idiot.transform.rotation = portals[random].rotation;
+            idiot.transform.position = currentOutput.position + Vector3.back * 5f;
+            idiot.transform.rotation = currentOutput.rotation;
+            SwitchOutput();
         }
 
         public void Rest()
@@ -167,10 +185,12 @@ namespace BCarnellChars.Characters
             while (spriteRenderer[0].color.a > 0)
             {
                 alpha -= 0.2f * (Time.deltaTime * TimeScale);
-                spriteRenderer[0].color = new Color(spriteRenderer[0].color.r, spriteRenderer[0].color.g, spriteRenderer[0].color.b, alpha);
+                foreach (SpriteRenderer render in spriteRenderer)
+                    render.color = new Color(spriteRenderer[0].color.r, spriteRenderer[0].color.g, spriteRenderer[0].color.b, alpha);
                 yield return null;
             }
-            spriteRenderer[0].color = new Color(spriteRenderer[0].color.r, spriteRenderer[0].color.g, spriteRenderer[0].color.b, 0);
+            foreach (SpriteRenderer render in spriteRenderer)
+                render.color = new Color(spriteRenderer[0].color.r, spriteRenderer[0].color.g, spriteRenderer[0].color.b, 0f);
             yield break;
         }
 
@@ -180,10 +200,12 @@ namespace BCarnellChars.Characters
             while (spriteRenderer[0].color.a < 1)
             {
                 alpha += 0.2f * (Time.deltaTime * TimeScale);
-                spriteRenderer[0].color = new Color(spriteRenderer[0].color.r, spriteRenderer[0].color.g, spriteRenderer[0].color.b, alpha);
+                foreach (SpriteRenderer render in spriteRenderer)
+                    render.color = new Color(spriteRenderer[0].color.r, spriteRenderer[0].color.g, spriteRenderer[0].color.b, alpha);
                 yield return null;
             }
-            spriteRenderer[0].color = new Color(spriteRenderer[0].color.r, spriteRenderer[0].color.g, spriteRenderer[0].color.b, 1);
+            foreach (SpriteRenderer render in spriteRenderer)
+                render.color = new Color(spriteRenderer[0].color.r, spriteRenderer[0].color.g, spriteRenderer[0].color.b, 1f);
             yield break;
         }
 
@@ -194,6 +216,27 @@ namespace BCarnellChars.Characters
             foreach (Transform portal in portals)
                 Destroy(portal.gameObject);
             portals.Clear();
+        }
+
+        private void SwitchOutput()
+        {
+            int random = UnityEngine.Random.Range(0, portals.Count);
+            outputCam.transform.SetParent(portals[random].transform, false);
+            outputCam.transform.rotation.eulerAngles.Set(0f, 180f, 0f);
+            currentOutput = portals[random];
+        }
+
+        private Texture2D Render(RenderTexture rTex)
+        {
+            Texture2D tex = new Texture2D(rTex.width, rTex.height, TextureFormat.RGB24, false);
+            var old_rt = RenderTexture.active;
+            RenderTexture.active = rTex;
+
+            tex.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
+            tex.Apply();
+
+            RenderTexture.active = old_rt;
+            return tex;
         }
     }
 }

@@ -22,7 +22,7 @@ namespace BCarnellChars.GeneratorStuff
             transform.position = tile.room.ec.RealRoomMid(tile.room) + Vector3.up * 5f;
 
             MaterialModifier.ChangeHole(quad.GetComponent<MeshRenderer>(), mask, quad.GetComponent<MeshRenderer>().materials[1]);
-            MaterialModifier.SetBase(quad.GetComponent<MeshRenderer>(), Resources.FindObjectsOfTypeAll<Texture2D>().ToList().Find(x => x.name == "StoreWJohnny_Blank"));
+            MaterialModifier.SetBase(quad.GetComponent<MeshRenderer>(), BasePlugin.bcppAssets.Get<RenderTexture>("MrPortalMan/ManCamRender"));
             return quad.transform;
         }
     }
