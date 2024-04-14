@@ -33,6 +33,7 @@ namespace BCarnellChars.Characters
         public Camera portalmanCam;
         public Camera outputCamPre;
         private Camera outputCam;
+        public Camera OutputCam => outputCam;
         private Transform currentOutput;
 
         private void Awake()
@@ -43,8 +44,6 @@ namespace BCarnellChars.Characters
             audWhere = BasePlugin.bcppAssets.Get<SoundObject>("MrPortalMan/WhereIs");
             audFulfilled = BasePlugin.bcppAssets.Get<SoundObject>("MrPortalMan/Fullfilled");
             teleport = Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(b => b.name == "Teleport");
-
-            spriteRenderer[1].sprite = AssetLoader.SpriteFromTexture2D(Render(outputCamPre.targetTexture), 34f);
         }
 
         private void Start()
@@ -91,7 +90,6 @@ namespace BCarnellChars.Characters
             if (!gameObject.activeSelf || Time.timeScale == 0)
                 return;
             Render(portalmanCam.targetTexture);
-            Render(outputCam.targetTexture);
         }
 
         private void SpawnBoard(RoomController room)
@@ -141,6 +139,8 @@ namespace BCarnellChars.Characters
 
         public void TeleportAnIdiot(Entity idiot)
         {
+            if (idiot.CompareTag("NPC") && !idiot.GetComponent<Navigator>().isActiveAndEnabled)
+                return;
             if (idiot.CompareTag("GrapplingHook"))
                 idiot.GetComponent<ITM_GrapplingHook>().pressure = 9999f;
             if (idiot.CompareTag("GrapplingHook") || idiot.GetComponent<Balloon>())
@@ -161,7 +161,7 @@ namespace BCarnellChars.Characters
                 }
             }
             idiot.transform.position = currentOutput.position + Vector3.back * 5f;
-            idiot.transform.rotation = currentOutput.rotation;
+            idiot.transform.rotation = currentOutput.rotation;   
             SwitchOutput();
         }
 
@@ -218,12 +218,21 @@ namespace BCarnellChars.Characters
             portals.Clear();
         }
 
+        private void OnDestroy()
+        {
+            if (spriteRenderer[1].sprite != null)
+                Destroy(spriteRenderer[1].sprite);
+        }
+
         private void SwitchOutput()
         {
             int random = UnityEngine.Random.Range(0, portals.Count);
             outputCam.transform.SetParent(portals[random].transform, false);
-            outputCam.transform.rotation.eulerAngles.Set(0f, 180f, 0f);
+            outputCam.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
             currentOutput = portals[random];
+            if (spriteRenderer[1].sprite != null)
+                Destroy(spriteRenderer[1].sprite); // I don't want to fill up de assets!
+            spriteRenderer[1].sprite = AssetLoader.SpriteFromTexture2D(Render(outputCam.targetTexture), 34f);
         }
 
         private Texture2D Render(RenderTexture rTex)

@@ -34,7 +34,7 @@ namespace BCarnellChars.OtherStuff
             publicActive = true;
             transform.position = player.cameraBase.position;
             player.plm.am.moveMods.Add(moveMod);
-            CoreGameManager.Instance.GetCamera(player.playerNumber).UpdateTargets(transform, 24);
+            //CoreGameManager.Instance.GetCamera(player.playerNumber).UpdateTargets(transform, 24);
             textCanvas.worldCamera = CoreGameManager.Instance.GetCamera(player.playerNumber).canvasCam;
             textCanvas.transform.SetParent(null);
             textCanvas.transform.position = Vector3.zero;
@@ -88,7 +88,7 @@ namespace BCarnellChars.OtherStuff
         public void Destroy()
         {
             player.plm.am.moveMods.Remove(moveMod);
-            Singleton<CoreGameManager>.Instance.GetCamera(player.playerNumber).UpdateTargets(null, 24);
+            //Singleton<CoreGameManager>.Instance.GetCamera(player.playerNumber).UpdateTargets(null, 24);
             Destroy(textCanvas.gameObject);
             Destroy(gameObject);
         }

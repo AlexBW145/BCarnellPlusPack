@@ -27,24 +27,45 @@ namespace BCarnellChars.Patches
     class CullingPortal
     {
         private static Cell currentCell;
+        private static Cell currentCellOutputCam;
         private static int currentChunkId = -1;
+        private static int currentChunkIdOutputCam = -1;
         static void Postfix(CullingManager __instance, ref EnvironmentController ___ec, ref bool ___active, ref bool ___manualMode)
         {
             if (___ec.Npcs.Find(x => x.Character == EnumExtensions.GetFromExtendedName<Character>("MrPortalMan")))
             {
                 MrPortalMan poo = ___ec.Npcs.Find(x => x.Character == EnumExtensions.GetFromExtendedName<Character>("MrPortalMan")).gameObject.GetComponent<MrPortalMan>();
-                if (poo && poo.portalmanCam != null && ___ec.ContainsCoordinates(IntVector2.GetGridPosition(poo.portalmanCam.transform.position)))
+                if (poo)
                 {
-                    currentCell = ___ec.CellFromPosition(poo.portalmanCam.transform.position);
-                    if (currentCell.HasChunk && currentCell.Chunk.Id != currentChunkId && ___active && !___manualMode)
+                    if (poo.portalmanCam != null && ___ec.ContainsCoordinates(IntVector2.GetGridPosition(poo.portalmanCam.transform.position)))
                     {
-                        __instance.RenderChunk(currentCell.Chunk.Id, true);
+                        currentCell = ___ec.CellFromPosition(poo.portalmanCam.transform.position);
+                        if (currentCell.HasChunk && currentCell.Chunk.Id != currentChunkId)
+                            currentChunkId = currentCell.Chunk.Id;
                     }
+                    if (poo.OutputCam != null && ___ec.ContainsCoordinates(IntVector2.GetGridPosition(poo.OutputCam.transform.position)))
+                    {
+                        currentCellOutputCam = ___ec.CellFromPosition(poo.OutputCam.transform.position);
+                        if (currentCellOutputCam.HasChunk && currentCellOutputCam.Chunk.Id != currentChunkIdOutputCam)
+                            currentChunkIdOutputCam = currentCellOutputCam.Chunk.Id;
+                    }
+
+                }
+                if (___active && !___manualMode) {
+                    for (int i = 0; i < __instance.allChunks[currentChunkId].visibleChunks.Length; i++)
+                    {
+                        if (__instance.allChunks[i].Rendering)
+                            continue;
+                        __instance.allChunks[i].Render(__instance.allChunks[currentChunkId].visibleChunks[i]);
+                    }
+                    if (!__instance.allChunks[currentChunkIdOutputCam].Rendering)
+                        __instance.RenderChunk(currentChunkIdOutputCam, true);
                 }
             }
             else if (currentCell != null)
             {
                 currentChunkId = -1;
+                currentChunkIdOutputCam = -1;
                 currentCell = null;
             }
         }

@@ -168,7 +168,7 @@ namespace BCarnellChars.Characters
         {
             playing = true;
             if (curRPS != null)
-                Destroy(curRPS);
+                curRPS.Destroy();
             // IF PLAYTIME IS PLAYIN' WITH PLAYER, MAKE HER SAD BCUS SHE WAS INTERRUPTED!!
             if (player.jumpropes.Count > 0)
             {
@@ -181,7 +181,7 @@ namespace BCarnellChars.Characters
             curRPS.player = player;
             curRPS.rps = this;
             navigator.maxSpeed = 0f;
-            navigator.Entity.AddForce(new Force(base.transform.position - player.transform.position, 20f, -60f));
+            navigator.Entity.AddForce(new Force(transform.position - player.transform.position, 20f, -60f));
             //audMan.PlaySingle(audGo);
             behaviorStateMachine.ChangeState(new RPSGuy_Playing(this, this));
         }

@@ -803,7 +803,7 @@ namespace BCarnellChars
             portalman.portalmanCam.name = "MrPortalManCamera";
             portalman.portalmanCam.targetTexture = portalmanCamText;
             portalman.portalmanCam.cullingMask |= LayerMask.GetMask("Billboard");
-            portalman.portalmanCam.nearClipPlane = 0.01f;
+            //portalman.portalmanCam.nearClipPlane = 0.01f;
             portalman.portalmanCam.useOcclusionCulling = false;
             
             Destroy(portalman.portalmanCam.gameObject.GetComponent<VA_AudioListener>());
@@ -811,8 +811,8 @@ namespace BCarnellChars
             portalman.outputCamPre = Instantiate(mainCam, portalman.transform, false);
             portalman.outputCamPre.name = "OutputPortalCamera";
             portalman.outputCamPre.targetTexture = outputportalCamText;
-            portalman.outputCamPre.cullingMask |= LayerMask.GetMask("Billboard");
-            portalman.outputCamPre.nearClipPlane = 0.01f;
+            //portalman.outputCamPre.cullingMask |= LayerMask.GetMask("Billboard");
+            //portalman.outputCamPre.nearClipPlane = 0.01f;
             portalman.outputCamPre.useOcclusionCulling = false;
             Destroy(portalman.outputCamPre.gameObject.GetComponent<VA_AudioListener>());
             portalman.outputCamPre.enabled = false;
