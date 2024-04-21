@@ -35,7 +35,7 @@ namespace BCarnellEditor
         {
             // Dunno why doors are first...
             BaldiLevelEditorPlugin.doorTypes.Add("inflocked", typeof(InfLockedSwingEditorVisual));
-            PlusLevelLoaderPlugin.Instance.doorPrefabs.Add("inflocked", ObjectBuilderMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Obstacle>("InfLockedDoor")).value.ReflectionGetVariable("doorPre") as SwingDoor);
+            PlusLevelLoaderPlugin.Instance.doorPrefabs.Add("inflocked", ObjectBuilderMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Obstacle>("InfLockedDoor")).value.ReflectionGetVariable("doorPre") as Door);
 
             GameObject rpsguy = BaldiLevelEditorPlugin.StripAllScripts(NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("RPSGuy")).value.gameObject, true);
             // RPS LOOKS LIKE BEANS, SO UHH... CHANGE SPRITE I GUESS??
