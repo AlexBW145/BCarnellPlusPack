@@ -21,7 +21,7 @@ namespace BCarnellChars.Patches
             {
                 if (profitCardRng.NextDouble() < (double)profitCardChance)
                 {
-                    component.ReflectionSetVariable("requiredItem", ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("ProfitCard")).value);
+                    component.ReflectionSetVariable("requiredItem", BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard"));
                     MeshRenderer meshRender = __instance.GetComponent<MeshRenderer>();
                     meshRender.materials = meshRender.materials.AddToArray(BasePlugin.profitCardInsert);
                 }

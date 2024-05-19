@@ -20,7 +20,7 @@ namespace BCarnellEditor
             sodaMachine = gameObject.GetComponent<SodaMachine>();
             if (!sodaMachine)
                 return;
-            sodaMachine.ReflectionSetVariable("requiredItem", ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("ProfitCard")).value);
+            sodaMachine.ReflectionSetVariable("requiredItem", BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard"));
             var meshRender = sodaMachine.ReflectionGetVariable("meshRenderer") as MeshRenderer;
             meshRender.materials = meshRender.materials.AddToArray(BasePlugin.profitCardInsert);
         }

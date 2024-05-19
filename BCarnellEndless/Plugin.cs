@@ -1,4 +1,5 @@
 ﻿using BaldiEndless;
+using BCarnellChars;
 using BepInEx;
 using HarmonyLib;
 using MTM101BaldAPI;
@@ -17,9 +18,9 @@ namespace BCarnellEndless
         private void Awake()
         {
             Harmony harmony = new Harmony("alexbw145.baldiplus.bcarnellendless");
-            harmony.PatchAll();
+            harmony.PatchAllConditionals();
 
-            LoadingEvents.RegisterOnAssetsLoaded(() =>
+            LoadingEvents.RegisterOnAssetsLoaded(Info, () =>
             {
                 EndlessFloorsPlugin.AddGeneratorAction(Info, (data) =>
                 {
@@ -27,10 +28,10 @@ namespace BCarnellEndless
                     data.npcs.Add(new WeightedNPC { selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("ERRORBOT")).value, weight = 77 });
                     data.npcs.Add(new WeightedNPC { selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("SiegeCanonCart")).value, weight = 55 });
                     data.npcs.Add(new WeightedNPC { selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("MrPortalMan")).value, weight = 55 });
-                    data.items.Add(new WeightedItemObject() { selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("ProfitCard")).value, weight = 60 });
-                    data.items.Add(new WeightedItemObject() { selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("BHammer")).value, weight = 60 });
-                    data.items.Add(new WeightedItemObject() { selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("SecuredYellowLock")).value, weight = 10 });
-                    data.items.Add(new WeightedItemObject() { selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey")).value, weight = 30 });
+                    data.items.Add(new WeightedItemObject() { selection = BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard"), weight = 60 });
+                    data.items.Add(new WeightedItemObject() { selection = BasePlugin.bcppAssets.Get<ItemObject>("Items/BHammer"), weight = 60 });
+                    data.items.Add(new WeightedItemObject() { selection = BasePlugin.bcppAssets.Get<ItemObject>("Items/SecuredLock"), weight = 10 });
+                    data.items.Add(new WeightedItemObject() { selection = BasePlugin.bcppAssets.Get<ItemObject>("Items/UnsecuredKey"), weight = 30 });
                     data.objectBuilders.Add(new WeightedObjectBuilder() { selection = ObjectBuilderMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Obstacle>("InfLockedDoor")).value, weight = 85 });
                 });
                 

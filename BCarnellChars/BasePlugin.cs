@@ -25,6 +25,8 @@ using BCarnellChars.ItemStuff;
 using MTM101BaldAPI.Reflection;
 using MTM101BaldAPI.SaveSystem;
 using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
+using System.IO;
+using MTM101BaldAPI.ObjectCreation;
 
 namespace BCarnellChars
 {
@@ -257,7 +259,7 @@ namespace BCarnellChars
 
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Mr. Portal Man", "PTM_Intro.wav"), "Vfx_MrPortalMan_Intro", SoundType.Voice, new Color(1f, 0.6470588f, 0.1529412f)),
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Mr. Portal Man", "PTM_Questioning.wav"), "Vfx_MrPortalMan_WhereIs", SoundType.Voice, new Color(1f, 0.6470588f, 0.1529412f)),
-                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Mr. Portal Man", "PTM_End.wav"), "Vfx_MrPortalMan_Fulfilled", SoundType.Voice, new Color(1f, 0.6470588f, 0.1529412f))
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Mr. Portal Man", "PTM_End.wav"), "Vfx_MrPortalMan_Fulfilled", SoundType.Voice, new Color(1f, 0.6470588f, 0.1529412f)),
                 ],
                 [
                     "RPSUI/HitTie",
@@ -281,7 +283,7 @@ namespace BCarnellChars
 
                     "MrPortalMan/Hungry",
                     "MrPortalMan/WhereIs",
-                    "MrPortalMan/Fullfilled"
+                    "MrPortalMan/Fullfilled",
                 ]);
             bcppAssets.Get<SoundObject>("RPSUI/HitTie").subtitle = false;
             bcppAssets.Get<SoundObject>("RPSUI/HitWin").subtitle = false;
@@ -289,21 +291,21 @@ namespace BCarnellChars
             bcppAssets.Get<SoundObject>("ERRORBOT/Jammed").additionalKeys = [new SubtitleTimedKey() { key = "Sfx_ERRORBOT_Malfunction", time = 0.34f }];
             bcppAssets.Get<SoundObject>("ERRORBOT/Sprayed").additionalKeys = [new SubtitleTimedKey() { key = "Sfx_ERRORBOT_Malfunction", time = 0.34f }];
 
-            LoadingEvents.RegisterOnAssetsLoaded(PreLoad, false);
+            LoadingEvents.RegisterOnAssetsLoaded(Info, PreLoad, false);
             GeneratorManagement.Register(this, GenerationModType.Addend, (floorName, floorNum, ld) =>
             {
                 switch (floorName)
                 {
                     case "F1":
-                        ld.items = ld.items.AddRangeToArray([
+                        ld.potentialItems = ld.potentialItems.AddRangeToArray([
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("ProfitCard")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
                                 weight = 75
                             },
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
                                 weight = 100
                             }
                             ]);
@@ -316,42 +318,42 @@ namespace BCarnellChars
                         ]);
                         break;
                     case "F2":
-                        ld.items = ld.items.AddRangeToArray([
+                        ld.potentialItems = ld.potentialItems.AddRangeToArray([
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("ProfitCard")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
                                 weight = 75
                             },
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("BHammer")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
                                 weight = 80
                             },
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
                                 weight = 100
                             },
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("SecuredYellowLock")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/SecuredLock"),
                                 weight = 75
                             }
                             ]);
                         ld.shopItems = ld.shopItems.AddRangeToArray([
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("ProfitCard")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
                                 weight = 80
                             },
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("BHammer")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
                                 weight = 80
                             },
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
                                 weight = 100
                             }
                             ]);
@@ -375,42 +377,42 @@ namespace BCarnellChars
                         ld.additionalNPCs += 1;
                         break;
                     case "F3":
-                        ld.items = ld.items.AddRangeToArray([
+                        ld.potentialItems = ld.potentialItems.AddRangeToArray([
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("ProfitCard")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
                                 weight = 75
                             },
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("BHammer")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
                                 weight = 80
                             },
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
                                 weight = 100
                             },
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("SecuredYellowLock")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/SecuredLock"),
                                 weight = 75
                             }
                             ]);
                         ld.shopItems = ld.shopItems.AddRangeToArray([
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("ProfitCard")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
                                 weight = 80
                             },
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("BHammer")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
                                 weight = 80
                             },
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
                                 weight = 100
                             }
                             ]);
@@ -446,25 +448,25 @@ namespace BCarnellChars
                             ]);
                         break;
                     case "END":
-                        ld.items = ld.items.AddRangeToArray([
+                        ld.potentialItems = ld.potentialItems.AddRangeToArray([
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("ProfitCard")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
                                 weight = 80
                             },
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("BHammer")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
                                 weight = 80
                             },
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
                                 weight = 85
                             },
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("SecuredYellowLock")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/SecuredLock"),
                                 weight = 75
                             }
                             ]);
@@ -521,9 +523,19 @@ namespace BCarnellChars
             }
 
             // do dis
-            var rpsguy = ObjectCreators.CreateNPC<RPSGuy>("RPS Guy", EnumExtensions.ExtendEnum<Character>("RPSGuy"), ObjectCreators.CreatePosterObject(bcppAssets.Get<Texture2D>("PRI/RPSGuy"), []), spawnableRooms: [RoomCategory.Class, RoomCategory.Office, RoomCategory.Special]);
-            AccessTools.DeclaredField(typeof(Navigator), "avoidRooms").SetValue(rpsguy.Navigator, true);
-            AccessTools.DeclaredField(typeof(Looker), "distance").SetValue(rpsguy.looker, 99f);
+            var rpsguy = new NPCBuilder<RPSGuy>(Info)
+                .SetName("RPS Guy")
+                .SetEnum(EnumExtensions.ExtendEnum<Character>("RPSGuy"))
+                .AddLooker()
+                .AddTrigger()
+                .SetMaxSightDistance(99f)
+                .AddSpawnableRoomCategories(RoomCategory.Class, RoomCategory.Office, RoomCategory.Special)
+                .SetPoster(ObjectCreators.CreatePosterObject(bcppAssets.Get<Texture2D>("PRI/RPSGuy"), []))
+                .SetMetaTags(["BCPP"])
+                .Build(); //ObjectCreators.CreateNPC<RPSGuy>("RPS Guy", EnumExtensions.ExtendEnum<Character>("RPSGuy"), ObjectCreators.CreatePosterObject(bcppAssets.Get<Texture2D>("PRI/RPSGuy"), []), spawnableRooms: [RoomCategory.Class, RoomCategory.Office, RoomCategory.Special]);
+            //AccessTools.DeclaredField(typeof(Navigator), "avoidRooms").SetValue(rpsguy.Navigator, true);
+            rpsguy.Navigator.SetRoomAvoidance(true);
+            //AccessTools.DeclaredField(typeof(Looker), "distance").SetValue(rpsguy.looker, 99f);
             PropagatedAudioManager annoying = rpsguy.gameObject.AddComponent<PropagatedAudioManager>();
             annoying.audioDevice = rpsguy.gameObject.AddComponent<AudioSource>();
             AccessTools.DeclaredField(typeof(AudioManager), "soundOnStart").SetValue(annoying, new SoundObject[]
@@ -543,8 +555,7 @@ namespace BCarnellChars
             Destroy(rockpaperscissors.transform.Find("TextCanvas").transform.Find("Count").gameObject);
             RawImage raw = rockpaperscissors.transform.Find("TextCanvas").gameObject.AddComponent<RawImage>();
             raw.color = new Color(0f,0f,0f,0.50f); // Initial Color
-            DontDestroyOnLoad(rockpaperscissors);
-            rockpaperscissors.SetActive(false);
+            rockpaperscissors.ConvertToPrefab(false);
             Image uhf = new GameObject("Border", typeof(Image)).GetComponent<Image>();
             uhf.gameObject.layer = LayerMask.NameToLayer("UI");
             uhf.transform.SetParent(rockpaperscissors.transform.Find("TextCanvas").transform);
@@ -601,8 +612,17 @@ namespace BCarnellChars
                 bcppAssets.Get<Sprite>("RPSUI/Scissors")
             ]);
 
-            var errorbot = ObjectCreators.CreateNPC<ERRORBOT>("ERROR-BOT_ITEM-STEALER", EnumExtensions.ExtendEnum<Character>("ERRORBOT"), ObjectCreators.CreatePosterObject(bcppAssets.Get<Texture2D>("PRI/ERRORBOT"), []), usesHeatMap: true, spawnableRooms: [RoomCategory.Hall]);
-            AccessTools.DeclaredField(typeof(Navigator), "avoidRooms").SetValue(errorbot.Navigator, true);
+            var errorbot = new NPCBuilder<ERRORBOT>(Info)
+                .SetName("ERROR-BOT_ITEM-STEALER")
+                .SetEnum(EnumExtensions.ExtendEnum<Character>("ERRORBOT"))
+                .AddLooker()
+                .AddTrigger()
+                .AddSpawnableRoomCategories(RoomCategory.Hall)
+                .SetPoster(ObjectCreators.CreatePosterObject(bcppAssets.Get<Texture2D>("PRI/ERRORBOT"), []))
+                .SetMetaTags(["BCPP"])
+                .Build(); //ObjectCreators.CreateNPC<ERRORBOT>("ERROR-BOT_ITEM-STEALER", EnumExtensions.ExtendEnum<Character>("ERRORBOT"), ObjectCreators.CreatePosterObject(bcppAssets.Get<Texture2D>("PRI/ERRORBOT"), []), usesHeatMap: true, spawnableRooms: [RoomCategory.Hall]);
+            errorbot.Navigator.SetRoomAvoidance(true);
+            //AccessTools.DeclaredField(typeof(Navigator), "avoidRooms").SetValue(errorbot.Navigator, true);
             AnimatedSpriteRotator threesixty = errorbot.spriteBase.AddComponent<AnimatedSpriteRotator>();
             AccessTools.DeclaredField(typeof(AnimatedSpriteRotator), "renderer").SetValue(threesixty, errorbot.spriteRenderer[0]);
 
@@ -658,15 +678,27 @@ namespace BCarnellChars
             staticbot.audioDevice.spread = 0;
 
             // This part is the reason why I almost gave up
-            var siegecart = ObjectCreators.CreateNPC<SiegeCanonCart>("Siege Canon Cart", EnumExtensions.ExtendEnum<Character>("SiegeCanonCart"), ObjectCreators.CreatePosterObject(bcppAssets.Get<Texture2D>("PRI/SiegeCannonCart"), []), spawnableRooms: [RoomCategory.Hall]);
-            AccessTools.DeclaredField(typeof(Navigator), "avoidRooms").SetValue(siegecart.Navigator, true);
-            AccessTools.DeclaredField(typeof(Navigator), "preciseTarget").SetValue(siegecart.Navigator, false);
-            AccessTools.DeclaredField(typeof(Navigator), "autoRotate").SetValue(siegecart.Navigator, false);
-            AccessTools.DeclaredField(typeof(Navigator), "decelerate").SetValue(siegecart.Navigator, true);
+            var siegecart = new NPCBuilder<SiegeCanonCart>(Info)
+                .SetName("Siege Canon Cart")
+                .SetEnum(EnumExtensions.ExtendEnum<Character>("SiegeCanonCart"))
+                .AddLooker()
+                .AddTrigger()
+                .IgnoreBelts()
+                .AddSpawnableRoomCategories(RoomCategory.Hall)
+                .DisableNavigationPrecision()
+                .DisableAutoRotation()
+                .EnableAcceleration()
+                .SetPoster(ObjectCreators.CreatePosterObject(bcppAssets.Get<Texture2D>("PRI/SiegeCannonCart"), []))
+                .SetMetaTags(["BCPP"])
+                .Build(); //ObjectCreators.CreateNPC<SiegeCanonCart>("Siege Canon Cart", EnumExtensions.ExtendEnum<Character>("SiegeCanonCart"), ObjectCreators.CreatePosterObject(bcppAssets.Get<Texture2D>("PRI/SiegeCannonCart"), []), spawnableRooms: [RoomCategory.Hall]);
+            siegecart.Navigator.SetRoomAvoidance(true);
+            //AccessTools.DeclaredField(typeof(Navigator), "preciseTarget").SetValue(siegecart.Navigator, false);
+            //AccessTools.DeclaredField(typeof(Navigator), "autoRotate").SetValue(siegecart.Navigator, false);
+            //AccessTools.DeclaredField(typeof(Navigator), "decelerate").SetValue(siegecart.Navigator, true);
             //AccessTools.DeclaredField(typeof(Looker), "hasFov").SetValue(siegecart.looker, true);
             siegecart.Navigator.maxSpeed = 15f;
             siegecart.Navigator.accel = 15f;
-            AccessTools.DeclaredField(typeof(NPC), "ignoreBelts").SetValue(siegecart, true);
+            //AccessTools.DeclaredField(typeof(NPC), "ignoreBelts").SetValue(siegecart, true);
             AudioManager motorAudMan = siegecart.gameObject.AddComponent<PropagatedAudioManager>();
             motorAudMan.audioDevice = siegecart.gameObject.AddComponent<AudioSource>();
             motorAudMan.audioDevice.spatialBlend = 1;
@@ -763,18 +795,27 @@ namespace BCarnellChars
             ball.name = "CanonBall";
             Destroy(ball.GetComponent<ITM_BSODA>());
             siegecart.ballPre = ball.AddComponent<SiegeCartBalls>();
-            DontDestroyOnLoad(ball);
-            ball.SetActive(false);
-            ball.GetComponent<Entity>().SetActive(false);
+            ball.ConvertToPrefab(true);
             ball.layer = LayerMask.NameToLayer("StandardEntities"); // No wonder why it keeps setting to default...
             Destroy(ball.transform.Find("RendereBase").Find("Particles").gameObject);
             ball.transform.Find("RendereBase").GetComponentInChildren<SpriteRenderer>().sprite = bcppAssets.Get<Sprite>("SiegeCanonCart/Ball");
             bcppAssets.Add<Entity>("SiegeCannonBall", ball.GetComponent<Entity>());
 
-            var portalman = ObjectCreators.CreateNPC<MrPortalMan>("Mr Portal Man", EnumExtensions.ExtendEnum<Character>("MrPortalMan"), ObjectCreators.CreatePosterObject(bcppAssets.Get<Texture2D>("PRI/MrPortalMan"), []), usesHeatMap: true, spawnableRooms: [RoomCategory.Hall]);
-            AccessTools.DeclaredField(typeof(Looker), "hasFov").SetValue(portalman.looker, false);
+            var portalman = new NPCBuilder<MrPortalMan>(Info)
+                .SetName("Mr Portal Man")
+                .SetEnum(EnumExtensions.ExtendEnum<Character>("MrPortalMan"))
+                .AddLooker()
+                .AddTrigger()
+                .IgnoreBelts()
+                .SetAirborne()
+                .IgnorePlayerOnSpawn()
+                .AddSpawnableRoomCategories(RoomCategory.Faculty)
+                .SetPoster(ObjectCreators.CreatePosterObject(bcppAssets.Get<Texture2D>("PRI/MrPortalMan"), []))
+                .SetMetaTags(["BCPP"])
+                .Build(); //ObjectCreators.CreateNPC<MrPortalMan>("Mr Portal Man", EnumExtensions.ExtendEnum<Character>("MrPortalMan"), ObjectCreators.CreatePosterObject(bcppAssets.Get<Texture2D>("PRI/MrPortalMan"), []), usesHeatMap: true, spawnableRooms: [RoomCategory.Hall]);
+            //AccessTools.DeclaredField(typeof(Looker), "hasFov").SetValue(portalman.looker, false);
             AccessTools.DeclaredField(typeof(Looker), "layerMask").SetValue(portalman.looker, (LayerMask)AccessTools.DeclaredField(typeof(Looker), "layerMask").GetValue(NPCMetaStorage.Instance.Get(Character.Principal).value.looker));
-            AccessTools.DeclaredField(typeof(NPC), "ignorePlayerOnSpawn").SetValue(portalman, true);
+            //AccessTools.DeclaredField(typeof(NPC), "ignorePlayerOnSpawn").SetValue(portalman, true);
             portalman.spriteRenderer[0].sprite = bcppAssets.Get<Sprite>("MrPortalMan/PortalMan");
             portalman.spriteRenderer[0].transform.position = new Vector3(0f, 0.5f, 0f);
             portalman.spriteRenderer = portalman.spriteRenderer.AddToArray(Instantiate(portalman.spriteRenderer[0].gameObject, portalman.spriteBase.transform, true).GetComponent<SpriteRenderer>());
@@ -835,55 +876,74 @@ namespace BCarnellChars
             portalman.portalPre = cryingPortal.GetComponent<CryingPortal>();
             cryingPortal.SetActive(false);
 
-            NPCMetaStorage.Instance.Add(new NPCMetadata(Info, [rpsguy], "RPS Guy", NPCFlags.Standard));
+            /*NPCMetaStorage.Instance.Add(new NPCMetadata(Info, [rpsguy], "RPS Guy", NPCFlags.Standard));
             NPCMetaStorage.Instance.Add(new NPCMetadata(Info, [errorbot], "ERROR-BOT_ITEM-STEALER", NPCFlags.Standard | NPCFlags.MakeNoise));
             NPCMetaStorage.Instance.Add(new NPCMetadata(Info, [siegecart], "Siege Canon Cart", NPCFlags.StandardNoCollide));
             NPCMetaStorage.Instance.Add(new NPCMetadata(Info, [portalman], "Mr Portal Man", NPCFlags.Standard));
+            */
             bcppAssets.AddRange<NPC>([
                 rpsguy,
                 errorbot,
                 siegecart,
-                portalman
+                portalman,
                 ],
                 [
                 "NPCs/RPS Guy",
                 "NPCs/ERROR-BOT_ITEM-STEALER",
                 "NPCs/Siege Cannon Cart",
-                "NPCs/Mr Portal Man"
+                "NPCs/Mr Portal Man",
                 ]);
 
             // Pretty sure this hammer came in before BBT, but I didn't really know how to add items to arrays back then...
-            ItemObject hammer = ObjectCreators.CreateItemObject("Itm_BHammer", "Desc_BHammer", bcppAssets.Get<Sprite>("Items/BHammer_Small"), bcppAssets.Get<Sprite>("Items/BHammer_Large"), EnumExtensions.ExtendEnum<Items>("BHammer"), 25, 30);
-            ITM_Hammer hammerFunc = new GameObject("BHammer", typeof(ITM_Hammer)).GetComponent<ITM_Hammer>();
-            hammer.item = hammerFunc;
-            DontDestroyOnLoad(hammerFunc.gameObject);
+            ItemObject hammer = new ItemBuilder(Info)
+                .SetItemComponent<ITM_Hammer>()
+                .SetNameAndDescription("Itm_BHammer", "Desc_BHammer")
+                .SetSprites(bcppAssets.Get<Sprite>("Items/BHammer_Small"), bcppAssets.Get<Sprite>("Items/BHammer_Large"))
+                .SetEnum(EnumExtensions.ExtendEnum<Items>("BHammer"))
+                .SetShopPrice(25)
+                .SetGeneratorCost(30)
+                .SetMeta(ItemFlags.None, ["BCPP"])
+                .Build(); //ObjectCreators.CreateItemObject("Itm_BHammer", "Desc_BHammer", bcppAssets.Get<Sprite>("Items/BHammer_Small"), bcppAssets.Get<Sprite>("Items/BHammer_Large"), EnumExtensions.ExtendEnum<Items>("BHammer"), 25, 30);
             // Annnddd, this is something stupidly uncool and sometimes creative...
-            ItemObject profitCard = ObjectCreators.CreateItemObject("Itm_ProfitCard", "Desc_ProfitCard", bcppAssets.Get<Sprite>("Items/ProfitCard_Small"), bcppAssets.Get<Sprite>("Items/ProfitCard_Large"), EnumExtensions.ExtendEnum<Items>("ProfitCard"), 85, 25);
-            ITM_Acceptable profitCardFunc = Instantiate(Resources.FindObjectsOfTypeAll<ITM_Acceptable>().ToList().Find(p => p.name == "Quarter"));
-            profitCardFunc.name = "ProfitCard";
-            profitCardFunc.ReflectionSetVariable("item", EnumExtensions.GetFromExtendedName<Items>("ProfitCard"));
-            profitCard.item = profitCardFunc;
-            DontDestroyOnLoad(profitCardFunc.gameObject);
+            ItemObject profitCard = new ItemBuilder(Info)
+                .SetItemComponent<ITM_Acceptable>()
+                .SetNameAndDescription("Itm_ProfitCard", "Desc_ProfitCard")
+                .SetSprites(bcppAssets.Get<Sprite>("Items/ProfitCard_Small"), bcppAssets.Get<Sprite>("Items/ProfitCard_Large"))
+                .SetEnum(EnumExtensions.ExtendEnum<Items>("ProfitCard"))
+                .SetShopPrice(85)
+                .SetGeneratorCost(25)
+                .SetMeta(ItemFlags.None, ["BCPP"])
+                .Build(); //ObjectCreators.CreateItemObject("Itm_ProfitCard", "Desc_ProfitCard", bcppAssets.Get<Sprite>("Items/ProfitCard_Small"), bcppAssets.Get<Sprite>("Items/ProfitCard_Large"), EnumExtensions.ExtendEnum<Items>("ProfitCard"), 85, 25);
+            profitCard.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("item", EnumExtensions.GetFromExtendedName<Items>("ProfitCard"));
             profitCardInsert = Instantiate(Resources.FindObjectsOfTypeAll<Material>().ToList().Find(x => x.name == "BSODAMachine"));
             profitCardInsert.name = "ProfitCardMachine";
             profitCardInsert.SetMainTexture(bcppAssets.Get<Texture2D>("ProfitCardMachine"));
             // Something evil is brewing inside!
-            ItemObject swingingdoorInfKey = ObjectCreators.CreateItemObject("Itm_UnsecuredKey", "Desc_UnsecuredKey", bcppAssets.Get<Sprite>("Items/UnsecuredKey_Small"), bcppAssets.Get<Sprite>("Items/UnsecuredKey_Large"), EnumExtensions.ExtendEnum<Items>("UnsecuredYellowKey"), 110, 50);
-            ITM_Acceptable infKeyFunc = Instantiate(Resources.FindObjectsOfTypeAll<ITM_Acceptable>().ToList().Find(p => p.name == "DetentionKey"));
-            infKeyFunc.name = "UnsecuredLock";
-            infKeyFunc.ReflectionSetVariable("item", EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey"));
-            infKeyFunc.ReflectionSetVariable("audUse", Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(x => x.name == "Doors_StandardUnlock"));
-            swingingdoorInfKey.item = infKeyFunc;
-            DontDestroyOnLoad(infKeyFunc.gameObject);
-            ItemObject swingingdoorInfLock = ObjectCreators.CreateItemObject("Itm_SecuredLock", "Desc_SecuredLock", bcppAssets.Get<Sprite>("Items/SecuredLock_Small"), bcppAssets.Get<Sprite>("Items/SecuredLock_Large"), EnumExtensions.ExtendEnum<Items>("SecuredYellowLock"), 95, 75);
-            ITM_Acceptable infswingdoorlockFunc = Instantiate(Resources.FindObjectsOfTypeAll<ITM_Acceptable>().ToList().Find(p => p.name == "SwingDoorLock"));
-            infswingdoorlockFunc.name = "SecuredLock";
-            infswingdoorlockFunc.ReflectionSetVariable("item", EnumExtensions.GetFromExtendedName<Items>("SecuredYellowLock"));
-            infswingdoorlockFunc.ReflectionSetVariable("audUse", Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(x => x.name == "Slap"));
-            swingingdoorInfLock.item = infswingdoorlockFunc;
-            DontDestroyOnLoad(infswingdoorlockFunc.gameObject);
+            ItemObject swingingdoorInfKey = new ItemBuilder(Info)
+                .SetItemComponent<ITM_Acceptable>()
+                .SetNameAndDescription("Itm_UnsecuredKey", "Desc_UnsecuredKey")
+                .SetSprites(bcppAssets.Get<Sprite>("Items/UnsecuredKey_Small"), bcppAssets.Get<Sprite>("Items/UnsecuredKey_Large"))
+                .SetEnum(EnumExtensions.ExtendEnum<Items>("UnsecuredYellowKey"))
+                .SetShopPrice(110)
+                .SetGeneratorCost(50)
+                .SetMeta(ItemFlags.MultipleUse | ItemFlags.Persists, ["BCPP"])
+                .Build(); //ObjectCreators.CreateItemObject("Itm_UnsecuredKey", "Desc_UnsecuredKey", bcppAssets.Get<Sprite>("Items/UnsecuredKey_Small"), bcppAssets.Get<Sprite>("Items/UnsecuredKey_Large"), EnumExtensions.ExtendEnum<Items>("UnsecuredYellowKey"), 110, 50);
+            swingingdoorInfKey.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("item", EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey"));
+            swingingdoorInfKey.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("audUse", Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(x => x.name == "Doors_StandardUnlock"));
+            ItemObject swingingdoorInfLock = new ItemBuilder(Info)
+                .SetItemComponent<ITM_Acceptable>()
+                .SetNameAndDescription("Itm_SecuredLock", "Desc_SecuredLock")
+                .SetSprites(bcppAssets.Get<Sprite>("Items/SecuredLock_Small"), bcppAssets.Get<Sprite>("Items/SecuredLock_Large"))
+                .SetEnum(EnumExtensions.ExtendEnum<Items>("SecuredYellowLock"))
+                .SetShopPrice(95)
+                .SetGeneratorCost(75)
+                .SetMeta(ItemFlags.None, ["BCPP"])
+                .Build(); //ObjectCreators.CreateItemObject("Itm_SecuredLock", "Desc_SecuredLock", bcppAssets.Get<Sprite>("Items/SecuredLock_Small"), bcppAssets.Get<Sprite>("Items/SecuredLock_Large"), EnumExtensions.ExtendEnum<Items>("SecuredYellowLock"), 95, 75);
+            swingingdoorInfLock.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("item", EnumExtensions.GetFromExtendedName<Items>("SecuredYellowLock"));
+            swingingdoorInfLock.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("audUse", Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(x => x.name == "Slap"));
             GameObject inflockedSwingDoor = Instantiate(Resources.FindObjectsOfTypeAll<CoinDoor>().ToList().Find(p => p.name == "Door_SwingingCoin")).gameObject;
             inflockedSwingDoor.name = "Door_SwingingSecuredLock";
+            inflockedSwingDoor.transform.position = Vector3.up * float.MaxValue;
             Destroy(inflockedSwingDoor.GetComponent<CoinDoor>());
             inflockedSwingDoor.AddComponent<SecuredSwingingDoor>();
             securedYellowSwingingDoor = Instantiate(Resources.FindObjectsOfTypeAll<Material>().ToList().Find(x => x.name == "CoinDoor"));
@@ -895,6 +955,7 @@ namespace BCarnellChars
             DontDestroyOnLoad(inflockedSwingDoor);
             CoinDoorBuilder builder = Instantiate(Resources.FindObjectsOfTypeAll<CoinDoorBuilder>().ToList().Find(x => x.name == "CoinDoorBuilder"));
             builder.gameObject.name = "Inf Secured Swinging Door Builder";
+            builder.transform.position = Vector3.up * float.MaxValue;
             builder.ReflectionSetVariable("doorPre", inflockedSwingDoor.GetComponent<SwingDoor>());
             builder.obstacle = EnumExtensions.ExtendEnum<Obstacle>("InfLockedDoor");
             DontDestroyOnLoad(builder.gameObject);
@@ -902,10 +963,10 @@ namespace BCarnellChars
             bcppAssets.Add<SecuredSwingingDoor>("Obstacles/SecuredSwingingDoor", inflockedSwingDoor.GetComponent<SecuredSwingingDoor>());
             bcppAssets.Add<ObjectBuilder>("ObjectBuilder/SecuredSwingingDoor", builder);
 
-            ItemMetaStorage.Instance.Add(hammer, new ItemMetaData(Info, hammer));
+            /*ItemMetaStorage.Instance.Add(hammer, new ItemMetaData(Info, hammer));
             ItemMetaStorage.Instance.Add(profitCard, new ItemMetaData(Info, profitCard));
             ItemMetaStorage.Instance.Add(swingingdoorInfKey, new ItemMetaData(Info, swingingdoorInfKey));
-            ItemMetaStorage.Instance.Add(swingingdoorInfLock, new ItemMetaData(Info, swingingdoorInfLock));
+            ItemMetaStorage.Instance.Add(swingingdoorInfLock, new ItemMetaData(Info, swingingdoorInfLock));*/
             bcppAssets.AddRange<ItemObject>([
                 hammer,
                 profitCard,
@@ -920,113 +981,113 @@ namespace BCarnellChars
                 ]);
 
             // The Basement
-            lBasement = new LevelObject()
-            {
-                name = "Basement1",
-                previousLevels = [Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main1")],
+            lBasement = ScriptableObject.CreateInstance<LevelObject>();
+            // Make sure to not modify the ones you're unsure about!
+            lBasement.name = "Basement1";
+            lBasement.previousLevels = [Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main1")];
 
-                minSize = new IntVector2(40, 45),
-                maxSize = new IntVector2(50, 55),
-                minPlots = 4,
-                maxPlots = 11,
-                minPlotSize = 3,
-                outerEdgeBuffer = 7,
+            lBasement.minSize = new IntVector2(40, 45);
+            lBasement.maxSize = new IntVector2(50, 55);
+            lBasement.minPlots = 4;
+            lBasement.maxPlots = 11;
+            lBasement.minPlotSize = 3;
+            lBasement.outerEdgeBuffer = 7;
 
-                minHallsToRemove = 3,
-                maxHallsToRemove = 6,
-                minSideHallsToRemove = 2,
-                maxSideHallsToRemove = 3,
-                minReplacementHalls = 5,
-                maxReplacementHalls = 7,
-                bridgeTurnChance = 4,
-                additionTurnChance = 9,
-                maxHallAttempts = 9, // THIS HAS HELPED ME, THANK GOD!
-                deadEndBuffer = 6,
-                includeBuffers = true,
+            lBasement.minHallsToRemove = 3;
+            lBasement.maxHallsToRemove = 6;
+            lBasement.minSideHallsToRemove = 2;
+            lBasement.maxSideHallsToRemove = 3;
+            lBasement.minReplacementHalls = 5;
+            lBasement.maxReplacementHalls = 7;
+            lBasement.bridgeTurnChance = 4;
+            lBasement.additionTurnChance = 9;
+            lBasement.maxHallAttempts = 9; // THIS HAS HELPED ME, THANK GOD!
+            lBasement.deadEndBuffer = 6;
+            lBasement.includeBuffers = true;
 
-                hallWallTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").hallWallTexs,
-                hallFloorTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").hallFloorTexs,
-                hallCeilingTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").hallCeilingTexs,
-                hallLights = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").hallLights,
-                maxLightDistance = 9,
+            lBasement.hallWallTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").hallWallTexs;
+            lBasement.hallFloorTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").hallFloorTexs;
+            lBasement.hallCeilingTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").hallCeilingTexs;
+            lBasement.hallLights = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").hallLights;
+            lBasement.maxLightDistance = 9;
 
-                minPrePlotSpecialHalls = 1,
-                minPostPlotSpecialHalls = 0,
-                maxPrePlotSpecialHalls = 4,
-                maxPostPlotSpecialHalls = 2,
-                prePlotSpecialHallChance = 0.5f,
-                postPlotSpecialHallChance = 0.25f,
-                potentialPrePlotSpecialHalls = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").potentialPrePlotSpecialHalls,
-                potentialPostPlotSpecialHalls = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").potentialPostPlotSpecialHalls,
-                standardHallBuilders = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").standardHallBuilders,
+            lBasement.minPrePlotSpecialHalls = 1;
+            lBasement.minPostPlotSpecialHalls = 0;
+            lBasement.maxPrePlotSpecialHalls = 4;
+            lBasement.maxPostPlotSpecialHalls = 2;
+            lBasement.prePlotSpecialHallChance = 0.5f;
+            lBasement.postPlotSpecialHallChance = 0.25f;
+            lBasement.potentialPrePlotSpecialHalls = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").potentialPrePlotSpecialHalls;
+            lBasement.potentialPostPlotSpecialHalls = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").potentialPostPlotSpecialHalls;
+            lBasement.standardHallBuilders = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").standardHallBuilders;
 
-                minSpecialBuilders = 4,
-                maxSpecialBuilders = 5,
-                forcedSpecialHallBuilders = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").forcedSpecialHallBuilders,
-                specialHallBuilders = [..Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").specialHallBuilders,
+            lBasement.minSpecialBuilders = 4;
+            lBasement.maxSpecialBuilders = 5;
+            lBasement.forcedSpecialHallBuilders = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").forcedSpecialHallBuilders;
+            lBasement.specialHallBuilders = [..Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").specialHallBuilders,
                             new WeightedObjectBuilder()
                             {
                                 selection = ObjectBuilderMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Obstacle>("InfLockedDoor")).value,
                                 weight = 75
-                            }],
+                            }];
 
-                minClassRooms = 7,
-                maxClassRooms = 7,
-                classStickToHallChance = 1,
-                potentialClassRooms = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").potentialClassRooms,
-                minFacultyRooms = 10,
-                maxFacultyRooms = 14,
-                facultyStickToHallChance = 0.75f,
-                potentialFacultyRooms = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").potentialFacultyRooms,
-                minExtraRooms = 0,
-                maxExtraRooms = 0,
-                extraStickToHallChance = 0.75f,
-                potentialExtraRooms = [],
-                minOffices = 1,
-                maxOffices = 1,
-                officeStickToHallChance = 1,
-                potentialOffices = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").potentialOffices,
-                minRoomSize = new IntVector2(3, 5),
+            lBasement.minClassRooms = 7;
+            lBasement.maxClassRooms = 7;
+            lBasement.classStickToHallChance = 1;
+            lBasement.potentialClassRooms = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").potentialClassRooms;
+            lBasement.minFacultyRooms = 10;
+            lBasement.maxFacultyRooms = 14;
+            lBasement.facultyStickToHallChance = 0.75f;
+            lBasement.potentialFacultyRooms = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").potentialFacultyRooms;
+            lBasement.minExtraRooms = 0;
+            lBasement.maxExtraRooms = 0;
+            lBasement.extraStickToHallChance = 0.75f;
+            lBasement.potentialExtraRooms = [];
+            lBasement.minOffices = 1;
+            lBasement.maxOffices = 1;
+            lBasement.officeStickToHallChance = 1;
+            lBasement.potentialOffices = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").potentialOffices;
+            lBasement.minRoomSize = new IntVector2(3, 5);
 
-                centerWeightMultiplier = 25,
-                perimeterBase = 4,
-                dijkstraWeightValueMultiplier = 0.3f,
-                dijkstraWeightPower = 1.6f,
-                extraDoorChance = 0.15f,
-                additionalHallDoorRequirementMultiplier = 4,
-                hallPriorityDampening = 3,
+            lBasement.centerWeightMultiplier = 25;
+            lBasement.perimeterBase = 4;
+            lBasement.dijkstraWeightValueMultiplier = 0.3f;
+            lBasement.dijkstraWeightPower = 1.6f;
+            lBasement.extraDoorChance = 0.15f;
+            lBasement.additionalHallDoorRequirementMultiplier = 4;
+            lBasement.hallPriorityDampening = 3;
 
-                classWallTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").classWallTexs,
-                classFloorTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").classFloorTexs,
-                classCeilingTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").classCeilingTexs,
-                facultyWallTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").facultyWallTexs,
-                facultyFloorTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").facultyFloorTexs,
-                facultyCeilingTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").facultyCeilingTexs,
-                classLights = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").classLights,
-                facultyLights = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").facultyLights,
-                officeLights = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").officeLights,
+            lBasement.classWallTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").classWallTexs;
+            lBasement.classFloorTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").classFloorTexs;
+            lBasement.classCeilingTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").classCeilingTexs;
+            lBasement.facultyWallTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").facultyWallTexs;
+            lBasement.facultyFloorTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").facultyFloorTexs;
+            lBasement.facultyCeilingTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").facultyCeilingTexs;
+            lBasement.classLights = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").classLights;
+            lBasement.facultyLights = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").facultyLights;
+            lBasement.officeLights = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").officeLights;
 
-                standardDoorMat = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").standardDoorMat,
-                minSpecialRooms = 2,
-                maxSpecialRooms = 2,
-                specialRoomsStickToEdge = true,
-                potentialSpecialRooms = [
-                new WeightedRoomAsset()
+            lBasement.standardDoorMat = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").standardDoorMat;
+            lBasement.minSpecialRooms = 2;
+            lBasement.maxSpecialRooms = 2;
+            lBasement.specialRoomsStickToEdge = true;
+            lBasement.potentialSpecialRooms = [
+            new WeightedRoomAsset()
                         {
                             selection = Resources.FindObjectsOfTypeAll<RoomAsset>().ToList().Find(x => x.name.Contains("Cafeteria")),
                             weight = 100
                         }
-            ],
-                windowChance = 0.5f,
+        ];
+            lBasement.windowChance = 0.5f;
 
-                lightMode = LightMode.Greatest,
-                standardLightStrength = 5,
-                standardLightColor = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").standardLightColor,
-                standardDarkLevel = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").standardDarkLevel,
-                potentialBaldis = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").potentialBaldis,
-                additionalNPCs = 1,
-                potentialNPCs = [
-                new WeightedNPC()
+            lBasement.lightMode = LightMode.Greatest;
+            lBasement.standardLightStrength = 5;
+            lBasement.standardLightColor = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").standardLightColor;
+            lBasement.standardDarkLevel = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").standardDarkLevel;
+            lBasement.potentialBaldis = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").potentialBaldis;
+            lBasement.additionalNPCs = 1;
+            lBasement.potentialNPCs = [
+            new WeightedNPC()
                 {
                     selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("ERRORBOT")).value,
                     weight = 100
@@ -1045,43 +1106,43 @@ namespace BCarnellChars
                 {
                     selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("SiegeCanonCart")).value,
                     weight = 150
-                }],
-                forcedNpcs = [
-                NPCMetaStorage.Instance.Get(Character.LookAt).value,
-                ],
-                posterChance = 2,
-                posters = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").posters,
-                items = [..Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").items,
+                }];
+            lBasement.forcedNpcs = [
+            NPCMetaStorage.Instance.Get(Character.LookAt).value,
+                ];
+            lBasement.posterChance = 2;
+            lBasement.posters = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").posters;
+            lBasement.items = [..Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").items,
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("ProfitCard")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
                                 weight = 75
                             },
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("BHammer")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
                                 weight = 80
                             },
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
                                 weight = 100
                             },
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("SecuredYellowLock")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/SecuredLock"),
                                 weight = 75
                             }
-                            ],
-                singleEntranceItemVal = 10,
-                noHallItemVal = 15,
-                minEvents = 2,
-                maxEvents = 5,
-                initialEventGap = 0,
-                minEventGap = 60,
-                maxEventGap = 150,
-                randomEvents = [
-                    new WeightedRandomEvent()
+                        ];
+            lBasement.singleEntranceItemVal = 10;
+            lBasement.noHallItemVal = 15;
+            lBasement.minEvents = 2;
+            lBasement.maxEvents = 5;
+            lBasement.initialEventGap = 0;
+            lBasement.minEventGap = 60;
+            lBasement.maxEventGap = 150;
+            lBasement.randomEvents = [
+                new WeightedRandomEvent()
                     {
                         selection = Resources.FindObjectsOfTypeAll<RandomEvent>().ToList().Find(x => x.name == "Event_Flood"),
                         weight = 150
@@ -1106,53 +1167,50 @@ namespace BCarnellChars
                         selection = Resources.FindObjectsOfTypeAll<RandomEvent>().ToList().Find(x => x.name == "Event_Party"),
                         weight = 75
                     }
-                ],
+            ];
 
-                fieldTrip = false,
-                fieldTrips = [],
-                tripEntrancePre = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").tripEntrancePre,
-                tripEntranceRoom = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").tripEntranceRoom,
-                fieldTripItems = [],
+            lBasement.fieldTrip = false;
+            lBasement.fieldTrips = [];
+            lBasement.tripEntrancePre = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").tripEntrancePre;
+            lBasement.tripEntranceRoom = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").tripEntranceRoom;
+            lBasement.fieldTripItems = [];
 
-                exitCount = 4,
-                elevatorPre = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").elevatorPre,
-                elevatorRoom = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").elevatorRoom,
-                hallBuffer = 4,
-                edgeBuffer = 3,
+            lBasement.exitCount = 4;
+            lBasement.elevatorPre = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").elevatorPre;
+            lBasement.elevatorRoom = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").elevatorRoom;
+            lBasement.hallBuffer = 4;
+            lBasement.edgeBuffer = 3;
 
-                mapPrice = 150,
-                shopItems = [..Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main2").shopItems,
+            lBasement.mapPrice = 150;
+            lBasement.shopItems = [..Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main2").shopItems,
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("ProfitCard")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
                                 weight = 80
                             },
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("BHammer")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
                                 weight = 80
                             },
                             new WeightedItemObject()
                             {
-                                selection = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey")).value,
+                                selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
                                 weight = 100
-                            }],
-                totalShopItems = 6,
-                finalLevel = true,
-                timeBonusLimit = 780,
-                timeBonusVal = 200
-            };
-            sBasement = new SceneObject()
-            {
-                name = "BasementLevel_1",
-                manager = Resources.FindObjectsOfTypeAll<MainGameManager>().ToList().Find(x => x.name.Contains("Lvl3")),
-                levelObject = lBasement,
-                skybox = Resources.FindObjectsOfTypeAll<Cubemap>().ToList().Find(x => x.name.Contains("DayStandard")),
-                skyboxColor = Color.white,
-                nextLevel = Resources.FindObjectsOfTypeAll<SceneObject>().ToList().Find(x => x.name.Contains("Placeholder")),
-                levelTitle = "B1",
-                levelNo = -1
-            };
+                            }];
+            lBasement.totalShopItems = 6;
+            lBasement.finalLevel = true;
+            lBasement.timeBonusLimit = 780;
+            lBasement.timeBonusVal = 200;
+            sBasement = ScriptableObject.CreateInstance<SceneObject>();
+            sBasement.name = "BasementLevel_1";
+            sBasement.manager = Resources.FindObjectsOfTypeAll<MainGameManager>().ToList().Find(x => x.name.Contains("Lvl3"));
+            sBasement.levelObject = lBasement;
+            sBasement.skybox = Resources.FindObjectsOfTypeAll<Cubemap>().ToList().Find(x => x.name.Contains("DayStandard"));
+            sBasement.skyboxColor = Color.white;
+            sBasement.nextLevel = Resources.FindObjectsOfTypeAll<SceneObject>().ToList().Find(x => x.name.Contains("Placeholder"));
+            sBasement.levelTitle = "B1";
+            sBasement.levelNo = -1;
 
             //Resources.FindObjectsOfTypeAll<SceneObject>().ToList().Find(x => x.name == "MainLevel_1").nextLevel = sBasement;
 
@@ -1172,6 +1230,9 @@ namespace BCarnellChars
                 hi++;
             }*/
 #endif
+            // Custom Posters Mod
+            if (Chainloader.PluginInfos.ContainsKey("io.github.luisrandomness.bbp_custom_posters"))
+                Chainloader.PluginInfos["io.github.luisrandomness.bbp_custom_posters"].Instance.GetType().Assembly.GetType("LuisRandomness.BBPCustomPosters.CustomPostersPlugin").InvokeMember("AddPostersFromDirectory", BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod, null, null, [this, "Texture2D", "Posters"]);
         }
     }
 

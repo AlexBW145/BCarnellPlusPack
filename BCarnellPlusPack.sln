@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BCarnellTimes", "BCarnellTi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BCarnellChars", "BCarnellChars\BCarnellChars.csproj", "{99FB493D-0820-405F-A89C-53BBF789FCD0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BCarnellEndless", "BCarnellEndless\BCarnellEndless.csproj", "{9AB98B58-356C-41C3-9F7C-111C7EDFCECA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BCarnellEndless", "BCarnellEndless\BCarnellEndless.csproj", "{9AB98B58-356C-41C3-9F7C-111C7EDFCECA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BCarnellTeacher", "BCarnellTeacher\BCarnellTeacher.csproj", "{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +52,12 @@ Global
 		{9AB98B58-356C-41C3-9F7C-111C7EDFCECA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AB98B58-356C-41C3-9F7C-111C7EDFCECA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AB98B58-356C-41C3-9F7C-111C7EDFCECA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}.Cheat|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}.Cheat|Any CPU.Build.0 = Debug|Any CPU
+		{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

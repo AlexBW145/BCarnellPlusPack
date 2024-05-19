@@ -32,6 +32,8 @@ namespace BCarnellChars.Patches
         private static int currentChunkIdOutputCam = -1;
         static void Postfix(CullingManager __instance, ref EnvironmentController ___ec, ref bool ___active, ref bool ___manualMode)
         {
+            if (Time.timeScale == 0)
+                return;
             if (___ec.Npcs.Find(x => x.Character == EnumExtensions.GetFromExtendedName<Character>("MrPortalMan")))
             {
                 MrPortalMan poo = ___ec.Npcs.Find(x => x.Character == EnumExtensions.GetFromExtendedName<Character>("MrPortalMan")).gameObject.GetComponent<MrPortalMan>();

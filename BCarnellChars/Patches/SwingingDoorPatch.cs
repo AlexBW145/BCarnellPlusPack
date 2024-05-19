@@ -52,14 +52,13 @@ namespace BCarnellChars.Patches
             if (!___disabled && __instance.items[__instance.selectedItem].itemType == EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey"))
             {
                 MonoBehaviour.Instantiate(__instance.items[__instance.selectedItem].item).Use(__instance.pm);
-                __instance.StartCoroutine(delay(__instance.pm));
+                //__instance.StartCoroutine(delay(__instance.pm));
                 return false;
             }
             return true;
         }
 
-        // Just wanna make sure because some mods patches the ItemManager and I don't want any problems.
-        static IEnumerator delay(PlayerManager instance)
+        /*static IEnumerator delay(PlayerManager instance)
         {
             float time = 0.1f;
             int slot = instance.itm.selectedItem;
@@ -71,6 +70,6 @@ namespace BCarnellChars.Patches
             if (instance.itm.items[slot].itemType != EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey"))
                 instance.itm.SetItem(ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey")).value, slot);
             yield break;
-        }
+        }*/
     }
 }

@@ -28,7 +28,7 @@ namespace BCarnellEditor
         {
             Harmony harmony = new Harmony("alexbw145.baldiplus.bcarnelleditor");
             harmony.PatchAllConditionals();
-            LoadingEvents.RegisterOnAssetsLoaded(PostLoad, true);
+            LoadingEvents.RegisterOnAssetsLoaded(Info, PostLoad, true);
         }
 
         private void PostLoad()
@@ -64,6 +64,10 @@ namespace BCarnellEditor
             crazyMachineCard1.AddComponent<ProfitCardVendingMachine>();
             GameObject crazyMachineCard2 = Instantiate(Resources.FindObjectsOfTypeAll<SodaMachine>().ToList().Find(x => x.name == "CrazyVendingMachineZesty")).gameObject;
             crazyMachineCard2.AddComponent<ProfitCardVendingMachine>();
+            sodaMachineCard.transform.position = new Vector3(0, float.MaxValue, 0);
+            zestyMachineCard.transform.position = new Vector3(0, float.MaxValue, 0);
+            crazyMachineCard1.transform.position = new Vector3(0, float.MaxValue, 0);
+            crazyMachineCard2.transform.position = new Vector3(0, float.MaxValue, 0);
 
             DontDestroyOnLoad(sodaMachineCard);
             //sodaMachineCard.SetActive(false);
@@ -83,14 +87,14 @@ namespace BCarnellEditor
             PlusLevelLoaderPlugin.Instance.prefabAliases.Add("crazymachine_bsodaprofit", crazyMachineCard1);
             PlusLevelLoaderPlugin.Instance.prefabAliases.Add("crazymachine_zestyprofit", crazyMachineCard2);
 
-            BaldiLevelEditorPlugin.itemObjects.Add("profitcard", ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("ProfitCard")).value);
-            BaldiLevelEditorPlugin.itemObjects.Add("bhammer", ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("BHammer")).value);
-            BaldiLevelEditorPlugin.itemObjects.Add("unsecuredyellowkey", ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey")).value);
-            BaldiLevelEditorPlugin.itemObjects.Add("securedyellowlock", ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("SecuredYellowLock")).value);
-            PlusLevelLoaderPlugin.Instance.itemObjects.Add("profitcard", ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("ProfitCard")).value);
-            PlusLevelLoaderPlugin.Instance.itemObjects.Add("bhammer", ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("BHammer")).value);
-            PlusLevelLoaderPlugin.Instance.itemObjects.Add("unsecuredyellowkey", ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey")).value);
-            PlusLevelLoaderPlugin.Instance.itemObjects.Add("securedyellowlock", ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("SecuredYellowLock")).value);
+            BaldiLevelEditorPlugin.itemObjects.Add("profitcard", BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard"));
+            BaldiLevelEditorPlugin.itemObjects.Add("bhammer", BasePlugin.bcppAssets.Get<ItemObject>("Items/BHammer"));
+            BaldiLevelEditorPlugin.itemObjects.Add("unsecuredyellowkey", BasePlugin.bcppAssets.Get<ItemObject>("Items/UnsecuredKey"));
+            BaldiLevelEditorPlugin.itemObjects.Add("securedyellowlock", BasePlugin.bcppAssets.Get<ItemObject>("Items/SecuredLock"));
+            PlusLevelLoaderPlugin.Instance.itemObjects.Add("profitcard", BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard"));
+            PlusLevelLoaderPlugin.Instance.itemObjects.Add("bhammer", BasePlugin.bcppAssets.Get<ItemObject>("Items/BHammer"));
+            PlusLevelLoaderPlugin.Instance.itemObjects.Add("unsecuredyellowkey", BasePlugin.bcppAssets.Get<ItemObject>("Items/UnsecuredKey"));
+            PlusLevelLoaderPlugin.Instance.itemObjects.Add("securedyellowlock", BasePlugin.bcppAssets.Get<ItemObject>("Items/SecuredLock"));
 
 
         }
