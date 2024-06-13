@@ -70,7 +70,7 @@ namespace BCarnellChars.Characters
             navigator.SetSpeed(0);
             foreach (SpriteRenderer render in spriteRenderer)
                 render.gameObject.SetActive(false);
-            baseTrigger[0].enabled = false;
+            Navigator.Entity.SetTrigger(false);
 
             List<RoomController> list = new List<RoomController>();
             foreach (RoomController room in ec.rooms)
@@ -111,6 +111,12 @@ namespace BCarnellChars.Characters
             }
         }
 
+        protected override void VirtualUpdate()
+        {
+            if (Navigator.Entity.ExternalActivity.moveMods.Count > 0)
+                Navigator.Entity.ExternalActivity.moveMods = [];
+        }
+
         public void StartToDevour()
         {
             SwitchOutput();
@@ -123,7 +129,7 @@ namespace BCarnellChars.Characters
             navigator.SetSpeed(18);
             foreach (SpriteRenderer render in spriteRenderer)
                 render.gameObject.SetActive(true);
-            baseTrigger[0].enabled = true;
+            Navigator.Entity.SetTrigger(true);
             StartCoroutine(showFade());
         }
 
@@ -156,7 +162,8 @@ namespace BCarnellChars.Characters
             }
             idiot.transform.position = currentOutput.position + Vector3.back * 5f;
             idiot.transform.rotation = currentOutput.rotation;   
-            SwitchOutput();
+            if (idiot.CompareTag("Player") | idiot.CompareTag("NPC"))
+                SwitchOutput();
         }
 
         public void Rest()
@@ -166,7 +173,7 @@ namespace BCarnellChars.Characters
             audMan.PlaySingle(teleport);
             audMan.PlaySingle(audFulfilled);
             StartCoroutine(hideFade());
-            baseTrigger[0].enabled = false;
+            Navigator.Entity.SetTrigger(false);
             behaviorStateMachine.ChangeState(new MrPortalMan_Cooldown(this, UnityEngine.Random.RandomRangeInt(40, 80)));
             behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 0));
             navigator.maxSpeed = 0;

@@ -25,7 +25,6 @@ namespace BCarnellChars.Characters.States
 
         public override void Update()
         {
-            base.Update();
             if (currentAteFood >= numberOfFoodNeed)
                 portalMan.Rest();
 
@@ -51,24 +50,20 @@ namespace BCarnellChars.Characters.States
 
         public override void PlayerSighted(PlayerManager player)
         {
-            base.PlayerSighted(player);
             if (currentTarget == null)
                 currentTarget = player.GetComponent<PlayerEntity>();
         }
 
         public override void DestinationEmpty()
         {
-            base.DestinationEmpty();
             if (currentTarget != null) {
                 portalMan.looker.Raycast(currentTarget.transform, Mathf.Min((portalMan.transform.position - currentTarget.transform.position).magnitude + currentTarget.GetComponent<NPC>().Navigator.Velocity.magnitude, portalMan.looker.distance, portalMan.ec.MaxRaycast), out bool _sighted);
                 if (!_sighted)
                     currentTarget = null;
             }
         }
-
         public override void OnStateTriggerStay(Collider other)
         {
-            base.OnStateTriggerEnter(other);
             if (other.CompareTag("NPC") || other.CompareTag("Player")) {
                 portalMan.TeleportAnIdiot(other.GetComponent<Entity>());
                 if (other.GetComponent<Entity>() == currentTarget)

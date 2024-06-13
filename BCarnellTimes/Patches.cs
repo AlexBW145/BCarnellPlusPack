@@ -71,7 +71,8 @@ namespace BCarnellTimes
         }
     }
 
-    [HarmonyPatch(typeof(ERRORBOT), "Jammed")]
+    // Useless
+    /*[HarmonyPatch(typeof(ERRORBOT), "Jammed")]
     class Gummed
     {
         static void Postfix(ERRORBOT __instance, Collider other, ref AudioManager ___audMan, ref SoundObject ___splat)
@@ -87,5 +88,5 @@ namespace BCarnellTimes
                 ___audMan.PlaySingle(___splat);
             }
         }
-    }
+    }*/
 }
