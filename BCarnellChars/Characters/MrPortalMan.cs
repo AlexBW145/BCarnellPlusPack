@@ -96,7 +96,7 @@ namespace BCarnellChars.Characters
             while (!flag && _spawnedPortals.Count > 0)
             {
                 cell = _spawnedPortals[UnityEngine.Random.Range(0, _spawnedPortals.Count)];
-                if (cell.HasFreeWall)
+                if (cell.HasFreeWall & !ec.TrapCheck(cell))
                 {
                     var port = Instantiate(portalPre, cell.TileTransform).Spawn(cell);
                     port.gameObject.SetActive(true);
