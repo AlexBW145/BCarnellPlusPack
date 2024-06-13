@@ -145,15 +145,14 @@ namespace BCarnellChars.Characters
             {
                 audMan.PlaySingle(teleport);
                 if (idiot.GetComponent<AudioManager>() != null) idiot.GetComponent<AudioManager>().PlaySingle(teleport);
+                if (idiot.gameObject.GetComponent<ITM_GrapplingHook>()) Destroy(idiot);
             }
             else
             {
                 CoreGameManager.Instance.audMan.PlaySingle(teleport);
                 if (FindObjectOfType<ITM_GrapplingHook>())
                 {
-                    ITM_GrapplingHook grapple = FindObjectOfType<ITM_GrapplingHook>();
-                    if (grapple.pressure < 9999f)
-                        grapple.pressure = 9999f;
+                    Destroy(FindObjectOfType<ITM_GrapplingHook>());
                 }
             }
             idiot.transform.position = currentOutput.position + Vector3.back * 5f;
