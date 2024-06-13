@@ -23,7 +23,7 @@ namespace BCarnellChars.Patches
         }
     }
 
-    // Missed the texture made a better version in the latest API update without notifying me, useless.
+    // Missed the texture made a better version in the latest API update, useless.
     /*[HarmonyPatch(typeof(CullingManager), "LateUpdate")]
     class CullingPortal
     {
