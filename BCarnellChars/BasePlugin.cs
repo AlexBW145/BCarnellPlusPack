@@ -297,218 +297,7 @@ namespace BCarnellChars
             bcppAssets.Get<SoundObject>("ERRORBOT/Sprayed").additionalKeys = [new SubtitleTimedKey() { key = "Sfx_ERRORBOT_Malfunction", time = 0.34f }];
 
             LoadingEvents.RegisterOnAssetsLoaded(Info, PreLoad(), false);
-            LoadingEvents.RegisterOnAssetsLoaded(Info, PostLoad, true);
-
             ModdedSaveGame.AddSaveHandler(Info); // I hate it when the same ol' mistakes happen!
-        }
-
-        private void PostLoad()
-        {
-            GeneratorManagement.Register(this, GenerationModType.Addend, (floorName, floorNum, ld) =>
-            {
-                switch (floorName)
-                {
-                    case "F1":
-                        ld.potentialItems = ld.potentialItems.AddRangeToArray([
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
-                                weight = 75
-                            },
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
-                                weight = 100
-                            }
-                            ]);
-                        ld.potentialNPCs.AddRange([
-                            new WeightedNPC()
-                            {
-                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("RPSGuy")).value,
-                                weight = 150
-                            }
-                        ]);
-                        break;
-                    case "F2":
-                        ld.potentialItems = ld.potentialItems.AddRangeToArray([
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
-                                weight = 75
-                            },
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
-                                weight = 80
-                            },
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
-                                weight = 100
-                            },
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/SecuredLock"),
-                                weight = 75
-                            }
-                            ]);
-                        ld.shopItems = ld.shopItems.AddRangeToArray([
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
-                                weight = 80
-                            },
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
-                                weight = 80
-                            },
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
-                                weight = 100
-                            }
-                            ]);
-                        ld.potentialNPCs.AddRange([
-                            new WeightedNPC()
-                            {
-                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("RPSGuy")).value,
-                                weight = 200
-                            },
-                            new WeightedNPC()
-                            {
-                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("ERRORBOT")).value,
-                                weight = 140
-                            },
-                            new WeightedNPC()
-                            {
-                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("SiegeCanonCart")).value,
-                                weight = 140
-                            }
-                        ]);
-                        ld.additionalNPCs += 1;
-                        break;
-                    case "F3":
-                        ld.potentialItems = ld.potentialItems.AddRangeToArray([
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
-                                weight = 75
-                            },
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
-                                weight = 80
-                            },
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
-                                weight = 100
-                            },
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/SecuredLock"),
-                                weight = 75
-                            }
-                            ]);
-                        ld.shopItems = ld.shopItems.AddRangeToArray([
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
-                                weight = 80
-                            },
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
-                                weight = 80
-                            },
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
-                                weight = 100
-                            }
-                            ]);
-                        ld.potentialNPCs.AddRange([
-                            new WeightedNPC()
-                            {
-                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("RPSGuy")).value,
-                                weight = 200
-                            },
-                            new WeightedNPC()
-                            {
-                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("ERRORBOT")).value,
-                                weight = 140
-                            },
-                            new WeightedNPC()
-                            {
-                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("SiegeCanonCart")).value,
-                                weight = 140
-                            },
-                            new WeightedNPC()
-                            {
-                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("MrPortalMan")).value,
-                                weight = 150
-                            }
-                        ]);
-                        ld.additionalNPCs += 1;
-                        ld.specialHallBuilders = ld.specialHallBuilders.AddRangeToArray([
-                            new WeightedObjectBuilder()
-                            {
-                                selection = ObjectBuilderMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Obstacle>("InfLockedDoor")).value,
-                                weight = 75
-                            }
-                            ]);
-                        break;
-                    case "END":
-                        ld.potentialItems = ld.potentialItems.AddRangeToArray([
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
-                                weight = 80
-                            },
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
-                                weight = 80
-                            },
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
-                                weight = 85
-                            },
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/SecuredLock"),
-                                weight = 75
-                            }
-                            ]);
-                        ld.potentialNPCs.AddRange([
-                            new WeightedNPC()
-                            {
-                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("RPSGuy")).value,
-                                weight = 100
-                            },
-                            new WeightedNPC()
-                            {
-                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("ERRORBOT")).value,
-                                weight = 100
-                            },
-                            new WeightedNPC()
-                            {
-                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("SiegeCanonCart")).value,
-                                weight = 100
-                            },
-                            new WeightedNPC()
-                            {
-                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("MrPortalMan")).value,
-                                weight = 100
-                            }
-                        ]);
-                        ld.additionalNPCs += 2;
-                        break;
-                }
-
-            });
         }
 
         private IEnumerator PreLoad()
@@ -1011,8 +800,6 @@ namespace BCarnellChars
 
             yield return "";
             // The Basement
-            // But before we pity ourselves, we must create a new killer!!
-            //var prototypeBot = ObjectCreators.CreateNPC<PrototypeBot>("PrototypeBot-01", EnumExtensions.ExtendEnum<Character>("PrototypeBot"), ObjectCreators.CreatePosterObject(Resources.FindObjectsOfTypeAll<Texture2D>().ToList().Find(x => x.name == "Transparent"), []), spawnableRooms: [RoomCategory.Hall, RoomCategory.Office], maxAudioDistance: 400f);
             lBasement = ScriptableObject.CreateInstance<LevelObject>();
             // Make sure to not modify the ones you're unsure about!
             lBasement.name = "Basement1";
@@ -1262,6 +1049,212 @@ namespace BCarnellChars
                 hi++;
             }*/
 #endif
+
+            GeneratorManagement.Register(this, GenerationModType.Addend, (floorName, floorNum, ld) =>
+            {
+                switch (floorName)
+                {
+                    case "F1":
+                        ld.potentialItems = ld.potentialItems.AddRangeToArray([
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
+                                weight = 75
+                            },
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
+                                weight = 100
+                            }
+                            ]);
+                        ld.potentialNPCs.AddRange([
+                            new WeightedNPC()
+                            {
+                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("RPSGuy")).value,
+                                weight = 150
+                            }
+                        ]);
+                        break;
+                    case "F2":
+                        ld.potentialItems = ld.potentialItems.AddRangeToArray([
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
+                                weight = 75
+                            },
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
+                                weight = 80
+                            },
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
+                                weight = 100
+                            },
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/SecuredLock"),
+                                weight = 75
+                            }
+                            ]);
+                        ld.shopItems = ld.shopItems.AddRangeToArray([
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
+                                weight = 80
+                            },
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
+                                weight = 80
+                            },
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
+                                weight = 100
+                            }
+                            ]);
+                        ld.potentialNPCs.AddRange([
+                            new WeightedNPC()
+                            {
+                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("RPSGuy")).value,
+                                weight = 200
+                            },
+                            new WeightedNPC()
+                            {
+                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("ERRORBOT")).value,
+                                weight = 140
+                            },
+                            new WeightedNPC()
+                            {
+                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("SiegeCanonCart")).value,
+                                weight = 140
+                            }
+                        ]);
+                        ld.additionalNPCs += 1;
+                        break;
+                    case "F3":
+                        ld.potentialItems = ld.potentialItems.AddRangeToArray([
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
+                                weight = 75
+                            },
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
+                                weight = 80
+                            },
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
+                                weight = 100
+                            },
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/SecuredLock"),
+                                weight = 75
+                            }
+                            ]);
+                        ld.shopItems = ld.shopItems.AddRangeToArray([
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
+                                weight = 80
+                            },
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
+                                weight = 80
+                            },
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
+                                weight = 100
+                            }
+                            ]);
+                        ld.potentialNPCs.AddRange([
+                            new WeightedNPC()
+                            {
+                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("RPSGuy")).value,
+                                weight = 200
+                            },
+                            new WeightedNPC()
+                            {
+                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("ERRORBOT")).value,
+                                weight = 140
+                            },
+                            new WeightedNPC()
+                            {
+                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("SiegeCanonCart")).value,
+                                weight = 140
+                            },
+                            new WeightedNPC()
+                            {
+                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("MrPortalMan")).value,
+                                weight = 150
+                            }
+                        ]);
+                        ld.additionalNPCs += 1;
+                        ld.specialHallBuilders = ld.specialHallBuilders.AddRangeToArray([
+                            new WeightedObjectBuilder()
+                            {
+                                selection = ObjectBuilderMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Obstacle>("InfLockedDoor")).value,
+                                weight = 75
+                            }
+                            ]);
+                        break;
+                    case "END":
+                        ld.potentialItems = ld.potentialItems.AddRangeToArray([
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
+                                weight = 80
+                            },
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
+                                weight = 80
+                            },
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
+                                weight = 85
+                            },
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/SecuredLock"),
+                                weight = 75
+                            }
+                            ]);
+                        ld.potentialNPCs.AddRange([
+                            new WeightedNPC()
+                            {
+                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("RPSGuy")).value,
+                                weight = 100
+                            },
+                            new WeightedNPC()
+                            {
+                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("ERRORBOT")).value,
+                                weight = 100
+                            },
+                            new WeightedNPC()
+                            {
+                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("SiegeCanonCart")).value,
+                                weight = 100
+                            },
+                            new WeightedNPC()
+                            {
+                                selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("MrPortalMan")).value,
+                                weight = 100
+                            }
+                        ]);
+                        ld.additionalNPCs += 2;
+                        break;
+                }
+
+            });
         }
     }
 
