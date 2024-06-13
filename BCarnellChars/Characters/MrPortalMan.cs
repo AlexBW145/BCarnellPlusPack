@@ -4,6 +4,7 @@ using BCarnellChars.Patches;
 using MTM101BaldAPI;
 using MTM101BaldAPI.AssetTools;
 using MTM101BaldAPI.Components;
+using MTM101BaldAPI.Reflection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -145,15 +146,13 @@ namespace BCarnellChars.Characters
             {
                 audMan.PlaySingle(teleport);
                 if (idiot.GetComponent<AudioManager>() != null) idiot.GetComponent<AudioManager>().PlaySingle(teleport);
-                if (idiot.gameObject.GetComponent<ITM_GrapplingHook>()) Destroy(idiot);
+                if (idiot.gameObject.GetComponent<ITM_GrapplingHook>()) idiot.GetComponent<ITM_GrapplingHook>().ReflectionSetVariable("maxPressure", 0f); ;
             }
             else
             {
                 CoreGameManager.Instance.audMan.PlaySingle(teleport);
                 if (FindObjectOfType<ITM_GrapplingHook>())
-                {
-                    Destroy(FindObjectOfType<ITM_GrapplingHook>());
-                }
+                    FindObjectOfType<ITM_GrapplingHook>().ReflectionSetVariable("maxPressure", 0f);
             }
             idiot.transform.position = currentOutput.position + Vector3.back * 5f;
             idiot.transform.rotation = currentOutput.rotation;   
