@@ -88,13 +88,6 @@ namespace BCarnellChars.Characters
             }
         }
 
-        protected override void VirtualUpdate()
-        {
-            if (!gameObject.activeSelf || Time.timeScale == 0)
-                return;
-            Render(portalmanCam.targetTexture);
-        }
-
         private void SpawnBoard(RoomController room)
         {
             _spawnedPortals = room.GetTilesOfShape(tileShapes, true);
