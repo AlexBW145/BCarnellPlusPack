@@ -223,8 +223,11 @@ namespace BCarnellChars.Characters
 
         private void OnDestroy()
         {
-            if (spriteRenderer[1].sprite != null)
+            if (spriteRenderer[1].sprite != null) // Sprite has Texture2D, both must be eliminated at once.
+            {
+                Destroy(spriteRenderer[1].sprite.texture);
                 Destroy(spriteRenderer[1].sprite);
+            }
         }
 
         private void SwitchOutput()
@@ -236,7 +239,10 @@ namespace BCarnellChars.Characters
             if (!outputCam.gameObject.GetComponent<CullAffector>())
                 currentOutput.gameObject.AddComponent<CullAffector>();
             if (spriteRenderer[1].sprite != null)
+            {
+                Destroy(spriteRenderer[1].sprite.texture);
                 Destroy(spriteRenderer[1].sprite); // I don't want to fill up de assets!
+            }
             spriteRenderer[1].sprite = AssetLoader.SpriteFromTexture2D(Render(outputCam.targetTexture), 34f);
             if (outputCam.gameObject.GetComponent<CullAffector>())
                 Destroy(outputCam.GetComponent<CullAffector>());
@@ -251,6 +257,7 @@ namespace BCarnellChars.Characters
 
             tex.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
             tex.Apply();
+            tex.name = "PortalOutputRenderTextShot";
 
             RenderTexture.active = old_rt;
             return tex;
