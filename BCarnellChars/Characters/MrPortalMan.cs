@@ -3,6 +3,7 @@ using BCarnellChars.GeneratorStuff;
 using BCarnellChars.Patches;
 using MTM101BaldAPI;
 using MTM101BaldAPI.AssetTools;
+using MTM101BaldAPI.Components;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -55,6 +56,8 @@ namespace BCarnellChars.Characters
         public override void Initialize()
         {
             base.Initialize();
+            if (!gameObject.GetComponent<CullAffector>())
+                gameObject.AddComponent<CullAffector>();
             portalmanCam.enabled = true;
             outputCam = Instantiate(outputCamPre, transform, false);
             outputCam.gameObject.SetActive(true);
@@ -85,7 +88,7 @@ namespace BCarnellChars.Characters
             }
         }
 
-        private void LateUpdate()
+        protected override void VirtualUpdate()
         {
             if (!gameObject.activeSelf || Time.timeScale == 0)
                 return;
@@ -216,6 +219,8 @@ namespace BCarnellChars.Characters
             foreach (Transform portal in portals)
                 Destroy(portal.gameObject);
             portals.Clear();
+            if (gameObject.GetComponent<CullAffector>())
+                Destroy(gameObject.GetComponent<CullAffector>());
         }
 
         private void OnDestroy()
@@ -230,14 +235,19 @@ namespace BCarnellChars.Characters
             outputCam.transform.SetParent(portals[random].transform, false);
             outputCam.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
             currentOutput = portals[random];
+            if (!outputCam.gameObject.GetComponent<CullAffector>())
+                currentOutput.gameObject.AddComponent<CullAffector>();
             if (spriteRenderer[1].sprite != null)
                 Destroy(spriteRenderer[1].sprite); // I don't want to fill up de assets!
             spriteRenderer[1].sprite = AssetLoader.SpriteFromTexture2D(Render(outputCam.targetTexture), 34f);
+            if (outputCam.gameObject.GetComponent<CullAffector>())
+                Destroy(outputCam.GetComponent<CullAffector>());
+            spriteRenderer[1].sprite.name = "Spr_PortalOutputRenderTextSpr";
         }
 
         private Texture2D Render(RenderTexture rTex)
         {
-            Texture2D tex = new Texture2D(rTex.width, rTex.height, TextureFormat.RGB24, false);
+            Texture2D tex = new Texture2D(rTex.width, rTex.height, TextureFormat.RGBA32, false);
             var old_rt = RenderTexture.active;
             RenderTexture.active = rTex;
 

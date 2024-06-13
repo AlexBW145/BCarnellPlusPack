@@ -27,10 +27,11 @@ using MTM101BaldAPI.SaveSystem;
 using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 using System.IO;
 using MTM101BaldAPI.ObjectCreation;
+using System.Collections;
 
 namespace BCarnellChars
 {
-    [BepInPlugin("alexbw145.baldiplus.bcarnellchars", "B. Carnell Chars", "1.0.3")]
+    [BepInPlugin("alexbw145.baldiplus.bcarnellchars", "B. Carnell Chars", "1.0.4")]
     [BepInDependency("mtm101.rulerp.bbplus.baldidevapi")]
     [BepInIncompatibility("alexbw145.bbplus.rpsguy")] // This is a bad idea...
     [BepInProcess("BALDI.exe")]
@@ -54,6 +55,10 @@ namespace BCarnellChars
             Harmony harmony = new Harmony("alexbw145.baldiplus.bcarnellchars");
             Instance = this;
             harmony.PatchAllConditionals();
+
+            // Custom Posters Mod
+            if (Chainloader.PluginInfos.ContainsKey("io.github.luisrandomness.bbp_custom_posters"))
+                Chainloader.PluginInfos["io.github.luisrandomness.bbp_custom_posters"].Instance.GetType().Assembly.GetType("LuisRandomness.BBPCustomPosters.CustomPostersPlugin").InvokeMember("AddBuiltInPackFromMod", BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod, null, null, [this, "Texture2D", "Posters"]);
 
             float errorbodySpriteSize = 100f;
             int siegeSize = 39;
@@ -291,7 +296,14 @@ namespace BCarnellChars
             bcppAssets.Get<SoundObject>("ERRORBOT/Jammed").additionalKeys = [new SubtitleTimedKey() { key = "Sfx_ERRORBOT_Malfunction", time = 0.34f }];
             bcppAssets.Get<SoundObject>("ERRORBOT/Sprayed").additionalKeys = [new SubtitleTimedKey() { key = "Sfx_ERRORBOT_Malfunction", time = 0.34f }];
 
-            LoadingEvents.RegisterOnAssetsLoaded(Info, PreLoad, false);
+            LoadingEvents.RegisterOnAssetsLoaded(Info, PreLoad(), false);
+            LoadingEvents.RegisterOnAssetsLoaded(Info, PostLoad, true);
+
+            ModdedSaveGame.AddSaveHandler(Info); // I hate it when the same ol' mistakes happen!
+        }
+
+        private void PostLoad()
+        {
             GeneratorManagement.Register(this, GenerationModType.Addend, (floorName, floorNum, ld) =>
             {
                 switch (floorName)
@@ -497,12 +509,17 @@ namespace BCarnellChars
                 }
 
             });
-
-            ModdedSaveGame.AddSaveHandler(Info); // I hate it when the same ol' mistakes happen!
         }
 
-        private void PreLoad()
+        private IEnumerator PreLoad()
         {
+            yield return 1;
+            yield return "Loading...";
+            if (MTM101BaldiDevAPI.Instance.Info.Metadata.Version < new Version("4.2.0.0"))
+            {
+                MTM101BaldiDevAPI.CauseCrash(Info, new Exception("BCPP crashed the mod loading screen because the API version is wrong."));
+                yield break;
+            }
             RadarModExists = Chainloader.PluginInfos.ContainsKey(radarID);
             if (RadarModExists)
             {
@@ -522,6 +539,7 @@ namespace BCarnellChars
                     Debug.LogError("MrPortalManColor is (0, 0, 0, 0). The map arrow will be fully clear.");
             }
 
+            yield return "Initializing RPS Guy";
             // do dis
             var rpsguy = new NPCBuilder<RPSGuy>(Info)
                 .SetName("RPS Guy")
@@ -548,13 +566,14 @@ namespace BCarnellChars
             annoying.audioDevice.maxDistance = 150;
             annoying.audioDevice.dopplerLevel = 0;
             annoying.audioDevice.spread = 0;
+            yield return "Initializing RPSUI";
             GameObject rockpaperscissors = GameObject.Instantiate(Resources.FindObjectsOfTypeAll<Jumprope>().ToList().Find(s => s.name == "Jumprope").gameObject);
             rockpaperscissors.name = "Rock Paper Scissors";
             Destroy(rockpaperscissors.GetComponent<Jumprope>());
             Destroy(rockpaperscissors.transform.Find("RopeCanvas").gameObject);
             Destroy(rockpaperscissors.transform.Find("TextCanvas").transform.Find("Count").gameObject);
             RawImage raw = rockpaperscissors.transform.Find("TextCanvas").gameObject.AddComponent<RawImage>();
-            raw.color = new Color(0f,0f,0f,0.50f); // Initial Color
+            raw.color = new Color(0f, 0f, 0f, 0.50f); // Initial Color
             rockpaperscissors.ConvertToPrefab(false);
             Image uhf = new GameObject("Border", typeof(Image)).GetComponent<Image>();
             uhf.gameObject.layer = LayerMask.NameToLayer("UI");
@@ -600,6 +619,7 @@ namespace BCarnellChars
             theyChoose.GetComponent<RectTransform>().anchoredPosition = new Vector3(-110, 0, 0); // Pro tip: anchoredPosition helps.
             theyChoose.GetComponent<Image>().sprite = Resources.FindObjectsOfTypeAll<Sprite>().ToList().Find(x => x.name == "Transparent");
             rockpaperscissors.transform.Find("TextCanvas").gameObject.GetComponentInChildren<TMP_Text>().alignment = TextAlignmentOptions.Center;
+            yield return "Finalizing RPS Guy";
             rpsguy.rpsPre = rockpaperscissors.AddComponent<RockPaperScissors>();
             rpsguy.rpsPre.hitSounds.AddRange([
                 bcppAssets.Get<SoundObject>("RPSUI/HitTie"),
@@ -612,6 +632,7 @@ namespace BCarnellChars
                 bcppAssets.Get<Sprite>("RPSUI/Scissors")
             ]);
 
+            yield return "Initializing ERROR-BOT_ITEM-STEALER";
             var errorbot = new NPCBuilder<ERRORBOT>(Info)
                 .SetName("ERROR-BOT_ITEM-STEALER")
                 .SetEnum(EnumExtensions.ExtendEnum<Character>("ERRORBOT"))
@@ -677,6 +698,7 @@ namespace BCarnellChars
             staticbot.audioDevice.dopplerLevel = 0;
             staticbot.audioDevice.spread = 0;
 
+            yield return "Initializing Siege Canon Cart";
             // This part is the reason why I almost gave up
             var siegecart = new NPCBuilder<SiegeCanonCart>(Info)
                 .SetName("Siege Canon Cart")
@@ -777,7 +799,7 @@ namespace BCarnellChars
                 moveRotationMap,
                 shootRotationMap
             });
-            siegecart.spriteRenderer[0].transform.position = new Vector3(0,0.75f,0);
+            siegecart.spriteRenderer[0].transform.position = new Vector3(0, 0.75f, 0);
             SpriteRenderer nonvisible = Instantiate(siegecart.spriteRenderer[0]); // I copy this from the existing one to make it animated.
             nonvisible.transform.SetParent(siegecart.spriteBase.transform);
             nonvisible.gameObject.SetActive(false); // And then I later hide it!
@@ -801,6 +823,7 @@ namespace BCarnellChars
             ball.transform.Find("RendereBase").GetComponentInChildren<SpriteRenderer>().sprite = bcppAssets.Get<Sprite>("SiegeCanonCart/Ball");
             bcppAssets.Add<Entity>("SiegeCannonBall", ball.GetComponent<Entity>());
 
+            yield return "Initializing Mr. Portal Man";
             var portalman = new NPCBuilder<MrPortalMan>(Info)
                 .SetName("Mr Portal Man")
                 .SetEnum(EnumExtensions.ExtendEnum<Character>("MrPortalMan"))
@@ -827,6 +850,7 @@ namespace BCarnellChars
             CapsuleCollider trigger = portalman.baseTrigger[0] as CapsuleCollider;
             trigger.radius = 3;
             trigger.height = 12;
+            yield return "Initializing Mr. Portal Man (RenderTextures)";
             // Welp, I was never here!
             RenderTexture baseRendererTexture = Resources.FindObjectsOfTypeAll<RenderTexture>().ToList().Find(x => x.name == "AuthenticGameTexture");
             Camera mainCam = Resources.FindObjectsOfTypeAll<GameCamera>().First().transform.Find("MainCamera").GetComponent<Camera>();
@@ -846,7 +870,7 @@ namespace BCarnellChars
             portalman.portalmanCam.cullingMask |= LayerMask.GetMask("Billboard");
             //portalman.portalmanCam.nearClipPlane = 0.01f;
             portalman.portalmanCam.useOcclusionCulling = false;
-            
+
             Destroy(portalman.portalmanCam.gameObject.GetComponent<VA_AudioListener>());
             portalman.portalmanCam.enabled = false;
             portalman.outputCamPre = Instantiate(mainCam, portalman.transform, false);
@@ -858,6 +882,7 @@ namespace BCarnellChars
             Destroy(portalman.outputCamPre.gameObject.GetComponent<VA_AudioListener>());
             portalman.outputCamPre.enabled = false;
             portalman.outputCamPre.gameObject.SetActive(false);
+            yield return "Initializing Mr. Portal Man (Portal Outputs)";
             // This is a room poster
             Material cryingportalMat = Instantiate(Resources.FindObjectsOfTypeAll<Material>().ToList().Find(x => x.name == "BlankChalk"));
             cryingportalMat.name = "CryingPortalMat";
@@ -872,15 +897,15 @@ namespace BCarnellChars
             Destroy(cryingPortal.GetComponent<Chalkboard>());
             CryingPortal cry = cryingPortal.AddComponent<CryingPortal>();
             cry.mask = cryingportalMask;
-            DontDestroyOnLoad(cryingPortal);
+            cryingPortal.ConvertToPrefab(true);
             portalman.portalPre = cryingPortal.GetComponent<CryingPortal>();
             cryingPortal.SetActive(false);
 
             /*NPCMetaStorage.Instance.Add(new NPCMetadata(Info, [rpsguy], "RPS Guy", NPCFlags.Standard));
             NPCMetaStorage.Instance.Add(new NPCMetadata(Info, [errorbot], "ERROR-BOT_ITEM-STEALER", NPCFlags.Standard | NPCFlags.MakeNoise));
             NPCMetaStorage.Instance.Add(new NPCMetadata(Info, [siegecart], "Siege Canon Cart", NPCFlags.StandardNoCollide));
-            NPCMetaStorage.Instance.Add(new NPCMetadata(Info, [portalman], "Mr Portal Man", NPCFlags.Standard));
-            */
+            NPCMetaStorage.Instance.Add(new NPCMetadata(Info, [portalman], "Mr Portal Man", NPCFlags.Standard));*/
+            yield return "Finalizing NPC Initialization";
             bcppAssets.AddRange<NPC>([
                 rpsguy,
                 errorbot,
@@ -894,48 +919,53 @@ namespace BCarnellChars
                 "NPCs/Mr Portal Man",
                 ]);
 
+            yield return "Initializing Unsafe Hammer";
             // Pretty sure this hammer came in before BBT, but I didn't really know how to add items to arrays back then...
             ItemObject hammer = new ItemBuilder(Info)
                 .SetItemComponent<ITM_Hammer>()
                 .SetNameAndDescription("Itm_BHammer", "Desc_BHammer")
                 .SetSprites(bcppAssets.Get<Sprite>("Items/BHammer_Small"), bcppAssets.Get<Sprite>("Items/BHammer_Large"))
                 .SetEnum(EnumExtensions.ExtendEnum<Items>("BHammer"))
-                .SetShopPrice(25)
+                .SetShopPrice(203) // Makin' sure it blends into Time's hammer.
                 .SetGeneratorCost(30)
                 .SetMeta(ItemFlags.None, ["BCPP"])
                 .Build(); //ObjectCreators.CreateItemObject("Itm_BHammer", "Desc_BHammer", bcppAssets.Get<Sprite>("Items/BHammer_Small"), bcppAssets.Get<Sprite>("Items/BHammer_Large"), EnumExtensions.ExtendEnum<Items>("BHammer"), 25, 30);
+            yield return "Initializing Profit Card and its assets";
             // Annnddd, this is something stupidly uncool and sometimes creative...
             ItemObject profitCard = new ItemBuilder(Info)
                 .SetItemComponent<ITM_Acceptable>()
                 .SetNameAndDescription("Itm_ProfitCard", "Desc_ProfitCard")
                 .SetSprites(bcppAssets.Get<Sprite>("Items/ProfitCard_Small"), bcppAssets.Get<Sprite>("Items/ProfitCard_Large"))
                 .SetEnum(EnumExtensions.ExtendEnum<Items>("ProfitCard"))
-                .SetShopPrice(85)
+                .SetShopPrice(285)
                 .SetGeneratorCost(25)
                 .SetMeta(ItemFlags.None, ["BCPP"])
                 .Build(); //ObjectCreators.CreateItemObject("Itm_ProfitCard", "Desc_ProfitCard", bcppAssets.Get<Sprite>("Items/ProfitCard_Small"), bcppAssets.Get<Sprite>("Items/ProfitCard_Large"), EnumExtensions.ExtendEnum<Items>("ProfitCard"), 85, 25);
             profitCard.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("item", EnumExtensions.GetFromExtendedName<Items>("ProfitCard"));
+            profitCard.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("audUse", Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(x => x.name == "CoinDrop"));
             profitCardInsert = Instantiate(Resources.FindObjectsOfTypeAll<Material>().ToList().Find(x => x.name == "BSODAMachine"));
             profitCardInsert.name = "ProfitCardMachine";
             profitCardInsert.SetMainTexture(bcppAssets.Get<Texture2D>("ProfitCardMachine"));
+            yield return "Initializing Unsecured Key";
             // Something evil is brewing inside!
             ItemObject swingingdoorInfKey = new ItemBuilder(Info)
                 .SetItemComponent<ITM_Acceptable>()
                 .SetNameAndDescription("Itm_UnsecuredKey", "Desc_UnsecuredKey")
                 .SetSprites(bcppAssets.Get<Sprite>("Items/UnsecuredKey_Small"), bcppAssets.Get<Sprite>("Items/UnsecuredKey_Large"))
                 .SetEnum(EnumExtensions.ExtendEnum<Items>("UnsecuredYellowKey"))
-                .SetShopPrice(110)
+                .SetShopPrice(1110)
                 .SetGeneratorCost(50)
                 .SetMeta(ItemFlags.MultipleUse | ItemFlags.Persists, ["BCPP"])
                 .Build(); //ObjectCreators.CreateItemObject("Itm_UnsecuredKey", "Desc_UnsecuredKey", bcppAssets.Get<Sprite>("Items/UnsecuredKey_Small"), bcppAssets.Get<Sprite>("Items/UnsecuredKey_Large"), EnumExtensions.ExtendEnum<Items>("UnsecuredYellowKey"), 110, 50);
             swingingdoorInfKey.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("item", EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey"));
             swingingdoorInfKey.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("audUse", Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(x => x.name == "Doors_StandardUnlock"));
+            yield return "Initializing Secured Lock and Secured Locked Door builder";
             ItemObject swingingdoorInfLock = new ItemBuilder(Info)
                 .SetItemComponent<ITM_Acceptable>()
                 .SetNameAndDescription("Itm_SecuredLock", "Desc_SecuredLock")
                 .SetSprites(bcppAssets.Get<Sprite>("Items/SecuredLock_Small"), bcppAssets.Get<Sprite>("Items/SecuredLock_Large"))
                 .SetEnum(EnumExtensions.ExtendEnum<Items>("SecuredYellowLock"))
-                .SetShopPrice(95)
+                .SetShopPrice(795)
                 .SetGeneratorCost(75)
                 .SetMeta(ItemFlags.None, ["BCPP"])
                 .Build(); //ObjectCreators.CreateItemObject("Itm_SecuredLock", "Desc_SecuredLock", bcppAssets.Get<Sprite>("Items/SecuredLock_Small"), bcppAssets.Get<Sprite>("Items/SecuredLock_Large"), EnumExtensions.ExtendEnum<Items>("SecuredYellowLock"), 95, 75);
@@ -943,7 +973,6 @@ namespace BCarnellChars
             swingingdoorInfLock.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("audUse", Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(x => x.name == "Slap"));
             GameObject inflockedSwingDoor = Instantiate(Resources.FindObjectsOfTypeAll<CoinDoor>().ToList().Find(p => p.name == "Door_SwingingCoin")).gameObject;
             inflockedSwingDoor.name = "Door_SwingingSecuredLock";
-            inflockedSwingDoor.transform.position = Vector3.up * float.MaxValue;
             Destroy(inflockedSwingDoor.GetComponent<CoinDoor>());
             inflockedSwingDoor.AddComponent<SecuredSwingingDoor>();
             securedYellowSwingingDoor = Instantiate(Resources.FindObjectsOfTypeAll<Material>().ToList().Find(x => x.name == "CoinDoor"));
@@ -952,13 +981,12 @@ namespace BCarnellChars
             //inflockedSwingDoor.GetComponent<SecuredSwingingDoor>().doorOverlay = securedYellowSwingingDoor;
             //inflockedSwingDoor.SetActive(false);
             inflockedSwingDoor.GetComponent<AudioManager>().enabled = false;
-            DontDestroyOnLoad(inflockedSwingDoor);
+            inflockedSwingDoor.ConvertToPrefab(true);
             CoinDoorBuilder builder = Instantiate(Resources.FindObjectsOfTypeAll<CoinDoorBuilder>().ToList().Find(x => x.name == "CoinDoorBuilder"));
             builder.gameObject.name = "Inf Secured Swinging Door Builder";
-            builder.transform.position = Vector3.up * float.MaxValue;
             builder.ReflectionSetVariable("doorPre", inflockedSwingDoor.GetComponent<SwingDoor>());
             builder.obstacle = EnumExtensions.ExtendEnum<Obstacle>("InfLockedDoor");
-            DontDestroyOnLoad(builder.gameObject);
+            builder.gameObject.ConvertToPrefab(true);
             ObjectBuilderMetaStorage.Instance.Add(EnumExtensions.GetFromExtendedName<Obstacle>("InfLockedDoor"), new ObjectBuilderMeta(Info, builder));
             bcppAssets.Add<SecuredSwingingDoor>("Obstacles/SecuredSwingingDoor", inflockedSwingDoor.GetComponent<SecuredSwingingDoor>());
             bcppAssets.Add<ObjectBuilder>("ObjectBuilder/SecuredSwingingDoor", builder);
@@ -967,6 +995,7 @@ namespace BCarnellChars
             ItemMetaStorage.Instance.Add(profitCard, new ItemMetaData(Info, profitCard));
             ItemMetaStorage.Instance.Add(swingingdoorInfKey, new ItemMetaData(Info, swingingdoorInfKey));
             ItemMetaStorage.Instance.Add(swingingdoorInfLock, new ItemMetaData(Info, swingingdoorInfLock));*/
+            yield return "Finalizing Item Initialization";
             bcppAssets.AddRange<ItemObject>([
                 hammer,
                 profitCard,
@@ -980,7 +1009,10 @@ namespace BCarnellChars
                 "Items/SecuredLock"
                 ]);
 
+            yield return "";
             // The Basement
+            // But before we pity ourselves, we must create a new killer!!
+            //var prototypeBot = ObjectCreators.CreateNPC<PrototypeBot>("PrototypeBot-01", EnumExtensions.ExtendEnum<Character>("PrototypeBot"), ObjectCreators.CreatePosterObject(Resources.FindObjectsOfTypeAll<Texture2D>().ToList().Find(x => x.name == "Transparent"), []), spawnableRooms: [RoomCategory.Hall, RoomCategory.Office], maxAudioDistance: 400f);
             lBasement = ScriptableObject.CreateInstance<LevelObject>();
             // Make sure to not modify the ones you're unsure about!
             lBasement.name = "Basement1";
@@ -1230,9 +1262,6 @@ namespace BCarnellChars
                 hi++;
             }*/
 #endif
-            // Custom Posters Mod
-            if (Chainloader.PluginInfos.ContainsKey("io.github.luisrandomness.bbp_custom_posters"))
-                Chainloader.PluginInfos["io.github.luisrandomness.bbp_custom_posters"].Instance.GetType().Assembly.GetType("LuisRandomness.BBPCustomPosters.CustomPostersPlugin").InvokeMember("AddPostersFromDirectory", BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod, null, null, [this, "Texture2D", "Posters"]);
         }
     }
 

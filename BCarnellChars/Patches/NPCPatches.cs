@@ -23,7 +23,8 @@ namespace BCarnellChars.Patches
         }
     }
 
-    [HarmonyPatch(typeof(CullingManager), "LateUpdate")]
+    // Missed the texture made a better version in the latest API update without notifying me, useless.
+    /*[HarmonyPatch(typeof(CullingManager), "LateUpdate")]
     class CullingPortal
     {
         private static Cell currentCell;
@@ -71,5 +72,5 @@ namespace BCarnellChars.Patches
                 currentCell = null;
             }
         }
-    }
+    }*/
 }

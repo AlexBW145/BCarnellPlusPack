@@ -132,13 +132,13 @@ namespace BCarnellChars.Characters
             if (player.Disobeying && (player.ruleBreak == "Faculty" || player.ruleBreak == "Escaping") && ec.Npcs.Find(p => p.Character == Character.Principal))
             {
                 Principal pri = ec.Npcs.Find(p => p.Character == Character.Principal).GetComponent<Principal>();
-                pri.WhistleReact(transform.position);
                 if (!(bool)pri.ReflectionGetVariable("allKnowing"))
                     pri.behaviorStateMachine.ChangeState(new Principal_ChasingPlayer(pri, player));
                 else
                     pri.behaviorStateMachine.ChangeState(new Principal_ChasingPlayer_AllKnowing(pri, player));
 
                 pri.ReflectionSetVariable("targetedPlayer", player);
+                pri.WhistleReact(transform.position);
                 pri.Scold(player.ruleBreak);
             }
         }
