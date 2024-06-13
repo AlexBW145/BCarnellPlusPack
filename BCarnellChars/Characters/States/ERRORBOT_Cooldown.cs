@@ -24,5 +24,9 @@ namespace BCarnellChars.Characters.States
                 erbot.EndCooldown();
             }
         }
+
+        public override void OnStateTriggerStay(Collider other)
+        {
+        }
     }
 }

@@ -4,6 +4,7 @@ using BBTimes.CustomContent.CustomItems;
 using BBTimes.ModPatches.GeneratorPatches;
 using BBTimes.Plugin;
 using BCarnellChars.Characters;
+using BCarnellChars.Characters.States;
 using BCarnellChars.ItemStuff;
 using HarmonyLib;
 using MTM101BaldAPI;
@@ -18,11 +19,10 @@ using UnityEngine;
 
 namespace BCarnellTimes
 {
-    // ITM_Hammer & Hammer doesn't conflict names, phew!
-    [HarmonyPatch(typeof(Hammer), "Use")]
+    [HarmonyPatch(typeof(BBTimes.CustomContent.CustomItems.ITM_Hammer), "Use")]
     class ActLikeBHammer
     {
-        static bool Prefix(Hammer __instance, PlayerManager pm, ref bool __result)
+        static bool Prefix(BBTimes.CustomContent.CustomItems.ITM_Hammer __instance, PlayerManager pm, ref bool __result)
         {
             if (pm.ec.Npcs.Find(x => x.Character == EnumExtensions.GetFromExtendedName<Character>("RPSGuy")))
             {
@@ -39,10 +39,10 @@ namespace BCarnellTimes
         }
     }
 
-    [HarmonyPatch(typeof(ITM_Hammer), "Use")]
+    [HarmonyPatch(typeof(BCarnellChars.ItemStuff.ITM_Hammer), "Use")]
     class ActLikeTimesHammer
     {
-        static bool Prefix(ITM_Hammer __instance, PlayerManager pm, ref bool __result)
+        static bool Prefix(BCarnellChars.ItemStuff.ITM_Hammer __instance, PlayerManager pm, ref bool __result)
         {
             if (Physics.Raycast(pm.transform.position, Singleton<CoreGameManager>.Instance.GetCamera(pm.playerNumber).transform.forward, out var raycastHit, pm.pc.reach, LayerMask.GetMask("Default", "Windows")))
             {
@@ -68,6 +68,24 @@ namespace BCarnellTimes
         static bool Prefix()
         {
             return PostRoomCreation.i.ld.name != "Basement1";
+        }
+    }
+
+    [HarmonyPatch(typeof(ERRORBOT), "Jammed")]
+    class Gummed
+    {
+        static void Postfix(ERRORBOT __instance, Collider other, ref AudioManager ___audMan, ref SoundObject ___splat)
+        {
+            if (other.GetComponent<ITM_Gum>())
+            {
+                __instance.looker.ReflectionSetVariable("layerMask", __instance.regularMask);
+                __instance.spriteRenderer[1].color = Color.magenta;
+                __instance.behaviorStateMachine.ChangeState(new ERRORBOT_Cooldown(__instance, __instance, UnityEngine.Random.RandomRangeInt(60, 120)));
+                __instance.behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(__instance, 99));
+                __instance.Navigator.maxSpeed = 0;
+                __instance.Navigator.SetSpeed(0);
+                ___audMan.PlaySingle(___splat);
+            }
         }
     }
 }

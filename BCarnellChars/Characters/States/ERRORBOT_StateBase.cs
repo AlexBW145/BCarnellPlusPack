@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 namespace BCarnellChars.Characters.States
 {
@@ -12,6 +13,12 @@ namespace BCarnellChars.Characters.States
             : base(npc)
         {
             erbot = errbot;
+        }
+
+        public override void OnStateTriggerStay(Collider other)
+        {
+            base.OnStateTriggerStay(other);
+            erbot.Jammed(other);
         }
     }
 }

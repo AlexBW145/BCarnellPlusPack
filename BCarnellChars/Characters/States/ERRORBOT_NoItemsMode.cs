@@ -23,11 +23,5 @@ namespace BCarnellChars.Characters.States
                 erbot.Alert(player);
 
         }
-
-        public override void OnStateTriggerStay(Collider other)
-        {
-            base.OnStateTriggerStay(other);
-            erbot.Jammed(other);
-        }
     }
 }

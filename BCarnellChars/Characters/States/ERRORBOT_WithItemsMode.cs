@@ -37,11 +37,5 @@ namespace BCarnellChars.Characters.States
             }
 
         }
-
-        public override void OnStateTriggerStay(Collider other)
-        {
-            base.OnStateTriggerStay(other);
-            erbot.Jammed(other);
-        }
     }
 }
