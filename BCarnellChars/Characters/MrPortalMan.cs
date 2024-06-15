@@ -1,6 +1,7 @@
 ﻿using BCarnellChars.Characters.States;
 using BCarnellChars.GeneratorStuff;
 using BCarnellChars.Patches;
+using HarmonyLib;
 using MTM101BaldAPI;
 using MTM101BaldAPI.AssetTools;
 using MTM101BaldAPI.Components;
@@ -24,19 +25,20 @@ namespace BCarnellChars.Characters
 
         public CryingPortal portalPre;
         private List<Cell> _spawnedPortals = new List<Cell>();
-        private List<Transform> portals = new List<Transform>();
+        private List<CryingPortal> portals = new List<CryingPortal>();
 
         private List<TileShape> tileShapes = new List<TileShape>()
         {
             TileShape.Corner,
             TileShape.Single
         };
+        [SerializeField] private float hallspawnPercent = 15f;
 
         public Camera portalmanCam;
         public Camera outputCamPre;
         private Camera outputCam;
         public Camera OutputCam => outputCam;
-        private Transform currentOutput;
+        private CryingPortal currentOutput;
 
         private void Awake()
         {
@@ -77,6 +79,14 @@ namespace BCarnellChars.Characters
                 if (room.category == RoomCategory.Faculty || room.category == RoomCategory.Special)
                     list.Add(room);
             int num = Mathf.RoundToInt(list.Count * (70f / 100f));
+            List<Cell> list2 = new List<Cell>();
+            foreach (List<Cell> subcell in ec.FindHallways())
+                foreach (Cell cell in subcell)
+                {
+                    if (cell.HasFreeWall && !cell.offLimits && cell.shape == TileShape.Straight && cell.room.type == RoomType.Hall)
+                        list2.Add(cell);
+                }    
+            int num2 = Mathf.RoundToInt(list2.Count * (hallspawnPercent / 100f));
             for (int i = 0; i < num; i++)
             {
                 if (list.Count <= 0)
@@ -87,21 +97,29 @@ namespace BCarnellChars.Characters
                 SpawnBoard(list[index]);
                 list.RemoveAt(index);
             }
+            for (int i = 0; i < num2; i++)
+            {
+                if (list2.Count <= 0)
+                {
+                    break;
+                }
+                int index = UnityEngine.Random.Range(0, list2.Count);
+                SpawnBoard(list2[index].room);
+                list2.RemoveAt(index);
+            }
         }
 
         private void SpawnBoard(RoomController room)
         {
-            _spawnedPortals = room.GetTilesOfShape(tileShapes, true);
+            _spawnedPortals = room.GetTilesOfShape(room.type == RoomType.Hall ? [TileShape.Straight] : tileShapes, true);
             Cell cell = null;
             bool flag = false;
             while (!flag && _spawnedPortals.Count > 0)
             {
                 cell = _spawnedPortals[UnityEngine.Random.Range(0, _spawnedPortals.Count)];
-                if (cell.HasFreeWall & !ec.TrapCheck(cell))
+                if (cell.HasFreeWall & !ec.TrapCheck(cell) & portals.TrueForAll(x => (cell.CenterWorldPosition - x.CellPos).magnitude > 250f)) // Side note: I can't decide on magnitudes without experimenting with them in-game.
                 {
-                    var port = Instantiate(portalPre, cell.TileTransform).Spawn(cell);
-                    port.gameObject.SetActive(true);
-                    portals.Add(port);
+                    portals.Add(Instantiate(portalPre, cell.TileTransform).Spawn(cell));
                     flag = true;
                 }
                 else
@@ -120,8 +138,8 @@ namespace BCarnellChars.Characters
         public void StartToDevour()
         {
             SwitchOutput();
-            transform.position = currentOutput.position + Vector3.back * 5f;
-            transform.rotation = currentOutput.rotation;
+            Navigator.Entity.Teleport(currentOutput.CellPos);
+            transform.rotation = currentOutput.PortalRotat;
 
             audMan.PlaySingle(audHungry);
             behaviorStateMachine.ChangeState(new MrPortalMan_Wandering(this));
@@ -160,8 +178,8 @@ namespace BCarnellChars.Characters
                 if (FindObjectOfType<ITM_GrapplingHook>())
                     FindObjectOfType<ITM_GrapplingHook>().ReflectionSetVariable("maxPressure", 0f);
             }
-            idiot.transform.position = currentOutput.position + Vector3.back * 5f;
-            idiot.transform.rotation = currentOutput.rotation;   
+            idiot.Teleport(currentOutput.CellPos);
+            idiot.transform.rotation = currentOutput.PortalRotat;
             if (idiot.CompareTag("Player") | idiot.CompareTag("NPC"))
                 SwitchOutput();
         }
@@ -214,7 +232,7 @@ namespace BCarnellChars.Characters
         {
             base.Despawn();
             _spawnedPortals.Clear();
-            foreach (Transform portal in portals)
+            foreach (CryingPortal portal in portals)
                 Destroy(portal.gameObject);
             portals.Clear();
             if (gameObject.GetComponent<CullAffector>())

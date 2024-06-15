@@ -304,9 +304,9 @@ namespace BCarnellChars
         {
             yield return 1;
             yield return "Loading...";
-            if (MTM101BaldiDevAPI.Instance.Info.Metadata.Version < new Version("4.2.0.0"))
+            if (MTM101BaldiDevAPI.Version < new Version("4.2.0.0"))
             {
-                MTM101BaldiDevAPI.CauseCrash(Info, new Exception("BCPP crashed the mod loading screen because the API version is wrong."));
+                MTM101BaldiDevAPI.CauseCrash(Info, new Exception("BCPP crashed the mod loading screen because the API version is wrong.\n<color=white>Current API Version: " + MTM101BaldiDevAPI.Version.ToString() + "</color>\n<color=yellow>Required API Version: 4.2.0.0 or later</color>"));
                 yield break;
             }
             RadarModExists = Chainloader.PluginInfos.ContainsKey(radarID);
@@ -433,19 +433,11 @@ namespace BCarnellChars
                 .Build(); //ObjectCreators.CreateNPC<ERRORBOT>("ERROR-BOT_ITEM-STEALER", EnumExtensions.ExtendEnum<Character>("ERRORBOT"), ObjectCreators.CreatePosterObject(bcppAssets.Get<Texture2D>("PRI/ERRORBOT"), []), usesHeatMap: true, spawnableRooms: [RoomCategory.Hall]);
             errorbot.Navigator.SetRoomAvoidance(true);
             //AccessTools.DeclaredField(typeof(Navigator), "avoidRooms").SetValue(errorbot.Navigator, true);
-            AnimatedSpriteRotator threesixty = errorbot.spriteBase.AddComponent<AnimatedSpriteRotator>();
-            AccessTools.DeclaredField(typeof(AnimatedSpriteRotator), "renderer").SetValue(threesixty, errorbot.spriteRenderer[0]);
-
-            Sprite target = bcppAssets.Get<Sprite>("ERRORBOT/Body1");
-            threesixty.targetSprite = target;
-            SpriteRotationMap rotationMap = new SpriteRotationMap()
+            SpriteRotator threesixty = errorbot.spriteBase.AddComponent<SpriteRotator>();
+            AccessTools.DeclaredField(typeof(SpriteRotator), "spriteRenderer").SetValue(threesixty, errorbot.spriteRenderer[0]);
+            AccessTools.DeclaredField(typeof(SpriteRotator), "sprites").SetValue(threesixty, new Sprite[]
             {
-                angleCount = 17
-            };
-            // It uses many, likely a 1st Prize reference but not a Dr. Reflex reference.
-            AccessTools.DeclaredField(typeof(SpriteRotationMap), "spriteSheet").SetValue(rotationMap, new Sprite[]
-            {
-                target,
+                bcppAssets.Get<Sprite>("ERRORBOT/Body1"),
                 bcppAssets.Get<Sprite>("ERRORBOT/Body2"),
                 bcppAssets.Get<Sprite>("ERRORBOT/Body3"),
                 bcppAssets.Get<Sprite>("ERRORBOT/Body4"),
@@ -462,10 +454,6 @@ namespace BCarnellChars
                 bcppAssets.Get<Sprite>("ERRORBOT/Body15"),
                 bcppAssets.Get<Sprite>("ERRORBOT/Body16"),
                 bcppAssets.Get<Sprite>("ERRORBOT/Body17"),
-            });
-            AccessTools.DeclaredField(typeof(AnimatedSpriteRotator), "spriteMap").SetValue(threesixty, new SpriteRotationMap[]
-            {
-                rotationMap
             });
             errorbot.spriteRenderer[0].transform.position = new Vector3(0f, -3.35f, 0f);
             errorbot.spriteRenderer = errorbot.spriteRenderer.AddItem(new GameObject("Head", typeof(SpriteRenderer)).GetComponent<SpriteRenderer>()).ToArray();
@@ -620,6 +608,7 @@ namespace BCarnellChars
                 .AddTrigger()
                 .IgnoreBelts()
                 .SetAirborne()
+                .DisableNavigationPrecision()
                 .IgnorePlayerOnSpawn()
                 .AddSpawnableRoomCategories(RoomCategory.Faculty)
                 .SetPoster(ObjectCreators.CreatePosterObject(bcppAssets.Get<Texture2D>("PRI/MrPortalMan"), []))
@@ -632,6 +621,7 @@ namespace BCarnellChars
             portalman.spriteRenderer[0].transform.position = new Vector3(0f, 0.5f, 0f);
             portalman.spriteRenderer = portalman.spriteRenderer.AddToArray(Instantiate(portalman.spriteRenderer[0].gameObject, portalman.spriteBase.transform, true).GetComponent<SpriteRenderer>());
             portalman.spriteRenderer[1].maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+            portalman.Navigator.Entity.SetTrigger(false);
             SpriteMask mask = portalman.spriteRenderer[0].gameObject.AddComponent<SpriteMask>();
             mask.sprite = bcppAssets.Get<Sprite>("MrPortalMan/PortalManMask");
             mask.alphaCutoff = 1f;
@@ -688,7 +678,6 @@ namespace BCarnellChars
             cry.mask = cryingportalMask;
             cryingPortal.ConvertToPrefab(true);
             portalman.portalPre = cryingPortal.GetComponent<CryingPortal>();
-            cryingPortal.SetActive(false);
 
             /*NPCMetaStorage.Instance.Add(new NPCMetadata(Info, [rpsguy], "RPS Guy", NPCFlags.Standard));
             NPCMetaStorage.Instance.Add(new NPCMetadata(Info, [errorbot], "ERROR-BOT_ITEM-STEALER", NPCFlags.Standard | NPCFlags.MakeNoise));
@@ -931,12 +920,7 @@ namespace BCarnellChars
                 ];
             lBasement.posterChance = 2;
             lBasement.posters = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").posters;
-            lBasement.items = [..Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").items,
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
-                                weight = 75
-                            },
+            lBasement.potentialItems = [..Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").potentialItems,
                             new WeightedItemObject()
                             {
                                 selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
@@ -953,6 +937,8 @@ namespace BCarnellChars
                                 weight = 75
                             }
                         ];
+            lBasement.forcedItems = [..Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").forcedItems, bcppAssets.Get<ItemObject>("Items/ProfitCard")];
+            lBasement.maxItemValue *= 2;
             lBasement.singleEntranceItemVal = 10;
             lBasement.noHallItemVal = 15;
             lBasement.minEvents = 2;
@@ -1000,7 +986,7 @@ namespace BCarnellChars
             lBasement.hallBuffer = 4;
             lBasement.edgeBuffer = 3;
 
-            lBasement.mapPrice = 150;
+            lBasement.mapPrice = 1000;
             lBasement.shopItems = [..Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main2").shopItems,
                             new WeightedItemObject()
                             {
@@ -1055,12 +1041,8 @@ namespace BCarnellChars
                 switch (floorName)
                 {
                     case "F1":
+                        ld.forcedItems.Add(bcppAssets.Get<ItemObject>("Items/ProfitCard"));
                         ld.potentialItems = ld.potentialItems.AddRangeToArray([
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
-                                weight = 75
-                            },
                             new WeightedItemObject()
                             {
                                 selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
@@ -1076,12 +1058,8 @@ namespace BCarnellChars
                         ]);
                         break;
                     case "F2":
+                        ld.forcedItems.Add(bcppAssets.Get<ItemObject>("Items/ProfitCard"));
                         ld.potentialItems = ld.potentialItems.AddRangeToArray([
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
-                                weight = 75
-                            },
                             new WeightedItemObject()
                             {
                                 selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
@@ -1135,12 +1113,8 @@ namespace BCarnellChars
                         ld.additionalNPCs += 1;
                         break;
                     case "F3":
+                        ld.forcedItems.Add(bcppAssets.Get<ItemObject>("Items/ProfitCard"));
                         ld.potentialItems = ld.potentialItems.AddRangeToArray([
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
-                                weight = 75
-                            },
                             new WeightedItemObject()
                             {
                                 selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
@@ -1206,12 +1180,8 @@ namespace BCarnellChars
                             ]);
                         break;
                     case "END":
+                        ld.forcedItems.Add(bcppAssets.Get<ItemObject>("Items/ProfitCard"));
                         ld.potentialItems = ld.potentialItems.AddRangeToArray([
-                            new WeightedItemObject()
-                            {
-                                selection = bcppAssets.Get<ItemObject>("Items/ProfitCard"),
-                                weight = 80
-                            },
                             new WeightedItemObject()
                             {
                                 selection = bcppAssets.Get<ItemObject>("Items/BHammer"),
@@ -1251,6 +1221,9 @@ namespace BCarnellChars
                             }
                         ]);
                         ld.additionalNPCs += 2;
+                        break;
+                    default: // For floors that are from different mods
+                        ld.forcedItems.Add(bcppAssets.Get<ItemObject>("Items/ProfitCard"));
                         break;
                 }
 
