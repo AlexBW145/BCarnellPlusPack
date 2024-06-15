@@ -128,8 +128,8 @@ namespace BCarnellChars.Characters
         };
         public static void AddLockedInRuleBreak(string rule) // Remember that you need to call this on a PostLoad function. (Don't you dare call it in during gameplay time...)
         {
-            if (lockedinRuleBreaks.Contains(rule)) {
-                Debug.LogWarning("ERROR-BOT_ITEM-STEALER already has a locked in rule break: " + rule);
+            if (lockedinRuleBreaks.Contains(rule) | rule == "") {
+                Debug.LogWarning(rule == "" ? "String cannot be blank for a locked in rule break!" : "ERROR-BOT_ITEM-STEALER already has a locked in rule break: " + rule);
                 return;
             }
 
