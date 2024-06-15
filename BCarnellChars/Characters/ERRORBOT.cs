@@ -11,6 +11,7 @@ using System.Collections;
 using MTM101BaldAPI.Registers;
 using HarmonyLib;
 using MTM101BaldAPI.Reflection;
+using BCarnellChars.OtherStuff;
 
 namespace BCarnellChars.Characters
 {
@@ -120,6 +121,20 @@ namespace BCarnellChars.Characters
                 behaviorStateMachine.ChangeState(new ERRORBOT_NoItemsMode(this, this, player));
         }
 
+        protected static List<string> lockedinRuleBreaks = new List<string>() // In case of compats...
+        {
+            "Faculty",
+            "Escaping"
+        };
+        public static void AddLockedInRuleBreak(string rule) // Remember that you need to call this on a PostLoad function. (Don't you dare call it in during gameplay time...)
+        {
+            if (lockedinRuleBreaks.Contains(rule)) {
+                Debug.LogWarning("ERROR-BOT_ITEM-STEALER already has a locked in rule break: " + rule);
+                return;
+            }
+
+            lockedinRuleBreaks.Add(rule);
+        }
         public void Alert(PlayerManager player)
         {
             transform.position = player.transform.position;
@@ -129,7 +144,7 @@ namespace BCarnellChars.Characters
             audMan.QueueAudio(audAlarm, true);
             audMan.SetLoop(true);
             ec.MakeNoise(transform.position, 112); // You're fucked.
-            if (player.Disobeying && (player.ruleBreak == "Faculty" || player.ruleBreak == "Escaping") && ec.Npcs.Find(p => p.Character == Character.Principal))
+            if (player.Disobeying && lockedinRuleBreaks.Contains(player.ruleBreak) && ec.Npcs.Find(p => p.Character == Character.Principal))
             {
                 Principal pri = ec.Npcs.Find(p => p.Character == Character.Principal).GetComponent<Principal>();
                 if (!(bool)pri.ReflectionGetVariable("allKnowing"))
@@ -152,7 +167,7 @@ namespace BCarnellChars.Characters
 
         public void Jammed(Collider other)
         {
-            if (other.CompareTag("GrapplingHook") || other.GetComponent<ITM_BSODA>()) // Pierced
+            if (other.CompareTag("GrapplingHook") || other.GetComponent<ITM_BSODA>() || other.GetComponent<SiegeCartBalls>()) // Pierced
             {
                 looker.ReflectionSetVariable("layerMask", regularMask);
                 spriteRenderer[1].color = other.GetComponent<ITM_BSODA>() ? Color.blue : Color.grey;
