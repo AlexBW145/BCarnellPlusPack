@@ -1,5 +1,6 @@
 ﻿using BCarnellChars.Characters.States;
 using BCarnellChars.GeneratorStuff;
+using BCarnellChars.ItemStuff;
 using BCarnellChars.Patches;
 using HarmonyLib;
 using MTM101BaldAPI;
@@ -178,8 +179,19 @@ namespace BCarnellChars.Characters
                 if (FindObjectOfType<ITM_GrapplingHook>())
                     FindObjectOfType<ITM_GrapplingHook>().ReflectionSetVariable("maxPressure", 0f);
             }
-            idiot.Teleport(currentOutput.CellPos);
-            idiot.transform.rotation = currentOutput.PortalRotat;
+            if (idiot.CompareTag("Player") && FindObjectsOfType<ITM_AnyportalOutput>().Count(x => x.Ready) > 0)
+            {
+                List<ITM_AnyportalOutput> placedOutputs = FindObjectsOfType<ITM_AnyportalOutput>().ToList().FindAll(x => x.Ready);
+                int index = Mathf.RoundToInt(UnityEngine.Random.Range(0f, placedOutputs.Count - 1));
+                idiot.Teleport(ec.CellFromPosition(placedOutputs[index].transform.position).CenterWorldPosition);
+                idiot.transform.rotation = placedOutputs[index].transform.rotation;
+                placedOutputs[index].Break();
+            }
+            else
+            {
+                idiot.Teleport(currentOutput.CellPos);
+                idiot.transform.rotation = currentOutput.PortalRotat;
+            }
             if (idiot.CompareTag("Player") | idiot.CompareTag("NPC"))
                 SwitchOutput();
         }
@@ -237,6 +249,8 @@ namespace BCarnellChars.Characters
             portals.Clear();
             if (gameObject.GetComponent<CullAffector>())
                 Destroy(gameObject.GetComponent<CullAffector>());
+            foreach (ITM_AnyportalOutput plac in FindObjectsOfType<ITM_AnyportalOutput>()) // No purpose of existing if Mr. Portal Man has despawned
+                if (plac.isActiveAndEnabled) plac.Break(true);
         }
 
         private void OnDestroy()

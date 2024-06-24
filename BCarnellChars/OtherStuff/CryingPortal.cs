@@ -18,7 +18,6 @@ namespace BCarnellChars.GeneratorStuff
         {
             room = tile.room;
             cell = tile;
-            room.functions.AddFunction(this);
             chalkboo = transform.Find("Chalkbaord").gameObject;
             var quad = chalkboo.transform.Find("Quad").gameObject;
             Direction direction = tile.RandomUncoveredDirection(new System.Random());

@@ -9,7 +9,8 @@ using UnityEngine;
 
 namespace BCarnellChars.Patches
 {
-    [HarmonyPatch(typeof(EnvironmentObject), "LoadingFinished")]
+    // Redoing this, useless.
+    /*[HarmonyPatch(typeof(EnvironmentObject), "GiveController")]
     class SodaCostPatch
     {
         private static float profitCardChance = 0.5f;
@@ -27,5 +28,5 @@ namespace BCarnellChars.Patches
                 }
             }
         }
-    }
+    }*/
 }

@@ -1,7 +1,9 @@
 ﻿using BCarnellChars.Characters;
+using BCarnellChars.OtherStuff;
 using HarmonyLib;
 using MTM101BaldAPI;
 using MTM101BaldAPI.AssetTools;
+using MTM101BaldAPI.Reflection;
 using MTM101BaldAPI.Registers;
 using System;
 using System.Collections.Generic;
@@ -24,6 +26,87 @@ namespace BCarnellChars.Patches
                 ___volume = 3f;
                 ___riseSpeed = 1.5f;
             }
+        }
+    }
+
+    [HarmonyPatch(typeof(Activity), "Completed", [typeof(int)])]
+    class BasementGet
+    {
+        static bool Prefix(int player, ref Notebook ___notebook, ref bool ___bonusMode)
+        {
+            if (!___bonusMode && BasementGameManager.BasementInstance != null)
+            {
+                ___notebook.Hide(true);
+                BaseGameManager.Instance.CollectNotebook(___notebook);
+                CoreGameManager.Instance.GetPlayer(player).plm.AddStamina(CoreGameManager.Instance.GetPlayer(player).plm.staminaMax, true);
+                return false;
+            }
+            return true;
+        }
+    }
+    [HarmonyPatch(typeof(Activity), "Completed", [typeof(int),typeof(bool),typeof(Activity)])]
+    class BasementCorrect
+    {
+        static void Postfix(int player, bool correct, Activity activity, ref bool ___bonusMode, Activity __instance)
+        {
+            if (correct && !___bonusMode)
+                foreach (Cell light in __instance.room.ec.activities.Find(x => x.room == __instance.room).room.cells)
+                    __instance.room.ec.SetLight(true, light);
+        }
+    }
+
+    [HarmonyPatch(typeof(TapePlayer), "InsertItem")]
+    class StunBot
+    {
+        static void Postfix(PlayerManager player, EnvironmentController ec, ref float ___time)
+        {
+            if (ec.Npcs.Find(x => x.GetComponent<PrototypeBot>()))
+            {
+                ec.Npcs.Find(x => x.GetComponent<PrototypeBot>()).gameObject.GetComponent<PrototypeBot>().StopAllCoroutines();
+                ec.Npcs.Find(x => x.GetComponent<PrototypeBot>()).gameObject.GetComponent<PrototypeBot>().StartCoroutine(
+                    ec.Npcs.Find(x => x.GetComponent<PrototypeBot>()).gameObject.GetComponent<PrototypeBot>().StunHearing(___time));
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(BaseGameManager), "LoadNextLevel")]
+    class IfBasement
+    {
+        static bool Prefix(BaseGameManager __instance, ref int ___defaultLives, ref float ___gradeValue, ref int ___correctProblems,
+            ref int ___problems, ref int ___levelNo)
+        {
+            if (SwitchNextFloorBCPP.enabledSwitch && CoreGameManager.Instance.sceneObject.levelNo == 0 && CoreGameManager.Instance.sceneObject.levelTitle == "F1")
+            {
+                __instance.ReflectionInvoke("PrepareToLoad", []);
+                CoreGameManager.Instance.PrepareForReload();
+                CoreGameManager.Instance.SetLives(___defaultLives);
+                CoreGameManager.Instance.tripPlayed = false;
+                if (___problems > 0)
+                {
+                    CoreGameManager.Instance.GradeVal += -Mathf.RoundToInt(___gradeValue * (___correctProblems / (float)___problems * 2f - 1f));
+                }
+
+                if (CoreGameManager.Instance.currentMode == Mode.Main)
+                {
+                    foreach (NPC item in __instance.Ec.npcsToSpawn)
+                    {
+                        PlayerFileManager.Instance.Find(PlayerFileManager.Instance.foundChars, (int)item.Character);
+                    }
+
+                    foreach (Obstacle obstacle in __instance.Ec.obstacles)
+                    {
+                        PlayerFileManager.Instance.Find(PlayerFileManager.Instance.foundObstcls, (int)obstacle);
+                    }
+
+                    PlayerFileManager.Instance.Find(PlayerFileManager.Instance.clearedLevels, ___levelNo);
+                }
+
+                SubtitleManager.Instance.DestroyAll();
+                CoreGameManager.Instance.sceneObject = BasePlugin.Instance.sBasement;
+                SceneManager.LoadSceneAsync("Game");
+                return false;
+            }
+            return true;
         }
     }
 

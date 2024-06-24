@@ -121,7 +121,7 @@ namespace BCarnellChars.Characters
                 behaviorStateMachine.ChangeState(new ERRORBOT_NoItemsMode(this, this, player));
         }
 
-        protected static List<string> lockedinRuleBreaks = new List<string>() // In case of compats...
+        protected static HashSet<string> lockedinRuleBreaks = new HashSet<string>() // In case of compats...
         {
             "Faculty",
             "Escaping"

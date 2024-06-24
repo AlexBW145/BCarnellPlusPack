@@ -1,11 +1,14 @@
 ﻿using BBTimes;
 using BBTimes.CustomComponents;
+using BBTimes.CustomComponents.CustomDatas;
 using BBTimes.CustomContent.CustomItems;
+using BBTimes.CustomContent.Events;
 using BBTimes.ModPatches.GeneratorPatches;
 using BBTimes.Plugin;
 using BCarnellChars.Characters;
 using BCarnellChars.Characters.States;
 using BCarnellChars.ItemStuff;
+using BCarnellChars.OtherStuff;
 using HarmonyLib;
 using MTM101BaldAPI;
 using MTM101BaldAPI.AssetTools;
@@ -68,6 +71,18 @@ namespace BCarnellTimes
         static bool Prefix()
         {
             return PostRoomCreation.i.ld.name != "Basement1";
+        }
+    }
+
+    [HarmonyPatch(typeof(BasementGameManager), "BeginSpoopMode")]
+    class HowWasTheFall
+    {
+        public static SoundObject audOff;
+        static void Postfix()
+        {
+            if (CoreGameManager.Instance.currentMode == Mode.Free)
+                return;
+            CoreGameManager.Instance.audMan.PlaySingle(audOff);
         }
     }
 

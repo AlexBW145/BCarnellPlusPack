@@ -28,10 +28,12 @@ using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 using System.IO;
 using MTM101BaldAPI.ObjectCreation;
 using System.Collections;
+using MTM101BaldAPI.Registers.Buttons;
+using UnityEngine.UIElements.StyleSheets;
 
 namespace BCarnellChars
 {
-    [BepInPlugin("alexbw145.baldiplus.bcarnellchars", "B. Carnell Chars", "1.0.4")]
+    [BepInPlugin("alexbw145.baldiplus.bcarnellchars", "B. Carnell Chars", "1.1.0")]
     [BepInDependency("mtm101.rulerp.bbplus.baldidevapi")]
     [BepInIncompatibility("alexbw145.bbplus.rpsguy")] // This is a bad idea...
     [BepInProcess("BALDI.exe")]
@@ -48,6 +50,7 @@ namespace BCarnellChars
         public SceneObject sBasement;
 
         public static Material profitCardInsert;
+        public static Material freeInsert;
         public static Material securedYellowSwingingDoor;
 
         private void Awake()
@@ -55,10 +58,6 @@ namespace BCarnellChars
             Harmony harmony = new Harmony("alexbw145.baldiplus.bcarnellchars");
             Instance = this;
             harmony.PatchAllConditionals();
-
-            // Custom Posters Mod
-            if (Chainloader.PluginInfos.ContainsKey("io.github.luisrandomness.bbp_custom_posters"))
-                Chainloader.PluginInfos["io.github.luisrandomness.bbp_custom_posters"].Instance.GetType().Assembly.GetType("LuisRandomness.BBPCustomPosters.CustomPostersPlugin").InvokeMember("AddBuiltInPackFromMod", BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod, null, null, [this, "Texture2D", "Posters"]);
 
             float errorbodySpriteSize = 100f;
             int siegeSize = 39;
@@ -76,7 +75,10 @@ namespace BCarnellChars
                 AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "Mr. Portal Man", "PRI_portalman.png"),
 
                 AssetLoader.TextureFromMod(this, "Texture2D", "ProfitCardMachine.png"),
-                AssetLoader.TextureFromMod(this, "Texture2D", "SwingDoor_SecuredLocked.png")
+                AssetLoader.TextureFromMod(this, "Texture2D", "FreeItemMachine.png"),
+                AssetLoader.TextureFromMod(this, "Texture2D", "SwingDoor_SecuredLocked.png"),
+                AssetLoader.TextureFromMod(this, "Texture2D", "AnyportalOutput.png"),
+                AssetLoader.TextureFromMod(this, "Texture2D", "AnyportalOutput_Mask.png"),
                 ],
                 [
                     "RPSUI/Player",
@@ -91,7 +93,10 @@ namespace BCarnellChars
                     "PRI/MrPortalMan",
 
                     "ProfitCardMachine",
-                    "Obstacles/InfLockedSwingingDoor"
+                    "FreeItemMachine",
+                    "Obstacles/InfLockedSwingingDoor",
+                    "AnyportalOutput",
+                    "AnyportalOutputMask"
                 ]);
             // Sprites
             bcppAssets.AddRange<Sprite>([
@@ -135,6 +140,9 @@ namespace BCarnellChars
                 AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "Mr. Portal Man", "PortalMan.png"), 34f),
                 AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "Mr. Portal Man", "PortalManMask.png"), 34f),
 
+                AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "PrototypeBot-01", "Placehold", "StaticIdle.png"), 49f),
+                AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "PrototypeBot-01", "Placehold", "Jumpscare.png"), 1f),
+
                 AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "Items", "Hammer_Small.png"), 1f),
                 AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "Items", "Hammer_Large.png"), 50f),
                 AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "Items", "ProfitCard_Small.png"), 1f),
@@ -142,7 +150,12 @@ namespace BCarnellChars
                 AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "Items", "YellowDoorKey_Small.png"), 1f),
                 AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "Items", "YellowDoorKey_Large.png"), 50f),
                 AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "Items", "YellowDoorInfLock_Small.png"), 1f),
-                AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "Items", "YellowDoorInfLock_Large.png"), 50f)
+                AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "Items", "YellowDoorInfLock_Large.png"), 50f),
+                AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "Items", "Anyportal_Small.png"), 1f),
+                AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "Items", "Anyportal_Large.png"), 50f),
+
+                AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "randommachine_bcmac.png"), 25f),
+                AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "randommachine_out_bcmac.png"), 25f),
                 ],
                 [
                     "RPSUI/Border",
@@ -185,6 +198,9 @@ namespace BCarnellChars
                     "MrPortalMan/PortalMan",
                     "MrPortalMan/PortalManMask",
 
+                    "PrototypeBot-01/Idle",
+                    "PrototypeBot-01/Jumpscare",
+
                     "Items/BHammer_Small",
                     "Items/BHammer_Large",
                     "Items/ProfitCard_Small",
@@ -192,7 +208,12 @@ namespace BCarnellChars
                     "Items/UnsecuredKey_Small",
                     "Items/UnsecuredKey_Large",
                     "Items/SecuredLock_Small",
-                    "Items/SecuredLock_Large"
+                    "Items/SecuredLock_Large",
+                    "Items/Anyportal_Small",
+                    "Items/Anyportal_Large",
+
+                    "Structures/RandomMachine",
+                    "Structures/RandomMachine_OutOfGoods"
                 ]);
             for (int frame = 1; frame <= 7; frame++) // Moving Frames
             {
@@ -241,6 +262,28 @@ namespace BCarnellChars
                     "SiegeCanonCart/ShootingRightFront_"+frame,
                     ]);
             }
+            for (int frame = 0; frame <= 10; frame++) // Jumpscare 1
+                bcppAssets.Add<Sprite>("PrototypeBot-01/Jumpscare01_" + frame, AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "PrototypeBot-01", "Jumpscares", "Jumpscare_1" + frame + ".png"), 1f));
+            for (int frame = 0; frame <= 13; frame++) // Jumpscare 2
+                bcppAssets.Add<Sprite>("PrototypeBot-01/Jumpscare02_" + frame, AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "PrototypeBot-01", "Jumpscares", "Jumpscare_2" + frame + ".png"), 1f));
+            float protoSize = 9f;
+            for (int frame = 0; frame <= 11; frame++) // Idle
+                bcppAssets.Add<Sprite>("PrototypeBot-01/Idle_" + frame, AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "PrototypeBot-01", "Idle", "Idle" + frame + ".png"), protoSize));
+            for (int frame = 0; frame <= 7; frame++) // Running
+                bcppAssets.Add<Sprite>("PrototypeBot-01/Running_" + frame, AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "PrototypeBot-01", "Running", "Running" + frame + ".png"), protoSize));
+            for (int frame = 0; frame <= 17; frame++) // Climbing
+                bcppAssets.Add<Sprite>("PrototypeBot-01/Climbing_" + frame, AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "PrototypeBot-01", "Climbing", "Climbing" + frame + ".png"), protoSize));
+            for (int frame = 0; frame <= 11; frame++) // ClimbOut
+                bcppAssets.Add<Sprite>("PrototypeBot-01/ClimbOut_" + frame, AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "PrototypeBot-01", "ClimbOut", "ClimbOut" + frame + ".png"), protoSize));
+#if DEBUG
+            /*bcppAssets.AddRange<Sprite>([
+                AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "Mr. Robber", "Robber.png"), 190f),
+                AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "Mr. Robber", "RobberTaxEvasion.png"), 190f)],
+                [
+                "MrRobber/Idle",
+                "MrRobber/Targeting"
+                ]);*/
+#endif
             // SoundObjects
             bcppAssets.AddRange<SoundObject>([
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "Hit 15.wav"), "Nothing", SoundType.Effect, Color.white),
@@ -265,6 +308,32 @@ namespace BCarnellChars
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Mr. Portal Man", "PTM_Intro.wav"), "Vfx_MrPortalMan_Intro", SoundType.Voice, new Color(1f, 0.6470588f, 0.1529412f)),
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Mr. Portal Man", "PTM_Questioning.wav"), "Vfx_MrPortalMan_WhereIs", SoundType.Voice, new Color(1f, 0.6470588f, 0.1529412f)),
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Mr. Portal Man", "PTM_End.wav"), "Vfx_MrPortalMan_Fulfilled", SoundType.Voice, new Color(1f, 0.6470588f, 0.1529412f)),
+#if DEBUG
+                /*ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Mr. Robber", "ROBR_BlastingGrenades.wav"), "Vfx_MrRobber_BlastingGreenades1", SoundType.Voice, Color.grey),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Mr. Robber", "ROBR_Notebooks.wav"), "Vfx_MrRobber_Notebooks", SoundType.Voice, Color.grey),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Mr. Robber", "ROBR_Worse.wav"), "Vfx_MrRobber_Worse1", SoundType.Voice, Color.grey),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Mr. Robber", "ROBR_Shine.wav"), "Vfx_MrRobber_Shine", SoundType.Voice, Color.grey),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Mr. Robber", "ROBR_TimeToFlee.wav"), "Vfx_MrRobber_Flee", SoundType.Voice, Color.grey),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Mr. Robber", "ROBR_WasNeverHere.wav"), "Vfx_MrRobber_WasNeverHere", SoundType.Voice, Color.grey),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Mr. Robber", "ROBR_RegretAlone.wav"), "Vfx_MrRobber_RegretAlone", SoundType.Voice, Color.grey),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Mr. Robber", "ROBR_beat.wav"), "Sfx_MrRobber_Beat", SoundType.Effect, Color.white),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Mr. Robber", "ROBR_essence.wav"), "Sfx_MrRobber_HiddenBeat", SoundType.Effect, Color.white),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Mr. Robber", "ROBR_screechIntro.wav"), "Sfx_MrRobber_Screech", SoundType.Effect, Color.white),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Mr. Robber", "ROBR_screechLoop.wav"), "Sfx_MrRobber_ScreechLoop", SoundType.Effect, Color.white),*/
+#endif
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "PrototypeBot-01", "PB01_Intro.wav"), "Nothing", SoundType.Effect, Color.clear),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "PrototypeBot-01", "PB01_IntroLoop.wav"), "Nothing", SoundType.Effect, Color.clear),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "PrototypeBot-01", "Jumpscares", "PB01_Kill1.wav"), "Sfx_PrototypeBot01_Jumpscare", SoundType.Effect, Color.white),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "PrototypeBot-01", "Jumpscares", "PB01_Kill2.wav"), "Sfx_PrototypeBot01_Jumpscare", SoundType.Effect, Color.white),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "PrototypeBot-01", "Jumpscares", "PB01_Kill3.wav"), "Sfx_PrototypeBot01_Jumpscare", SoundType.Effect, Color.white),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "PrototypeBot-01", "Jumpscares", "PB01_Kill4.wav"), "Sfx_PrototypeBot01_Jumpscare", SoundType.Effect, Color.white),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "PrototypeBot-01", "PB01_FastRun.wav"), "Sfx_CartoonKnock_Trimmed", SoundType.Effect, Color.white),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "PrototypeBot-01", "PB01_Waiting.wav"), "Sfx_Lose_Buzz", SoundType.Effect, Color.white),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "PrototypeBot-01", "PB01_AntiHearStun.wav"), "Sfx_ShrinkMachine_Door", SoundType.Effect, Color.white),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "PrototypeBot-01", "PB01_Ceiling.wav"), "Sfx_Lose_Buzz", SoundType.Effect, Color.white),
+
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "ITM_AnyportalOutputSpawning.wav"), "Sfx_Slap", SoundType.Effect, new Color(0.07058824f, 0.6431373f, 1f)),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "ITM_AnyportalOutputDestroyed.wav"), "Sfx_GlassBreak", SoundType.Effect, new Color(0.07058824f, 0.6431373f, 1f))
                 ],
                 [
                     "RPSUI/HitTie",
@@ -289,14 +358,47 @@ namespace BCarnellChars
                     "MrPortalMan/Hungry",
                     "MrPortalMan/WhereIs",
                     "MrPortalMan/Fullfilled",
+#if DEBUG
+                    /*"MrRobber/BlastingGreenades",
+                    "MrRobber/Notebooks",
+                    "MrRobber/Worse",
+                    "MrRobber/Shine",
+                    "MrRobber/Flee",
+                    "MrRobber/WasNeverHere",
+                    "MrRobber/RegretAlone",
+                    "MrRobber/AnnoyingBeat",
+                    "MrRobber/EssenceBeat",
+                    "MrRobber/ScreechIntro",
+                    "MrRobber/ScreechLoop",*/
+#endif
+                    "PrototypeBot-01/AmbientIntro",
+                    "PrototypeBot-01/AmbientLoop",
+                    "PrototypeBot-01/Jumpscare_01",
+                    "PrototypeBot-01/Jumpscare_02",
+                    "PrototypeBot-01/Jumpscare_03",
+                    "PrototypeBot-01/Jumpscare_04",
+                    "PrototypeBot-01/FastStomp",
+                    "PrototypeBot-01/Waiting",
+                    "PrototypeBot-01/Stunned",
+                    "PrototypeBot-01/Ceiling",
+
+                    "Items/AnyportalOutput/Spawning",
+                    "Items/AnyportalOutput/Destroyed"
                 ]);
             bcppAssets.Get<SoundObject>("RPSUI/HitTie").subtitle = false;
             bcppAssets.Get<SoundObject>("RPSUI/HitWin").subtitle = false;
             bcppAssets.Get<SoundObject>("RPSUI/HitLose").subtitle = false;
             bcppAssets.Get<SoundObject>("ERRORBOT/Jammed").additionalKeys = [new SubtitleTimedKey() { key = "Sfx_ERRORBOT_Malfunction", time = 0.34f }];
             bcppAssets.Get<SoundObject>("ERRORBOT/Sprayed").additionalKeys = [new SubtitleTimedKey() { key = "Sfx_ERRORBOT_Malfunction", time = 0.34f }];
+#if DEBUG
+            /*bcppAssets.Get<SoundObject>("MrRobber/BlastingGreenades").additionalKeys = [new SubtitleTimedKey() { key = "Vfx_MrRobber_BlastingGreenades2", time = 2.625f }];
+            bcppAssets.Get<SoundObject>("MrRobber/Worse").additionalKeys = [new SubtitleTimedKey() { key = "Vfx_MrRobber_Worse2", time = 3.142f }];
+            bcppAssets.Get<SoundObject>("MrRobber/ScreechIntro").additionalKeys = [new SubtitleTimedKey() { key = "Sfx_MrRobber_ScreechLoop", time = 1.399f }];*/
+#endif
+            bcppAssets.Get<SoundObject>("Items/AnyportalOutput/Spawning").additionalKeys = [new SubtitleTimedKey() { key = "Sfx_AnyportalOutput_Spawning", time = 0.5120181f }];
 
             LoadingEvents.RegisterOnAssetsLoaded(Info, PreLoad(), false);
+            LoadingEvents.RegisterOnAssetsLoaded(Info, PostLoad, true);
             ModdedSaveGame.AddSaveHandler(Info); // I hate it when the same ol' mistakes happen!
         }
 
@@ -309,6 +411,11 @@ namespace BCarnellChars
                 MTM101BaldiDevAPI.CauseCrash(Info, new Exception("BCPP crashed the mod loading screen because the API version is wrong.\n<color=white>Current API Version: " + MTM101BaldiDevAPI.Version.ToString() + "</color>\n<color=yellow>Required API Version: 4.2.0.0 or later</color>"));
                 yield break;
             }
+            // Custom Posters Mod (Doesn't work until next update)
+            if (Chainloader.PluginInfos.ContainsKey("io.github.luisrandomness.bbp_custom_posters"))
+                Chainloader.PluginInfos["io.github.luisrandomness.bbp_custom_posters"].Instance.GetType()
+                    .Assembly.GetType("LuisRandomness.BBPCustomPosters.CustomPostersPlugin")
+                    .InvokeMember("AddBuiltInPackFromMod", BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod, null, null, [this, "Texture2D", "Posters"]);
             RadarModExists = Chainloader.PluginInfos.ContainsKey(radarID);
             if (RadarModExists)
             {
@@ -678,23 +785,48 @@ namespace BCarnellChars
             cry.mask = cryingportalMask;
             cryingPortal.ConvertToPrefab(true);
             portalman.portalPre = cryingPortal.GetComponent<CryingPortal>();
+#if DEBUG
+            /*yield return "Initializing Mr. Robber";
+            var robber = ObjectCreators.CreateNPC<MrRobber>("Mr Robber", EnumExtensions.ExtendEnum<Character>("MrRobber"), ObjectCreators.CreatePosterObject(Resources.FindObjectsOfTypeAll<Texture2D>().ToList().Find(x => x.name == "Transparent"), []), spawnableRooms: [RoomCategory.Hall, RoomCategory.Special], minAudioDistance: 1f, maxAudioDistance: 500);
+            AccessTools.DeclaredField(typeof(Navigator), "avoidRooms").SetValue(robber.Navigator, true);
+            robber.sfxMan = robber.gameObject.AddComponent<AudioManager>();
+            robber.sfxMan.audioDevice = robber.gameObject.AddComponent<AudioSource>();
+            robber.sfxMan.audioDevice.playOnAwake = false;
+            robber.sfxMan.audioDevice.spatialBlend = 1f;
+            robber.sfxMan.audioDevice.spatialBlend = 1;
+            robber.sfxMan.audioDevice.rolloffMode = AudioRolloffMode.Custom;
+            robber.sfxMan.audioDevice.maxDistance = 150;
+            robber.sfxMan.audioDevice.dopplerLevel = 0;
+            robber.sfxMan.audioDevice.spread = 0;
+            AccessTools.DeclaredField(typeof(AudioManager), "soundOnStart").SetValue(robber.sfxMan, new SoundObject[]
+            {
+                bcppAssets.Get<SoundObject>("MrRobber/EssenceBeat")
+            });
+            AccessTools.DeclaredField(typeof(AudioManager), "loopOnStart").SetValue(robber.sfxMan, true);
+            robber.overlay = Instantiate(Resources.FindObjectsOfTypeAll<Gum>().ToList().First().transform.Find("GumOverlay").gameObject, robber.transform).GetComponent<Canvas>();
+            robber.overlay.transform.Find("Image").GetComponent<Image>().sprite = null;
+            robber.overlay.gameObject.ConvertToPrefab(false);*/
+#endif
 
             /*NPCMetaStorage.Instance.Add(new NPCMetadata(Info, [rpsguy], "RPS Guy", NPCFlags.Standard));
             NPCMetaStorage.Instance.Add(new NPCMetadata(Info, [errorbot], "ERROR-BOT_ITEM-STEALER", NPCFlags.Standard | NPCFlags.MakeNoise));
             NPCMetaStorage.Instance.Add(new NPCMetadata(Info, [siegecart], "Siege Canon Cart", NPCFlags.StandardNoCollide));
-            NPCMetaStorage.Instance.Add(new NPCMetadata(Info, [portalman], "Mr Portal Man", NPCFlags.Standard));*/
+            NPCMetaStorage.Instance.Add(new NPCMetadata(Info, [portalman], "Mr Portal Man", NPCFlags.Standard));
+            //NPCMetaStorage.Instance.Add(new NPCMetadata(Info, [robber], "Mr Robber", NPCFlags.Standard));*/
             yield return "Finalizing NPC Initialization";
             bcppAssets.AddRange<NPC>([
                 rpsguy,
                 errorbot,
                 siegecart,
                 portalman,
+                //robber
                 ],
                 [
                 "NPCs/RPS Guy",
                 "NPCs/ERROR-BOT_ITEM-STEALER",
                 "NPCs/Siege Cannon Cart",
                 "NPCs/Mr Portal Man",
+                //"NPCs/Mr Robber"
                 ]);
 
             yield return "Initializing Unsafe Hammer";
@@ -724,6 +856,11 @@ namespace BCarnellChars
             profitCardInsert = Instantiate(Resources.FindObjectsOfTypeAll<Material>().ToList().Find(x => x.name == "BSODAMachine"));
             profitCardInsert.name = "ProfitCardMachine";
             profitCardInsert.SetMainTexture(bcppAssets.Get<Texture2D>("ProfitCardMachine"));
+            profitCardInsert.renderQueue += 10;
+            // You'll need a free one!
+            freeInsert = Instantiate(profitCardInsert);
+            freeInsert.name = "FreeItemMachine";
+            freeInsert.SetMainTexture(bcppAssets.Get<Texture2D>("FreeItemMachine"));
             yield return "Initializing Unsecured Key";
             // Something evil is brewing inside!
             ItemObject swingingdoorInfKey = new ItemBuilder(Info)
@@ -768,6 +905,71 @@ namespace BCarnellChars
             ObjectBuilderMetaStorage.Instance.Add(EnumExtensions.GetFromExtendedName<Obstacle>("InfLockedDoor"), new ObjectBuilderMeta(Info, builder));
             bcppAssets.Add<SecuredSwingingDoor>("Obstacles/SecuredSwingingDoor", inflockedSwingDoor.GetComponent<SecuredSwingingDoor>());
             bcppAssets.Add<ObjectBuilder>("ObjectBuilder/SecuredSwingingDoor", builder);
+            yield return "Initializing Anyportal Output";
+            ItemObject anyportal = new ItemBuilder(Info)
+                .SetItemComponent<ITM_AnyportalOutput>()
+                .SetNameAndDescription("Itm_Anyportal", "Desc_Anyportal")
+                .SetSprites(bcppAssets.Get<Sprite>("Items/Anyportal_Small"), bcppAssets.Get<Sprite>("Items/Anyportal_Large"))
+                .SetEnum(EnumExtensions.ExtendEnum<Items>("AnyportalOutput"))
+                .SetShopPrice(980)
+                .SetGeneratorCost(105)
+                .SetMeta(ItemFlags.Persists, ["BCPP"])
+                .Build();
+            anyportal.item.gameObject.GetComponent<ITM_AnyportalOutput>().wrongPlacement = Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(x => x.name == "ErrorMaybe");
+            anyportal.item.gameObject.GetComponent<ITM_AnyportalOutput>().outputGeneration = bcppAssets.Get<SoundObject>("Items/AnyportalOutput/Spawning");
+            anyportal.item.gameObject.GetComponent<ITM_AnyportalOutput>().destroySnd = bcppAssets.Get<SoundObject>("Items/AnyportalOutput/Destroyed");
+
+            anyportal.item.gameObject.GetComponent<ITM_AnyportalOutput>().audMan = anyportal.item.gameObject.AddComponent<PropagatedAudioManager>();
+            anyportal.item.gameObject.GetComponent<ITM_AnyportalOutput>().audMan.audioDevice = anyportal.item.gameObject.AddComponent<AudioSource>();
+            anyportal.item.gameObject.GetComponent<ITM_AnyportalOutput>().audMan.audioDevice.playOnAwake = false;
+            anyportal.item.gameObject.GetComponent<ITM_AnyportalOutput>().audMan.audioDevice.spatialBlend = 1f;
+            anyportal.item.gameObject.GetComponent<ITM_AnyportalOutput>().audMan.audioDevice.dopplerLevel = 0f;
+            anyportal.item.gameObject.GetComponent<ITM_AnyportalOutput>().audMan.audioDevice.rolloffMode = AudioRolloffMode.Custom;
+            anyportal.item.gameObject.GetComponent<ITM_AnyportalOutput>().audMan.audioDevice.maxDistance = 100f;
+            anyportal.item.gameObject.GetComponent<ITM_AnyportalOutput>().audMan.audioDevice.SetCustomCurve(AudioSourceCurveType.CustomRolloff, NPCMetaStorage.Instance.Get(Character.Beans).value.GetComponent<AudioManager>().audioDevice.GetCustomCurve(AudioSourceCurveType.CustomRolloff));
+
+            GameObject quad = Instantiate(Resources.FindObjectsOfTypeAll<Chalkboard>().ToList().First(), anyportal.item.transform, false).gameObject;
+            quad.transform.Find("Chalkbaord").Find("Quad").SetParent(anyportal.item.transform, false);
+            Destroy(quad.gameObject);
+            anyportal.item.transform.Find("Quad").rotation = Quaternion.Euler(90f, 0f, 0f);
+            anyportal.item.transform.Find("Quad").localPosition = new Vector3(0f, -4.9f, 0f);
+            anyportal.item.transform.Find("Quad").localScale = new Vector3(10f, 10f, 10f);
+            Material outputmat = Instantiate(cryingportalMat);
+            outputmat.name = "OutputPortalMat";
+            outputmat.SetMainTexture(bcppAssets.Get<Texture2D>("AnyportalOutput"));
+            Material outputmask = Instantiate(cryingportalMask);
+            outputmask.name = "OutputPortalMask";
+            outputmask.SetMaskTexture(bcppAssets.Get<Texture2D>("AnyportalOutputMask"));
+            anyportal.item.gameObject.GetComponent<ITM_AnyportalOutput>().mask = outputmask;
+            anyportal.item.transform.Find("Quad").GetComponent<MeshRenderer>().materials = [outputmask, outputmat];
+            anyportal.item.transform.Find("Quad").GetComponent<MeshCollider>().enabled = false;
+
+            ParticleSystem particle = anyportal.item.transform.Find("Quad").gameObject.AddComponent<ParticleSystem>();
+            var main = particle.main;
+
+            main.duration = 5f;
+            main.startLifetime = 0.75f;
+            main.startSpeed = -10f;
+            main.startSize = 0.1f;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.scalingMode = ParticleSystemScalingMode.Hierarchy;
+            main.playOnAwake = false;
+            main.startColor = new Color(0.07058824f, 0.6431373f, 1f);
+
+            var emission = particle.emission;
+            emission.rateOverTime = 50f;
+
+
+            var shape = particle.shape;
+            shape.shapeType = ParticleSystemShapeType.Sphere;
+            shape.radius = 10f;
+
+            var render = anyportal.item.transform.Find("Quad").gameObject.GetComponent<ParticleSystemRenderer>();
+            render.renderMode = ParticleSystemRenderMode.Billboard;
+            render.material = Resources.FindObjectsOfTypeAll<Material>().ToList().Find(x => x.name == "UI_AsSprite");
+            render.sortMode = ParticleSystemSortMode.OldestInFront;
+            render.minParticleSize = 0.01f;
+            render.maxParticleSize = 0.01f;
 
             /*ItemMetaStorage.Instance.Add(hammer, new ItemMetaData(Info, hammer));
             ItemMetaStorage.Instance.Add(profitCard, new ItemMetaData(Info, profitCard));
@@ -778,21 +980,102 @@ namespace BCarnellChars
                 hammer,
                 profitCard,
                 swingingdoorInfKey,
-                swingingdoorInfLock
+                swingingdoorInfLock,
+                anyportal
                 ],
                 [
                 "Items/BHammer",
                 "Items/ProfitCard",
                 "Items/UnsecuredKey",
-                "Items/SecuredLock"
+                "Items/SecuredLock",
+                "Items/AnyportalOutput"
                 ]);
 
-            yield return "";
+            yield return "Initializing structures";
+            GameObject randommachine = Instantiate(Resources.FindObjectsOfTypeAll<TapePlayer>().ToList().Find(x => x.name == "PayPhone")).gameObject;
+            Destroy(randommachine.GetComponent<TapePlayer>());
+            Destroy(randommachine.GetComponent<AudioManager>());
+            Destroy(randommachine.GetComponent<AudioSource>());
+            randommachine.name = "Random Machine";
+            randommachine.ConvertToPrefab(true);
+
+            RandomItemMachine gambling = randommachine.AddComponent<RandomItemMachine>();
+            gambling.GetComponentInChildren<SpriteRenderer>().sprite = bcppAssets.Get<Sprite>("Structures/RandomMachine");
+            gambling.GetComponentInChildren<SpriteRenderer>().transform.position = new Vector3(gambling.GetComponentInChildren<SpriteRenderer>().transform.position.x, 4.2f, gambling.GetComponentInChildren<SpriteRenderer>().transform.position.z);
+            gambling.outOf = bcppAssets.Get<Sprite>("Structures/RandomMachine_OutOfGoods");
+
+            GenericHallBuilder gambleBuilder = Instantiate(Resources.FindObjectsOfTypeAll<GenericHallBuilder>().ToList().Find(x => x.name == "PayphoneBuilder"));
+            gambleBuilder.gameObject.name = "Random Machine Builder";
+            gambleBuilder.gameObject.ConvertToPrefab(true);
+            ObjectPlacer yesIhateThat = gambleBuilder.ReflectionGetVariable("objectPlacer") as ObjectPlacer;
+            yesIhateThat.ReflectionSetVariable("prefab", gambling.gameObject);
+            gambleBuilder.ReflectionSetVariable("objectPlacer", yesIhateThat);
+            bcppAssets.Add<ObjectBuilder>("ObjectBuilder/RandomItemMachine", gambleBuilder);
+
+            bcppAssets.AddRange<GameObject>([
+                    gambling.gameObject,
+                ],
+                [
+                    "Structures/RandomItemMachine",
+                ]);
+
+            yield return "Initializing v1.1 new stuff";
             // The Basement
-            lBasement = ScriptableObject.CreateInstance<LevelObject>();
+            // But before we pity ourselves, we must create a new killer!!
+            var prototypeBot = new NPCBuilder<PrototypeBot>(Info)
+                .SetName("PrototypeBot-01")
+                .SetEnum(EnumExtensions.ExtendEnum<Character>("PrototypeBot"))
+                .AddLooker()
+                .AddTrigger()
+                .IgnoreBelts()
+                .IgnorePlayerOnSpawn()
+                .AddSpawnableRoomCategories(RoomCategory.Hall, RoomCategory.Office)
+                .SetPoster(ObjectCreators.CreatePosterObject(Resources.FindObjectsOfTypeAll<Texture2D>().ToList().Find(x => x.name == "Transparent"), []))
+                .SetMinMaxAudioDistance(250f, 500f)
+                .SetMetaTags(["BCPP"])
+                .Build(); //ObjectCreators.CreateNPC<PrototypeBot>("PrototypeBot-01", EnumExtensions.ExtendEnum<Character>("PrototypeBot"), ObjectCreators.CreatePosterObject(Resources.FindObjectsOfTypeAll<Texture2D>().ToList().Find(x => x.name == "Transparent"), []), spawnableRooms: [RoomCategory.Hall, RoomCategory.Office], maxAudioDistance: 400f);
+            prototypeBot.spriteRenderer[0].sprite = bcppAssets.Get<Sprite>("PrototypeBot-01/Idle");
+            prototypeBot.spriteRenderer[0].transform.localPosition = new Vector3(0f, 0f, 0f);
+            prototypeBot.animator = prototypeBot.gameObject.AddComponent<CustomSpriteAnimator>();
+            prototypeBot.animator.affectedObject = prototypeBot.spriteRenderer[0];
+            List<Sprite> idle01 = new List<Sprite>();
+            for (int frame = 0; frame <= 11; frame++) // Idle
+                idle01.Add(bcppAssets.Get<Sprite>("PrototypeBot-01/Idle_" + frame));
+            List<Sprite> run01 = new List<Sprite>();
+            for (int frame = 0; frame <= 7; frame++) // Running
+                run01.Add(bcppAssets.Get<Sprite>("PrototypeBot-01/Running_" + frame));
+            List<Sprite> climb01 = new List<Sprite>();
+            for (int frame = 0; frame <= 17; frame++) // Climbing
+                climb01.Add(bcppAssets.Get<Sprite>("PrototypeBot-01/Climbing_" + frame));
+            List<Sprite> out01 = new List<Sprite>();
+            for (int frame = 0; frame <= 11; frame++) // ClimbOut
+                out01.Add(bcppAssets.Get<Sprite>("PrototypeBot-01/ClimbOut_" + frame));
+            PrototypeBot.animStuff.AddRange([idle01, run01, climb01, out01]);
+            // And a brand new game manager!!
+            MainGameManager managRef = Resources.FindObjectsOfTypeAll<MainGameManager>().First();
+            GameObject newManager = new GameObject("BCPP-Basement01_Manager");
+            newManager.SetActive(false);
+            BasementGameManager basementManager = newManager.AddComponent<BasementGameManager>();
+            basementManager.ReflectionSetVariable("destroyOnLoad", true);
+            Ambience ambObj = Instantiate(managRef.GetComponentInChildren<Ambience>(), newManager.transform);
+            basementManager.ReflectionSetVariable("ambience", ambObj);
+            basementManager.ReflectionSetVariable("elevatorScreenPre", Resources.FindObjectsOfTypeAll<ElevatorScreen>().First());
+            basementManager.overlay = Instantiate(Resources.FindObjectsOfTypeAll<Gum>().ToList().First().transform.Find("GumOverlay").gameObject, newManager.transform).GetComponent<Canvas>();
+            basementManager.overlay.transform.Find("Image").GetComponent<Image>().sprite = bcppAssets.Get<Sprite>("PrototypeBot-01/Jumpscare");
+            basementManager.overlayAnimator = basementManager.overlay.gameObject.AddComponent<CustomImageAnimatorUnscaledTime>();
+            basementManager.overlayAnimator.image = basementManager.overlay.transform.Find("Image").GetComponent<Image>();
+            List<Sprite> jump1 = new List<Sprite>();
+            for (int frame = 0; frame <= 10; frame++) // Jumpscare 1
+                jump1.Add(bcppAssets.Get<Sprite>("PrototypeBot-01/Jumpscare01_" + frame));
+            List<Sprite> jump2 = new List<Sprite>();
+            for (int frame = 0; frame <= 13; frame++) // Jumpscare 2
+                jump2.Add(bcppAssets.Get<Sprite>("PrototypeBot-01/Jumpscare02_" + frame));
+            BasementGameManager.jumpscareFrames.AddRange([jump1, jump2]);
+            newManager.ConvertToPrefab(true);
+            lBasement = ScriptableObject.CreateInstance<CustomLevelObject>();
             // Make sure to not modify the ones you're unsure about!
             lBasement.name = "Basement1";
-            lBasement.previousLevels = [Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main1")];
+            //lBasement.previousLevels = [Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main1")];
 
             lBasement.minSize = new IntVector2(40, 45);
             lBasement.maxSize = new IntVector2(50, 55);
@@ -851,8 +1134,8 @@ namespace BCarnellChars
             lBasement.maxExtraRooms = 0;
             lBasement.extraStickToHallChance = 0.75f;
             lBasement.potentialExtraRooms = [];
-            lBasement.minOffices = 1;
-            lBasement.maxOffices = 1;
+            lBasement.minOffices = 2;
+            lBasement.maxOffices = 6;
             lBasement.officeStickToHallChance = 1;
             lBasement.potentialOffices = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").potentialOffices;
             lBasement.minRoomSize = new IntVector2(3, 5);
@@ -881,21 +1164,21 @@ namespace BCarnellChars
             lBasement.specialRoomsStickToEdge = true;
             lBasement.potentialSpecialRooms = [
             new WeightedRoomAsset()
-                        {
-                            selection = Resources.FindObjectsOfTypeAll<RoomAsset>().ToList().Find(x => x.name.Contains("Cafeteria")),
-                            weight = 100
-                        }
-        ];
+                {
+                    selection = Resources.FindObjectsOfTypeAll<RoomAsset>().ToList().Find(x => x.name.Contains("Cafeteria")),
+                    weight = 100
+                }
+            ];
             lBasement.windowChance = 0.5f;
 
             lBasement.lightMode = LightMode.Greatest;
             lBasement.standardLightStrength = 5;
             lBasement.standardLightColor = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").standardLightColor;
             lBasement.standardDarkLevel = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").standardDarkLevel;
-            lBasement.potentialBaldis = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").potentialBaldis;
-            lBasement.additionalNPCs = 1;
+            lBasement.potentialBaldis = [new WeightedNPC() { selection = prototypeBot, weight = int.MaxValue }];
+            lBasement.additionalNPCs = 0;
             lBasement.potentialNPCs = [
-            new WeightedNPC()
+                /*new WeightedNPC()
                 {
                     selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("ERRORBOT")).value,
                     weight = 100
@@ -914,9 +1197,9 @@ namespace BCarnellChars
                 {
                     selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("SiegeCanonCart")).value,
                     weight = 150
-                }];
+                }*/];
             lBasement.forcedNpcs = [
-            NPCMetaStorage.Instance.Get(Character.LookAt).value,
+            //NPCMetaStorage.Instance.Get(Character.LookAt).value,
                 ];
             lBasement.posterChance = 2;
             lBasement.posters = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").posters;
@@ -937,17 +1220,18 @@ namespace BCarnellChars
                                 weight = 75
                             }
                         ];
-            lBasement.forcedItems = [..Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").forcedItems, bcppAssets.Get<ItemObject>("Items/ProfitCard")];
+            lBasement.forcedItems = [..Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").forcedItems, bcppAssets.Get<ItemObject>("Items/ProfitCard"),
+                Resources.FindObjectsOfTypeAll<ItemObject>().ToList().Find(x => x.itemType == Items.Tape)];
             lBasement.maxItemValue *= 2;
             lBasement.singleEntranceItemVal = 10;
             lBasement.noHallItemVal = 15;
-            lBasement.minEvents = 2;
-            lBasement.maxEvents = 5;
+            lBasement.minEvents = 0;
+            lBasement.maxEvents = 0;
             lBasement.initialEventGap = 0;
             lBasement.minEventGap = 60;
             lBasement.maxEventGap = 150;
             lBasement.randomEvents = [
-                new WeightedRandomEvent()
+                    /*new WeightedRandomEvent()
                     {
                         selection = Resources.FindObjectsOfTypeAll<RandomEvent>().ToList().Find(x => x.name == "Event_Flood"),
                         weight = 150
@@ -971,7 +1255,7 @@ namespace BCarnellChars
                     {
                         selection = Resources.FindObjectsOfTypeAll<RandomEvent>().ToList().Find(x => x.name == "Event_Party"),
                         weight = 75
-                    }
+                    }*/
             ];
 
             lBasement.fieldTrip = false;
@@ -1009,7 +1293,7 @@ namespace BCarnellChars
             lBasement.timeBonusVal = 200;
             sBasement = ScriptableObject.CreateInstance<SceneObject>();
             sBasement.name = "BasementLevel_1";
-            sBasement.manager = Resources.FindObjectsOfTypeAll<MainGameManager>().ToList().Find(x => x.name.Contains("Lvl3"));
+            sBasement.manager = basementManager; //Resources.FindObjectsOfTypeAll<MainGameManager>().ToList().Find(x => x.name.Contains("Lvl3"));
             sBasement.levelObject = lBasement;
             sBasement.skybox = Resources.FindObjectsOfTypeAll<Cubemap>().ToList().Find(x => x.name.Contains("DayStandard"));
             sBasement.skyboxColor = Color.white;
@@ -1017,27 +1301,25 @@ namespace BCarnellChars
             sBasement.levelTitle = "B1";
             sBasement.levelNo = -1;
 
-            //Resources.FindObjectsOfTypeAll<SceneObject>().ToList().Find(x => x.name == "MainLevel_1").nextLevel = sBasement;
-
-#if DEBUG
-            lBasement.potentialNPCs.Add(
-                new WeightedNPC()
-                {
-                    selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("RPSGuy")).value,
-                    weight = 150
-                });
-            /*var hi = 0;
-            while (hi < 99)
-            {
-                lBasement.forcedNpcs = lBasement.forcedNpcs.AddRangeToArray([
-                    NPCMetaStorage.Instance.Get(Character.Sweep).value
-                    ]);
-                hi++;
-            }*/
-#endif
+            // And the button... You'll get what I'm doing.
+            GameButton button = Instantiate(Resources.FindObjectsOfTypeAll<GameButton>().First());
+            button.gameObject.name = "Basement01Button";
+            button.gameObject.ConvertToPrefab(true);
+            button.ChangeColor(ButtonColorManager.CreateButtonMaterial("Proto01", new Color(0.3089626f, 0.1634033f, 0.6792453f, 1f)));
+            FacultyButtonBuilderBCPP butbuilder = new GameObject("FacultyButtonBuilder_BCPP", typeof(FacultyButtonBuilderBCPP)).GetComponent<FacultyButtonBuilderBCPP>();
+            butbuilder.gameObject.ConvertToPrefab(true);
+            butbuilder.buttonPre = button;
+            bcppAssets.Add<ObjectBuilder>("ObjectBuilder/BasementButtonBuilder", butbuilder);
 
             GeneratorManagement.Register(this, GenerationModType.Addend, (floorName, floorNum, ld) =>
             {
+                if (ld.specialHallBuilders.ToList().Exists(x => x.selection == Resources.FindObjectsOfTypeAll<GenericHallBuilder>().ToList().Find(x => x.name == "PayphoneBuilder")))
+                    ld.specialHallBuilders = ld.specialHallBuilders.AddToArray(
+                    new WeightedObjectBuilder()
+                    {
+                        selection = bcppAssets.Get<ObjectBuilder>("ObjectBuilder/RandomItemMachine"),
+                        weight = 75
+                    });
                 switch (floorName)
                 {
                     case "F1":
@@ -1056,6 +1338,15 @@ namespace BCarnellChars
                                 weight = 150
                             }
                         ]);
+#if DEBUG
+                        ld.forcedSpecialHallBuilders = ld.forcedSpecialHallBuilders.AddToArray(bcppAssets.Get<ObjectBuilder>("ObjectBuilder/BasementButtonBuilder"));
+#else
+                        ld.specialHallBuilders = ld.specialHallBuilders.AddToArray(new WeightedObjectBuilder()
+                        {
+                            selection = bcppAssets.Get<ObjectBuilder>("ObjectBuilder/BasementButtonBuilder"),
+                            weight = 10
+                        });
+#endif
                         break;
                     case "F2":
                         ld.forcedItems.Add(bcppAssets.Get<ItemObject>("Items/ProfitCard"));
@@ -1129,6 +1420,11 @@ namespace BCarnellChars
                             {
                                 selection = bcppAssets.Get<ItemObject>("Items/SecuredLock"),
                                 weight = 75
+                            },
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/AnyportalOutput"),
+                                weight = 90
                             }
                             ]);
                         ld.shopItems = ld.shopItems.AddRangeToArray([
@@ -1145,6 +1441,11 @@ namespace BCarnellChars
                             new WeightedItemObject()
                             {
                                 selection = bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
+                                weight = 100
+                            },
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/AnyportalOutput"),
                                 weight = 100
                             }
                             ]);
@@ -1196,6 +1497,11 @@ namespace BCarnellChars
                             {
                                 selection = bcppAssets.Get<ItemObject>("Items/SecuredLock"),
                                 weight = 75
+                            },
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/AnyportalOutput"),
+                                weight = 80
                             }
                             ]);
                         ld.potentialNPCs.AddRange([
@@ -1223,11 +1529,36 @@ namespace BCarnellChars
                         ld.additionalNPCs += 2;
                         break;
                     default: // For floors that are from different mods
-                        ld.forcedItems.Add(bcppAssets.Get<ItemObject>("Items/ProfitCard"));
+                        if (!ld.forcedItems.Contains(bcppAssets.Get<ItemObject>("Items/ProfitCard"))) ld.forcedItems.Add(bcppAssets.Get<ItemObject>("Items/ProfitCard"));
+                        if (ld.potentialNPCs.ToList().Exists(x => x.selection.GetComponent<MrPortalMan>()))
+                        {
+                            ld.potentialItems = ld.potentialItems.AddToArray(
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/AnyportalOutput"),
+                                weight = 90
+                            });
+                            ld.shopItems = ld.shopItems.AddToArray(
+                            new WeightedItemObject()
+                            {
+                                selection = bcppAssets.Get<ItemObject>("Items/AnyportalOutput"),
+                                weight = 100
+                            });
+                        }
                         break;
                 }
 
             });
+        }
+
+        private void PostLoad()
+        {
+            foreach(SodaMachine soda in Resources.FindObjectsOfTypeAll<SodaMachine>())
+            {
+                soda.gameObject.AddComponent<ToProfitCardCost>();
+            }
+
+            GeneratorManagement.Invoke("B1", -1, lBasement as CustomLevelObject);
         }
     }
 
