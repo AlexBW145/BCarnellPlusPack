@@ -30,11 +30,17 @@ using MTM101BaldAPI.ObjectCreation;
 using System.Collections;
 using MTM101BaldAPI.Registers.Buttons;
 using UnityEngine.UIElements.StyleSheets;
+using System.Dynamic;
+using System.IO.Pipes;
+using System.Text;
+using System.Data;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace BCarnellChars
 {
-    [BepInPlugin("alexbw145.baldiplus.bcarnellchars", "B. Carnell Chars", "1.1.0")]
+    [BepInPlugin("alexbw145.baldiplus.bcarnellchars", "B. Carnell Chars", BCPPSave.Version)]
     [BepInDependency("mtm101.rulerp.bbplus.baldidevapi")]
+    [BepInDependency("io.github.luisrandomness.bbp_custom_posters", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInIncompatibility("alexbw145.bbplus.rpsguy")] // This is a bad idea...
     [BepInProcess("BALDI.exe")]
     public class BasePlugin : BaseUnityPlugin
@@ -57,7 +63,14 @@ namespace BCarnellChars
         {
             Harmony harmony = new Harmony("alexbw145.baldiplus.bcarnellchars");
             Instance = this;
+            gameObject.AddComponent<BCPPSave>(); // No idea...
             harmony.PatchAllConditionals();
+
+            // Custom Posters Mod
+            if (Chainloader.PluginInfos.ContainsKey("io.github.luisrandomness.bbp_custom_posters"))
+                Chainloader.PluginInfos["io.github.luisrandomness.bbp_custom_posters"].Instance.GetType()
+                    .Assembly.GetType("LuisRandomness.BBPCustomPosters.CustomPostersPlugin")
+                    .InvokeMember("AddBuiltInPackFromMod", BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod, null, null, [this, "Texture2D", "Posters"]);
 
             float errorbodySpriteSize = 100f;
             int siegeSize = 39;
@@ -411,11 +424,6 @@ namespace BCarnellChars
                 MTM101BaldiDevAPI.CauseCrash(Info, new Exception("BCPP crashed the mod loading screen because the API version is wrong.\n<color=white>Current API Version: " + MTM101BaldiDevAPI.Version.ToString() + "</color>\n<color=yellow>Required API Version: 4.2.0.0 or later</color>"));
                 yield break;
             }
-            // Custom Posters Mod (Doesn't work until next update)
-            if (Chainloader.PluginInfos.ContainsKey("io.github.luisrandomness.bbp_custom_posters"))
-                Chainloader.PluginInfos["io.github.luisrandomness.bbp_custom_posters"].Instance.GetType()
-                    .Assembly.GetType("LuisRandomness.BBPCustomPosters.CustomPostersPlugin")
-                    .InvokeMember("AddBuiltInPackFromMod", BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod, null, null, [this, "Texture2D", "Posters"]);
             RadarModExists = Chainloader.PluginInfos.ContainsKey(radarID);
             if (RadarModExists)
             {
@@ -1032,7 +1040,7 @@ namespace BCarnellChars
                 .AddSpawnableRoomCategories(RoomCategory.Hall, RoomCategory.Office)
                 .SetPoster(ObjectCreators.CreatePosterObject(Resources.FindObjectsOfTypeAll<Texture2D>().ToList().Find(x => x.name == "Transparent"), []))
                 .SetMinMaxAudioDistance(250f, 500f)
-                .SetMetaTags(["BCPP"])
+                .SetMetaTags(["BCPP", "adv_exclusion_hammer_immunity"]) // Why do you not check the LevelObject from the SceneObject from the CoreGameManager??
                 .Build(); //ObjectCreators.CreateNPC<PrototypeBot>("PrototypeBot-01", EnumExtensions.ExtendEnum<Character>("PrototypeBot"), ObjectCreators.CreatePosterObject(Resources.FindObjectsOfTypeAll<Texture2D>().ToList().Find(x => x.name == "Transparent"), []), spawnableRooms: [RoomCategory.Hall, RoomCategory.Office], maxAudioDistance: 400f);
             prototypeBot.spriteRenderer[0].sprite = bcppAssets.Get<Sprite>("PrototypeBot-01/Idle");
             prototypeBot.spriteRenderer[0].transform.localPosition = new Vector3(0f, 0f, 0f);
@@ -1344,7 +1352,7 @@ namespace BCarnellChars
                         ld.specialHallBuilders = ld.specialHallBuilders.AddToArray(new WeightedObjectBuilder()
                         {
                             selection = bcppAssets.Get<ObjectBuilder>("ObjectBuilder/BasementButtonBuilder"),
-                            weight = 10
+                            weight = 11
                         });
 #endif
                         break;
@@ -1549,6 +1557,21 @@ namespace BCarnellChars
                 }
 
             });
+
+            ModdedSaveSystem.AddSaveLoadAction(this, (isSave, path) =>
+            {
+                if (!isSave)
+                    BCPPSave.Instance.Load();
+                else
+                    BCPPSave.Instance.Save();
+#if DEBUG
+                if (BCPPSave.Instance.firstTime)
+                {
+                    Debug.LogWarning("FIRST TIME IN BCPP, NO PROBLEM!!");
+                    BCPPSave.Instance.firstTime = false;
+                }
+#endif
+            });
         }
 
         private void PostLoad()
@@ -1559,6 +1582,10 @@ namespace BCarnellChars
             }
 
             GeneratorManagement.Invoke("B1", -1, lBasement as CustomLevelObject);
+            // Sugaku characters should not appear for whatever reasons...
+            lBasement.additionalNPCs = 0;
+            lBasement.minEvents = 0;
+            lBasement.maxEvents = 0;
         }
     }
 
@@ -1571,5 +1598,72 @@ namespace BCarnellChars
         public static ConfigEntry<Color> SiegeCartColor;
 
         public static ConfigEntry<Color> MrPortalManColor;
+    }
+
+    public class BCPPSave : Singleton<BCPPSave> // Is it friendly enough??
+    {
+        public const string Version = "1.1.1";
+        public static Version typeVersion => new Version(Version);
+
+        public bool basementCompleted;
+        public bool firstTime;
+
+        void Start()
+        {
+            SetDefaults(typeVersion.Build);
+        }
+
+        public bool Load()
+        {
+            string path = Path.Combine(ModdedSaveSystem.GetCurrentSaveFolder(BasePlugin.Instance), "BCPP.dat");
+            if (!File.Exists(path))
+            {
+                SetDefaults(typeVersion.Build);
+                Save();
+                return false;
+            }
+            using (var stream = File.Open(path, FileMode.Open))
+            {
+                using (var reader = new BinaryReader(stream, Encoding.UTF8, false))
+                {
+                    int ver = reader.ReadInt32();
+                    if (ver < typeVersion.Build)
+                    {
+                        SetDefaults(ver);
+                        return false;
+                    }
+                    basementCompleted = reader.ReadBoolean();
+                    firstTime = reader.ReadBoolean();
+                }
+
+                return true;
+            }
+        }
+
+        public void Save()
+        {
+            string path = Path.Combine(ModdedSaveSystem.GetCurrentSaveFolder(BasePlugin.Instance), "BCPP.dat");
+            if (!File.Exists(path))
+            {
+                File.Delete(path);
+            }
+
+            using (var stream = File.Open(path, FileMode.Create))
+            {
+                using (var writer = new BinaryWriter(stream, Encoding.UTF8, false))
+                {
+                    writer.Write(typeVersion.Build);
+                    writer.Write(basementCompleted);
+                    writer.Write(firstTime);
+                }
+            }
+        }
+
+        public void SetDefaults(int build)
+        {
+            if (build >= new Version("1.1.0").Build)
+                basementCompleted = false;
+            firstTime = true;
+        }
     }
 }

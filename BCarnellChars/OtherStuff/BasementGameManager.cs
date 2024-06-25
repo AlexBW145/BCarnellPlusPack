@@ -1,7 +1,9 @@
 ﻿using BCarnellChars.Characters;
 using HarmonyLib;
+using MTM101BaldAPI;
 using MTM101BaldAPI.Components;
 using MTM101BaldAPI.Reflection;
+using MTM101BaldAPI.SaveSystem;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -103,6 +105,7 @@ namespace BCarnellChars.OtherStuff
                     ec.SetLight(true, light);
             }
 
+            ec.MaxRaycast = 250f;
             StartCoroutine(FadeOnFog());
         }
 
@@ -162,6 +165,13 @@ namespace BCarnellChars.OtherStuff
             elevatorScreen.ShowResults(time, num);
             if (CoreGameManager.Instance.GetPoints(0) > 0 && !levelObject.finalLevel)
                 elevatorScreen.QueueShop();
+            if (CoreGameManager.Instance.SaveEnabled && MTM101BaldiDevAPI.SaveGamesEnabled && levelObject.name == "Basement1"
+                && CoreGameManager.Instance.currentMode != Mode.Free && levelObject.finalLevel)
+            {
+                BCPPSave.Instance.basementCompleted = true;
+                BCPPSave.Instance.Save();
+            }
+
         }
 
         public override void RestartLevel()

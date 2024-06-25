@@ -110,6 +110,46 @@ namespace BCarnellChars.Patches
         }
     }
 
+    [HarmonyPatch(typeof(MainMenu), "Start")]
+    class DoneForDay
+    {
+        static void Postfix()
+        {
+            if (BCPPSave.Instance.basementCompleted)
+            {
+                RectTransform canv = RectTransform.FindObjectsOfType<RectTransform>(true).ToList().Find(x => x.name == "PickChallenge");
+                StandardMenuButton but = GameObject.Instantiate(canv.gameObject.GetComponentInChildren<StandardMenuButton>().gameObject,
+                    canv, true).GetComponent<StandardMenuButton>();
+                but.name = "BasementFloor";
+                but.transform.SetSiblingIndex(canv.gameObject.GetComponentInChildren<StandardMenuButton>().transform.GetSiblingIndex());
+                but.GetComponent<RectTransform>().localScale = new Vector3(1f,1f,1f) / 2f;
+                but.GetComponent<RectTransform>().anchoredPosition = new Vector2(182f, 164f);
+                but.GetComponent<TextLocalizer>().key = "But_Basement01";
+                but.OnHighlight = new UnityEvent();
+                but.OnHighlight.AddListener(() =>
+                {
+                    but.transform.parent.Find("ModeText").GetComponent<TextLocalizer>().GetLocalizedText("Men_Basement01");
+                });
+                but.OnPress = new UnityEvent();
+                but.OnPress.AddListener(() =>
+                {
+                    GameLoader gl = Resources.FindObjectsOfTypeAll<GameLoader>().First();
+                    gl.gameObject.SetActive(true);
+                    but.transform.parent.gameObject.SetActive(false);
+                    gl.CheckSeed();
+                    gl.Initialize(int.MaxValue);
+                    gl.SetMode((int)Mode.Main);
+                    ElevatorScreen evl = SceneManager.GetActiveScene().GetRootGameObjects().Where(x => x.name == "ElevatorScreen").First().GetComponent<ElevatorScreen>();
+                    gl.AssignElevatorScreen(evl);
+                    evl.gameObject.SetActive(true);
+                    gl.LoadLevel(BasePlugin.Instance.sBasement);
+                    evl.Initialize();
+                    gl.SetSave(false);
+                });
+            }
+        }
+    }
+
 #if DEBUG
     [HarmonyPatch(typeof(LevelGenerator), "StartGenerate")]
     class EveryoneIsHere

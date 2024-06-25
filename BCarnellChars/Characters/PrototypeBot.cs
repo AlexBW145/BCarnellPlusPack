@@ -100,6 +100,10 @@ namespace BCarnellChars.Characters
 
         public virtual void MechFunctInvoke()
         {
+#if DEBUG
+            for (int k = 0; k < CoreGameManager.Instance.setPlayers; k++)
+                Debug.Log("Distance between PrototypeBot-01 & player"+k+ ": " + Vector3.Distance(transform.position, players[k].transform.position));
+#endif
             if (!behaviorStateMachine.currentState.GetType().Equals(typeof(PrototypeBot_Stunned)))
             {
                 audMan.FlushQueue(true);
@@ -150,7 +154,10 @@ namespace BCarnellChars.Characters
             behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 1));
         }
     }
+}
 
+namespace BCarnellChars.Characters.States
+{
     public class PrototypeBot_StateBase : NpcState
     {
         protected PrototypeBot prototypebot;
@@ -183,7 +190,7 @@ namespace BCarnellChars.Characters
 
         public override void Hear(Vector3 position, int value)
         {
-            if (value >= 112 && Mathf.RoundToInt((prototypebot.transform.position - position).magnitude) < (245+value))
+            if (value >= 112 && Mathf.RoundToInt(Vector3.Distance(npc.transform.position, position)) < (245 + value))
                 prototypebot.behaviorStateMachine.ChangeState(new PrototypeBot_Chase(prototypebot, prototypebot, position));
             else if (!npc.Navigator.HasDestination && npc.behaviorStateMachine.currentState.GetType().Equals(typeof(PrototypeBot_StateBase)))
                 prototypebot.MechFunctInvoke();
@@ -242,7 +249,7 @@ namespace BCarnellChars.Characters
             npc.Navigator.SetSpeed(30);
             npc.Navigator.Entity.SetGrounded(false);
             for (int k = 0; k < CoreGameManager.Instance.setPlayers; k++)
-                npc.Navigator.Entity.IgnoreEntity(CoreGameManager.Instance.GetPlayer(k).plm.Entity, true);
+                npc.Navigator.Entity.IgnoreEntity(npc.players[k].plm.Entity, true);
             player = npc.players[Mathf.RoundToInt(UnityEngine.Random.Range(0, npc.players.Count - 1))];
             bool flag = false;
             int attempts = 0;
@@ -256,8 +263,8 @@ namespace BCarnellChars.Characters
                 {
                     if (!flag)
                         break;
-                    if ((npc.transform.position - npc.players[k].transform.position).magnitude > 250f
-                        && (npc.transform.position - npc.players[k].transform.position).magnitude <= 180f)
+                    if ((Vector3.Distance(npc.transform.position, npc.players[k].transform.position) > 250f
+                        && Vector3.Distance(npc.transform.position, npc.players[k].transform.position) <= 180f))
                         flag = false;
                 }
             }
@@ -281,7 +288,7 @@ namespace BCarnellChars.Characters
                 }
                 return;
             }
-            float distance = (npc.transform.position - player.transform.position).magnitude;
+            float distance = Vector3.Distance(npc.transform.position, player.transform.position);
             if (distance <= 300f)
             {
                 ChangeNavigationState(new NavigationState_TargetPlayer(npc, 99, player.transform.position));
@@ -300,8 +307,8 @@ namespace BCarnellChars.Characters
                     {
                         if (!flag)
                             break;
-                        if ((npc.transform.position - npc.players[k].transform.position).magnitude > 250f
-                            && (npc.transform.position - npc.players[k].transform.position).magnitude <= 180f)
+                        if (Vector3.Distance(npc.transform.position, npc.players[k].transform.position) > 250f
+                            && Vector3.Distance(npc.transform.position, npc.players[k].transform.position) <= 180f)
                             flag = false;
                     }
                 }
@@ -324,8 +331,8 @@ namespace BCarnellChars.Characters
 
         public override void PlayerLost(PlayerManager player)
         {
-            if ((npc.transform.position - player.transform.position).magnitude <= 40f)
-                prototypebot.MechFunctInvoke(); 
+            if (Vector3.Distance(npc.transform.position, player.transform.position) <= 40f)
+                prototypebot.MechFunctInvoke();
         }
 
         public override void Exit()
@@ -334,7 +341,7 @@ namespace BCarnellChars.Characters
             npc.Navigator.Entity.SetBaseRotation(0f);
             npc.Navigator.Entity.SetGrounded(true);
             for (int k = 0; k < CoreGameManager.Instance.setPlayers; k++)
-                npc.Navigator.Entity.IgnoreEntity(CoreGameManager.Instance.GetPlayer(k).plm.Entity, false);
+                npc.Navigator.Entity.IgnoreEntity(npc.players[k].plm.Entity, false);
         }
     }
 
@@ -364,7 +371,7 @@ namespace BCarnellChars.Characters
                 {
                     if (!flag)
                         break;
-                    if ((npc.transform.position - npc.players[k].transform.position).magnitude <= 150f && (npc.transform.position - npc.players[k].transform.position).magnitude > 250f)
+                    if (Vector3.Distance(npc.transform.position, npc.players[k].transform.position) <= 150f && Vector3.Distance(npc.transform.position, npc.players[k].transform.position) > 250f)
                         flag = false;
                 }
             }
@@ -383,7 +390,7 @@ namespace BCarnellChars.Characters
 
         public override void PlayerLost(PlayerManager player)
         {
-            if ((npc.transform.position - player.transform.position).magnitude >= 200f)
+            if (Vector3.Distance(npc.transform.position, player.transform.position) >= 200f)
                 prototypebot.MechFunctInvoke();
         }
     }
@@ -418,7 +425,7 @@ namespace BCarnellChars.Characters
                 {
                     if (!flag)
                         break;
-                    if ((npc.transform.position - npc.players[k].transform.position).magnitude <= 280f)
+                    if (Vector3.Distance(npc.transform.position, npc.players[k].transform.position) <= 280f)
                         flag = false;
                 }
             }
@@ -429,7 +436,7 @@ namespace BCarnellChars.Characters
 
         public override void Update()
         {
-            float distance = (npc.transform.position - player.transform.position).magnitude;
+            float distance = Vector3.Distance(npc.transform.position, player.transform.position);
             if (distance <= 300f)
             {
                 ChangeNavigationState(new NavigationState_TargetPlayer(npc, 99, player.transform.position));
@@ -513,7 +520,7 @@ namespace BCarnellChars.Characters
             {
                 for (int k = 0; k < CoreGameManager.Instance.setPlayers; k++)
                 {
-                    if (room.category != RoomCategory.Class || room.ec.activities.Find(x => x.room == room & !x.IsCompleted) || (npc.ec.RealRoomMax(room) - npc.players[k].transform.position).magnitude <= 160f)
+                    if (room.category != RoomCategory.Class || room.ec.activities.Find(x => x.room == room & !x.IsCompleted) || Vector3.Distance(npc.ec.RealRoomMax(room), npc.players[k].transform.position) <= 160f)
                         continue;
                     //Debug.Log("Adding classroom");
                     peek.Add(room);
@@ -528,7 +535,7 @@ namespace BCarnellChars.Characters
         public override void Update()
         {
             passedTime += npc.ec.NpcTimeScale;
-            float distance = (npc.ec.RealRoomMid(npc.Navigator.Entity.CurrentRoom) - npc.players[0].transform.position).magnitude;
+            float distance = Vector3.Distance(npc.ec.RealRoomMid(npc.Navigator.Entity.CurrentRoom), npc.players[0].transform.position);
             if (distance >= 200f || passedTime >= 60f)
                 prototypebot.MechFunctInvoke();
             if (distance < 110f)
