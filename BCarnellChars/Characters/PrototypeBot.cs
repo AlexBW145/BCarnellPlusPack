@@ -421,6 +421,7 @@ namespace BCarnellChars.Characters.States
             player = _player;
         }
         private int maxattempts = 70;
+        private float elaspedTime;
 
         public override void Enter()
         {
@@ -455,8 +456,9 @@ namespace BCarnellChars.Characters.States
         public override void Update()
         {
             float distance = Vector3.Distance(npc.transform.position, player.transform.position);
-            if (distance <= 300f)
+            if (distance <= 380f && elaspedTime < 55f)
             {
+                elaspedTime += Time.deltaTime * npc.TimeScale;
                 if (!player.hidden)
                     ChangeNavigationState(new NavigationState_TargetPlayer(npc, 99, player.transform.position));
                 else
