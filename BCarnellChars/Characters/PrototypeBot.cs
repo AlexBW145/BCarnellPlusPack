@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
@@ -107,7 +108,7 @@ namespace BCarnellChars.Characters
             if (!behaviorStateMachine.currentState.GetType().Equals(typeof(PrototypeBot_Stunned)))
             {
                 audMan.FlushQueue(true);
-                mechFuncts[UnityEngine.Random.Range(0, mechFuncts.Length - 1)].Invoke();
+                mechFuncts[Mathf.RoundToInt(UnityEngine.Random.Range(0f, mechFuncts.Length - 1f))].Invoke();
             }
         }
         public virtual IEnumerator StunHearing(float time)
@@ -119,7 +120,7 @@ namespace BCarnellChars.Characters
             audMan.QueueAudio(BasePlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/Stunned"), true);
             yield return new WaitForSecondsEnviromentTimescale(ec, time);
             audMan.FlushQueue(true);
-            mechFuncts[UnityEngine.Random.Range(0, mechFuncts.Length - 1)].Invoke();
+            mechFuncts[Mathf.RoundToInt(UnityEngine.Random.Range(0f, mechFuncts.Length - 1f))].Invoke();
         }
 
         // Action Functions
@@ -146,12 +147,13 @@ namespace BCarnellChars.Characters
             behaviorStateMachine.ChangeState(new PrototypeBot_Prank(this, this));
             behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 0));
         }
-        private void TeleportToSides()
+        private void TeleportToSides() // This thing busted...
         {
-            audMan.SetLoop(false);
+            DoorPrank();
+            /*audMan.SetLoop(false);
             audMan.maintainLoop = false;
             behaviorStateMachine.ChangeState(new PrototypeBot_Corner(this, this));
-            behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 1));
+            behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 1));*/
         }
     }
 }
@@ -251,6 +253,7 @@ namespace BCarnellChars.Characters.States
         }
         private PlayerManager player;
         private int maxattempts = 30;
+        private float elaspedTime;
 
         public override void Enter()
         {
@@ -289,6 +292,9 @@ namespace BCarnellChars.Characters.States
         {
             if (player == null | flagged)
                 return;
+            elaspedTime += Time.deltaTime * npc.TimeScale;
+            if (elaspedTime >= 55f)
+                prototypebot.MechFunctInvoke();
             if (player.plm.Entity.CurrentRoom.type != RoomType.Hall | player.hidden) // Is this fair enough??
             {
                 if (npc.Navigator.HasDestination && (npc.ec.CellFromPosition(player.transform.position).room.type != RoomType.Hall | player.hidden)
@@ -370,9 +376,9 @@ namespace BCarnellChars.Characters.States
         {
             base.Enter();
             flagged = true;
-            prototypebot.animator.SetDefaultAnimation("Idle", 1f);
-            npc.Navigator.maxSpeed = 50;
-            npc.Navigator.SetSpeed(50);
+            prototypebot.animator.SetDefaultAnimation("Running", 1.9f);
+            npc.Navigator.maxSpeed = 31;
+            npc.Navigator.SetSpeed(31);
             npc.Navigator.Entity.SetTrigger(false); // Don't want accidents happen...
             bool flag = false;
             int attempts = 0;
@@ -401,12 +407,22 @@ namespace BCarnellChars.Characters.States
         public override void Update()
         {
             if (player)
-                ChangeNavigationState(new NavigationState_TargetPlayer(npc, 99, player.transform.position));
+            {
+                if (player.plm.Entity.CurrentRoom.type != RoomType.Hall)
+                    prototypebot.MechFunctInvoke();
+                else
+                    ChangeNavigationState(new NavigationState_TargetPlayer(npc, 99, player.transform.position));
+                if (npc.looker.PlayerInSight())
+                {
+                    npc.Navigator.maxSpeed = 11;
+                    npc.Navigator.SetSpeed(11);
+                }
+            }
         }
 
         public override void PlayerLost(PlayerManager player)
         {
-            if (Vector3.Distance(npc.transform.position, player.transform.position) >= 200f)
+            if (Vector3.Distance(npc.transform.position, player.transform.position) <= 211f)
                 prototypebot.MechFunctInvoke();
         }
     }
@@ -420,8 +436,7 @@ namespace BCarnellChars.Characters.States
         {
             player = _player;
         }
-        private int maxattempts = 70;
-        private float elaspedTime;
+        private int maxattempts = 30;
 
         public override void Enter()
         {
@@ -443,7 +458,8 @@ namespace BCarnellChars.Characters.States
                 {
                     if (!flag)
                         break;
-                    if (Vector3.Distance(npc.transform.position, npc.players[k].transform.position) <= 380f)
+                    if (Vector3.Distance(npc.transform.position, npc.players[k].transform.position) <= 340f ||
+                        Vector3.Distance(npc.transform.position, npc.players[k].transform.position) > 400f)
                         flag = false;
                 }
             }
@@ -456,9 +472,8 @@ namespace BCarnellChars.Characters.States
         public override void Update()
         {
             float distance = Vector3.Distance(npc.transform.position, player.transform.position);
-            if (distance <= 380f && elaspedTime < 55f)
+            if (distance <= 400f)
             {
-                elaspedTime += Time.deltaTime * npc.TimeScale;
                 if (!player.hidden)
                     ChangeNavigationState(new NavigationState_TargetPlayer(npc, 99, player.transform.position));
                 else
@@ -517,6 +532,7 @@ namespace BCarnellChars.Characters.States
     public class PrototypeBot_Prank : PrototypeBot_StateBase
     {
         private float passedTime = 0f;
+        private Door nearestDoor;
         public PrototypeBot_Prank(NPC npc, PrototypeBot bot)
             : base(npc, bot)
         {
@@ -529,19 +545,39 @@ namespace BCarnellChars.Characters.States
             prototypebot.animator.SetDefaultAnimation("Idle", 1f);
             npc.Navigator.maxSpeed = 0;
             npc.Navigator.SetSpeed(0);
+            if (BaseGameManager.Instance.FoundNotebooks < 1) {
+                prototypebot.MechFunctInvoke();
+                return;
+            }
             List<RoomController> peek = new List<RoomController>();
             foreach (RoomController room in npc.ec.rooms)
             {
+                if (room == null) continue;
                 for (int k = 0; k < CoreGameManager.Instance.setPlayers; k++)
                 {
-                    if (room.category != RoomCategory.Class || room.ec.activities.Find(x => x.room == room & !x.IsCompleted) || Vector3.Distance(npc.ec.RealRoomMax(room), npc.players[k].transform.position) <= 260f)
+                    if (room.category != RoomCategory.Class || room.ec.activities.Find(x => x.room == room & !x.IsCompleted)
+                        || Vector3.Distance(npc.ec.RealRoomMid(room), npc.players[k].transform.position) > 360f || Vector3.Distance(npc.ec.RealRoomMid(room), npc.players[k].transform.position) <= 190f)
                         continue;
                     //Debug.Log("Adding classroom");
                     peek.Add(room);
                 }
             }
-            if (peek.Count > 0)
+            if (peek.Count > 0) {
                 npc.Navigator.Entity.Teleport(npc.ec.RealRoomMid(peek[Mathf.RoundToInt(UnityEngine.Random.Range(0, peek.Count - 1))]));
+                float nearest = float.PositiveInfinity;
+                foreach (var tile in npc.Navigator.Entity.CurrentRoom.AllTilesNoGarbage(false, true))
+                {
+                    foreach (var door in tile.doors)
+                    {
+                        var distance = Vector3.Distance(door.transform.position, npc.transform.position);
+                        if (distance <= nearest)
+                        {
+                            nearestDoor = door;
+                            nearest = distance;
+                        }
+                    }
+                }
+            }
             else
                 prototypebot.MechFunctInvoke();
             flagged = false;
@@ -549,11 +585,15 @@ namespace BCarnellChars.Characters.States
 
         public override void Update()
         {
-            passedTime += ((BaseGameManager.Instance.FoundNotebooks / BaseGameManager.Instance.NotebookTotal) * 2) * (Time.timeScale * npc.ec.NpcTimeScale);
+            if (nearestDoor == null)
+                return;
+            passedTime += ((BaseGameManager.Instance.FoundNotebooks / BaseGameManager.Instance.NotebookTotal) * 2) * (Time.deltaTime * npc.ec.NpcTimeScale);
             float distance = Vector3.Distance(npc.ec.RealRoomMid(npc.Navigator.Entity.CurrentRoom), npc.players[0].transform.position);
-            if (distance >= 200f || passedTime >= 60f)
+            float doorDist = Vector3.Distance(nearestDoor.transform.position, npc.players[0].transform.position);
+            Physics.Raycast(nearestDoor.transform.position, npc.players[0].transform.position - nearestDoor.transform.position, out RaycastHit playerHit, float.PositiveInfinity, LayerMask.GetMask("Default", "Player"), QueryTriggerInteraction.Ignore);
+            if (distance >= 360f || passedTime >= (20f * BaseGameManager.Instance.FoundNotebooks))
                 prototypebot.MechFunctInvoke();
-            if (distance < 60f & !flagged)
+            if ((doorDist < 30f | playerHit.transform.CompareTag("Player")) & !flagged)
                 prototypebot.StartCoroutine(isReady(npc.players[0]));
         }
 
