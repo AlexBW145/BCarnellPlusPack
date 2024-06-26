@@ -92,7 +92,7 @@ namespace BCarnellEditor
                 BaldiLevelEditorPlugin.editorObjects.Add(EditorObjectType.CreateFromGameObject<EditorPrefab, PrefabLocation>(name + "profit", sodaProfitCard, Vector3.zero));
                 PlusLevelLoaderPlugin.Instance.prefabAliases.Add(name + "profit", sodaProfitCard);
                 sodaToolcats.Add(new (name + "profit", true,
-                BaldiLevelEditorPlugin.Instance.assetMan.Get<Sprite>("UI/Object_" + name) != null ? BaldiLevelEditorPlugin.Instance.assetMan.Get<Sprite>("UI/Object_" + name) : BaldiLevelEditorPlugin.Instance.assetMan.Get<Sprite>("UI/Object_bsodamachine")));
+                BaldiLevelEditorPlugin.Instance.assetMan.Get<Sprite>("UI/Object_" + name) ?? BaldiLevelEditorPlugin.Instance.assetMan.Get<Sprite>("UI/Object_bsodamachine")));
                 // Dunno if people are NOT gonna use the assetman from the base level editor itself...
             }
 

@@ -35,6 +35,8 @@ using System.IO.Pipes;
 using System.Text;
 using System.Data;
 using System.Runtime.InteropServices.ComTypes;
+using BepInEx.Logging;
+using System.Runtime.ConstrainedExecution;
 
 namespace BCarnellChars
 {
@@ -1610,7 +1612,8 @@ namespace BCarnellChars
 
     public class BCPPSave : Singleton<BCPPSave> // Is it friendly enough??
     {
-        public const string Version = "1.1.1";
+        public ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource("BCPPSave");
+        public const string Version = "1.1.2";
         public static Version typeVersion => new Version(Version);
 
         public bool basementCompleted;
@@ -1618,7 +1621,7 @@ namespace BCarnellChars
 
         void Start()
         {
-            SetDefaults(typeVersion.Build);
+            SetDefaults(typeVersion);
         }
 
         public bool Load()
@@ -1626,22 +1629,35 @@ namespace BCarnellChars
             string path = Path.Combine(ModdedSaveSystem.GetCurrentSaveFolder(BasePlugin.Instance), "BCPP.dat");
             if (!File.Exists(path))
             {
-                SetDefaults(typeVersion.Build);
+                logger.LogWarning("Save data for B. Carnell Plus Pack does not exist, creating file now!");
+                SetDefaults(typeVersion);
                 Save();
                 return false;
             }
-            using (var stream = File.Open(path, FileMode.Open))
+            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 using (var reader = new BinaryReader(stream, Encoding.UTF8, false))
                 {
-                    int ver = reader.ReadInt32();
-                    if (ver < typeVersion.Build)
+                    try
                     {
-                        SetDefaults(ver);
+                        string ver = reader.ReadString(); // Was too stupid to write scrambled integers inside the file...
+                        if (new Version(ver) < typeVersion)
+                        {
+                            logger.LogWarning("Save data's mod version for B. Carnell Plus Pack is lower than the current mod version, setting to defaults!");
+                            SetDefaults(new Version(ver));
+                            return false;
+                        }
+                        basementCompleted = reader.ReadBoolean();
+                        firstTime = reader.ReadBoolean();
+                    }
+                    catch
+                    {
+                        logger.LogWarning("Save data for B. Carnell Plus Pack failed to load or is corrupted, setting to defaults!");
+                        File.Copy(path, Path.Combine(ModdedSaveSystem.GetCurrentSaveFolder(BasePlugin.Instance), "BCPP_CorruptDat_" + DateTime.Now.ToString("s").Replace(":", "-")));
+                        SetDefaults(typeVersion);
+                        Save();
                         return false;
                     }
-                    basementCompleted = reader.ReadBoolean();
-                    firstTime = reader.ReadBoolean();
                 }
 
                 return true;
@@ -1656,20 +1672,20 @@ namespace BCarnellChars
                 File.Delete(path);
             }
 
-            using (var stream = File.Open(path, FileMode.Create))
+            using (var stream = File.Open(path, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
             {
                 using (var writer = new BinaryWriter(stream, Encoding.UTF8, false))
                 {
-                    writer.Write(typeVersion.Build);
+                    writer.Write(Version);
                     writer.Write(basementCompleted);
                     writer.Write(firstTime);
                 }
             }
         }
 
-        public void SetDefaults(int build)
+        public void SetDefaults(Version build)
         {
-            if (build < new Version("1.1.0").Build | build == typeVersion.Build)
+            if (build < new Version("1.1.0") | build == typeVersion)
                 basementCompleted = false;
             firstTime = true;
         }
