@@ -305,6 +305,9 @@ namespace BCarnellChars
 
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "RPS Guy", "RPS_lose.wav"), "Vfx_RPS_lost", SoundType.Voice, new Color(0.7176471f, 0.6941177f, 0.6235294f)),
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "RPS Guy", "RPS_win.wav"), "Vfx_RPS_win", SoundType.Voice, new Color(0.7176471f, 0.6941177f, 0.6235294f)),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "RPS Guy", "RPS_lose2.wav"), "Vfx_RPS_lost2", SoundType.Voice, new Color(0.7176471f, 0.6941177f, 0.6235294f)),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "RPS Guy", "RPS_lostsight.wav"), "Vfx_RPS_lostsight", SoundType.Voice, new Color(0.7176471f, 0.6941177f, 0.6235294f)),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "RPS Guy", "RPS_play.wav"), "Vfx_RPS_play", SoundType.Voice, new Color(0.7176471f, 0.6941177f, 0.6235294f)),
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "RPS Guy", "RPS_dies.wav"), "Sfx_AppleCrunch", SoundType.Effect, Color.white),
 
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "RPS Guy", "mus_rps.wav"), "Mfx_mus_Playtime", SoundType.Music, new Color(0.7176471f, 0.6941177f, 0.6235294f)),
@@ -355,6 +358,9 @@ namespace BCarnellChars
 
                     "RPSGuy/LostGame",
                     "RPSGuy/WonGame",
+                    "RPSGuy/LostGameQuote2",
+                    "RPSGuy/LostSightOfPlayer",
+                    "RPSGuy/WannaPlay",
                     "RPSGuy/Killed",
 
                     "RPSGuy/AmbientMusic",
@@ -408,7 +414,8 @@ namespace BCarnellChars
             bcppAssets.Get<SoundObject>("MrRobber/Worse").additionalKeys = [new SubtitleTimedKey() { key = "Vfx_MrRobber_Worse2", time = 3.142f }];
             bcppAssets.Get<SoundObject>("MrRobber/ScreechIntro").additionalKeys = [new SubtitleTimedKey() { key = "Sfx_MrRobber_ScreechLoop", time = 1.399f }];*/
 #endif
-            bcppAssets.Get<SoundObject>("Items/AnyportalOutput/Spawning").additionalKeys = [new SubtitleTimedKey() { key = "Sfx_AnyportalOutput_Spawning", time = 0.5120181f }];
+            bcppAssets.Get<SoundObject>("Items/AnyportalOutput/Spawning").additionalKeys = [new SubtitleTimedKey() { key = "Sfx_AnyportalOutput_Spawning", time = 0.5120181f },
+            new SubtitleTimedKey() { key = "Sfx_BellGeneric", time = 6.21f }];
 
             LoadingEvents.RegisterOnAssetsLoaded(Info, PreLoad(), false);
             LoadingEvents.RegisterOnAssetsLoaded(Info, PostLoad, true);
@@ -457,6 +464,7 @@ namespace BCarnellChars
                 .Build(); //ObjectCreators.CreateNPC<RPSGuy>("RPS Guy", EnumExtensions.ExtendEnum<Character>("RPSGuy"), ObjectCreators.CreatePosterObject(bcppAssets.Get<Texture2D>("PRI/RPSGuy"), []), spawnableRooms: [RoomCategory.Class, RoomCategory.Office, RoomCategory.Special]);
             //AccessTools.DeclaredField(typeof(Navigator), "avoidRooms").SetValue(rpsguy.Navigator, true);
             rpsguy.Navigator.SetRoomAvoidance(true);
+            rpsguy.spriteRenderer[0].transform.localPosition = new Vector3(0f,-2.3f,0);
             //AccessTools.DeclaredField(typeof(Looker), "distance").SetValue(rpsguy.looker, 99f);
             PropagatedAudioManager annoying = rpsguy.gameObject.AddComponent<PropagatedAudioManager>();
             annoying.audioDevice = rpsguy.gameObject.AddComponent<AudioSource>();
@@ -1661,7 +1669,7 @@ namespace BCarnellChars
 
         public void SetDefaults(int build)
         {
-            if (build >= new Version("1.1.0").Build)
+            if (build < new Version("1.1.0").Build | build == typeVersion.Build)
                 basementCompleted = false;
             firstTime = true;
         }

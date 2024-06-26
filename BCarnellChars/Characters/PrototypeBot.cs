@@ -208,6 +208,16 @@ namespace BCarnellChars.Characters.States
                 base.DoorHit(door);
             }
         }
+
+        protected void Rumble(float duration)
+        {
+            float num = Vector3.Distance(npc.transform.position, npc.players[0].transform.position);
+            if (num < 100f)
+            {
+                float signedAngle = Vector3.SignedAngle(npc.transform.position - npc.players[0].transform.position, npc.players[0].transform.forward, Vector3.up);
+                InputManager.Instance.Rumble(1f - num / 100f, duration, signedAngle);
+            }
+        }
     }
 
     public class PrototypeBot_Stunned : PrototypeBot_StateBase
@@ -292,6 +302,7 @@ namespace BCarnellChars.Characters.States
             if (distance <= 300f)
             {
                 ChangeNavigationState(new NavigationState_TargetPlayer(npc, 99, player.transform.position));
+                Rumble(0.1f);
                 if (distance <= 60f && npc.looker.PlayerInSight(player))
                     prototypebot.StartCoroutine(animationPlay());
             }
@@ -404,7 +415,7 @@ namespace BCarnellChars.Characters.States
         {
             player = _player;
         }
-        private int maxattempts = 30;
+        private int maxattempts = 70;
 
         public override void Enter()
         {
@@ -425,7 +436,7 @@ namespace BCarnellChars.Characters.States
                 {
                     if (!flag)
                         break;
-                    if (Vector3.Distance(npc.transform.position, npc.players[k].transform.position) <= 280f)
+                    if (Vector3.Distance(npc.transform.position, npc.players[k].transform.position) <= 380f)
                         flag = false;
                 }
             }
@@ -439,7 +450,10 @@ namespace BCarnellChars.Characters.States
             float distance = Vector3.Distance(npc.transform.position, player.transform.position);
             if (distance <= 300f)
             {
-                ChangeNavigationState(new NavigationState_TargetPlayer(npc, 99, player.transform.position));
+                if (!player.hidden)
+                    ChangeNavigationState(new NavigationState_TargetPlayer(npc, 99, player.transform.position));
+                else
+                    ChangeNavigationState(new NavigationState_WanderRandom(npc, 100));
                 if (distance < 100f && !npc.looker.IsVisible && !prototypebot.AudMan.QueuedAudioIsPlaying)
                     prototypebot.AudMan.Pause(false);
             }
@@ -447,7 +461,7 @@ namespace BCarnellChars.Characters.States
                 prototypebot.MechFunctInvoke();
             if (distance >= 35f && !npc.looker.IsVisible)
                 npc.Navigator.SetSpeed(25f);
-            else if ((distance < 65f && npc.looker.PlayerInSight() && npc.looker.IsVisible) || distance < 30f)
+            else if (((distance < 65f && npc.looker.IsVisible) || distance < 30f) && npc.looker.PlayerInSight())
                 prototypebot.StartCoroutine(isReady());
             else
             {
@@ -457,17 +471,7 @@ namespace BCarnellChars.Characters.States
             }
 
             if (prototypebot.AudMan.QueuedAudioIsPlaying)
-                Rumble();
-        }
-
-        private void Rumble()
-        {
-            float num = Vector3.Distance(npc.transform.position, CoreGameManager.Instance.GetPlayer(player.playerNumber).transform.position);
-            if (num < 100f)
-            {
-                float signedAngle = Vector3.SignedAngle(npc.transform.position - CoreGameManager.Instance.GetPlayer(player.playerNumber).transform.position, CoreGameManager.Instance.GetPlayer(player.playerNumber).transform.forward, Vector3.up);
-                InputManager.Instance.Rumble(1f - num / 100f, 0.1f, signedAngle);
-            }
+                Rumble(0.1f);
         }
 
         private IEnumerator isReady()
@@ -598,8 +602,10 @@ namespace BCarnellChars.Characters.States
 
             if (prototypebot.animator.currentAnimationName == "Running" && Time.timeScale != 0)
             {
-                if (prototypebot.animator.currentFrameIndex % 3 == 0)
+                if (prototypebot.animator.currentFrameIndex % 3 == 0) {
                     prototypebot.AudMan.PlaySingle(prototypebot.faststompSnd);
+                    Rumble(0.3f);
+                }
             }
         }
 

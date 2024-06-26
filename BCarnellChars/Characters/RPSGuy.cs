@@ -23,7 +23,9 @@ namespace BCarnellChars.Characters
         /*private SoundObject audCall = new SoundObject();
         private SoundObject audLetsPlay;
         private SoundObject audGo;*/
-        private SoundObject audCongrats;
+        private SoundObject[] audCongrats;
+        private SoundObject audWannaPlay;
+        private SoundObject audFine;
         private SoundObject audYouLose;
         private SoundObject audDestroyed;
 
@@ -57,9 +59,11 @@ namespace BCarnellChars.Characters
             alive = BasePlugin.bcppAssets.Get<Sprite>("RPSGuy/Alive");
             dead = BasePlugin.bcppAssets.Get<Sprite>("RPSGuy/Dead");
 
-            audCongrats = BasePlugin.bcppAssets.Get<SoundObject>("RPSGuy/LostGame");
+            audCongrats = [BasePlugin.bcppAssets.Get<SoundObject>("RPSGuy/LostGame"), BasePlugin.bcppAssets.Get<SoundObject>("RPSGuy/LostGameQuote2")];
             audYouLose = BasePlugin.bcppAssets.Get<SoundObject>("RPSGuy/WonGame");
             audDestroyed = BasePlugin.bcppAssets.Get<SoundObject>("RPSGuy/Killed");
+            audWannaPlay = BasePlugin.bcppAssets.Get<SoundObject>("RPSGuy/WannaPlay");
+            audFine = BasePlugin.bcppAssets.Get<SoundObject>("RPSGuy/LostSightOfPlayer");
 
             spriteRenderer[0].sprite = alive;
         }
@@ -93,11 +97,9 @@ namespace BCarnellChars.Characters
 
         public void StartPersuingPlayer(PlayerManager player)
         {
+            behaviorStateMachine.ChangeNavigationState(new NavigationState_TargetPlayer(this, 63, player.transform.position));
             if (!audMan.audioDevice.isPlaying)
-            {
-                behaviorStateMachine.ChangeNavigationState(new NavigationState_TargetPlayer(this, 63, player.transform.position));
-                //audMan.PlaySingle(audLetsPlay);
-            }
+                audMan.PlaySingle(audWannaPlay);
         }
 
         public void PlayerTurnAround(PlayerManager player)
@@ -115,11 +117,14 @@ namespace BCarnellChars.Characters
             {
                 CoreGameManager.Instance.AddPoints(streakPoints, curRPS.player.playerNumber, true);
                 if (!GlobalCam.Instance.TransitionActive) GlobalCam.Instance.Transition(UiTransition.Dither, 0.01666667f);
-                audMan.PlaySingle(audCongrats);
+                audMan.PlayRandomAudio(audCongrats);
                 streakPoints += streakInitial;
             }
-            if (destroyGame)
+            if (destroyGame) {
                 curRPS.Destroy();
+                if (!won && !isDead)
+                    audMan.PlaySingle(audFine);
+            }
             if (!isDead)
             {
                 navigator.maxSpeed = normSpeed;
@@ -143,6 +148,8 @@ namespace BCarnellChars.Characters
             {
                 spriteRenderer[0].sprite = alive;
                 isDead = false;
+                navigator.maxSpeed = normSpeed;
+                navigator.SetSpeed(normSpeed);
             }
             behaviorStateMachine.ChangeState(new RPSGuy_Wandering(this, this));
         }
