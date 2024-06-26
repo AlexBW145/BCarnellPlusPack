@@ -161,6 +161,7 @@ namespace BCarnellChars.Characters.States
     public class PrototypeBot_StateBase : NpcState
     {
         protected PrototypeBot prototypebot;
+        protected internal bool flagged = false; // Was the bot teleporting infront of you a threat?
 
         public PrototypeBot_StateBase(NPC npc, PrototypeBot bot)
             : base(npc)
@@ -201,7 +202,7 @@ namespace BCarnellChars.Characters.States
             if (door.locked)
             {
                 door.Unlock();
-                door.OpenTimed(5f, makeNoise: false);
+                door.OpenTimed(5f, false);
             }
             else
             {
@@ -254,6 +255,7 @@ namespace BCarnellChars.Characters.States
         public override void Enter()
         {
             base.Enter();
+            flagged = true;
             prototypebot.animator.SetDefaultAnimation("Climbing", 1f);
             npc.Navigator.maxSpeed = 30;
             npc.Navigator.SetSpeed(30);
@@ -273,22 +275,23 @@ namespace BCarnellChars.Characters.States
                 {
                     if (!flag)
                         break;
-                    if ((Vector3.Distance(npc.transform.position, npc.players[k].transform.position) > 250f
-                        && Vector3.Distance(npc.transform.position, npc.players[k].transform.position) <= 180f))
+                    if (Vector3.Distance(npc.transform.position, npc.players[k].transform.position) > 450f
+                        || Vector3.Distance(npc.transform.position, npc.players[k].transform.position) <= 340f)
                         flag = false;
                 }
             }
             if (attempts >= maxattempts)
                 prototypebot.MechFunctInvoke();
+            flagged = false;
         }
 
         public override void Update()
         {
-            if (player == null)
+            if (player == null | flagged)
                 return;
-            if (player.plm.Entity.CurrentRoom.type != RoomType.Hall) // Is this fair enough??
+            if (player.plm.Entity.CurrentRoom.type != RoomType.Hall | player.hidden) // Is this fair enough??
             {
-                if (npc.Navigator.HasDestination && npc.ec.CellFromPosition(player.transform.position).room.type != RoomType.Hall
+                if (npc.Navigator.HasDestination && (npc.ec.CellFromPosition(player.transform.position).room.type != RoomType.Hall | player.hidden)
                     && !npc.behaviorStateMachine.CurrentNavigationState.GetType().Equals(typeof(NavigationState_TargetPosition)))
                     npc.Navigator.ClearDestination();
                 if (!npc.Navigator.HasDestination || npc.ec.CellFromPosition(npc.Navigator.CurrentDestination).room.type != RoomType.Hall)
@@ -299,11 +302,11 @@ namespace BCarnellChars.Characters.States
                 return;
             }
             float distance = Vector3.Distance(npc.transform.position, player.transform.position);
-            if (distance <= 300f)
+            if (distance <= 400f)
             {
                 ChangeNavigationState(new NavigationState_TargetPlayer(npc, 99, player.transform.position));
                 Rumble(0.1f);
-                if (distance <= 60f && npc.looker.PlayerInSight(player))
+                if (distance <= 80f && npc.looker.PlayerInSight(player))
                     prototypebot.StartCoroutine(animationPlay());
             }
             else
@@ -366,6 +369,7 @@ namespace BCarnellChars.Characters.States
         public override void Enter()
         {
             base.Enter();
+            flagged = true;
             prototypebot.animator.SetDefaultAnimation("Idle", 1f);
             npc.Navigator.maxSpeed = 50;
             npc.Navigator.SetSpeed(50);
@@ -390,6 +394,7 @@ namespace BCarnellChars.Characters.States
                 prototypebot.MechFunctInvoke();
             npc.Navigator.Entity.SetTrigger(true);
             player = npc.players[Mathf.RoundToInt(UnityEngine.Random.Range(0, npc.players.Count - 1))];
+            flagged = false;
         }
 
         private PlayerManager player;
@@ -420,6 +425,7 @@ namespace BCarnellChars.Characters.States
         public override void Enter()
         {
             base.Enter();
+            flagged = true;
             prototypebot.animator.SetDefaultAnimation("Idle", 1f);
             npc.Navigator.maxSpeed = 40;
             npc.Navigator.SetSpeed(40);
@@ -443,6 +449,7 @@ namespace BCarnellChars.Characters.States
             npc.Navigator.Entity.SetTrigger(true);
             if (attempts >= maxattempts)
                 prototypebot.MechFunctInvoke();
+            flagged = false;
         }
 
         public override void Update()
@@ -461,7 +468,7 @@ namespace BCarnellChars.Characters.States
                 prototypebot.MechFunctInvoke();
             if (distance >= 35f && !npc.looker.IsVisible)
                 npc.Navigator.SetSpeed(25f);
-            else if (((distance < 65f && npc.looker.IsVisible) || distance < 30f) && npc.looker.PlayerInSight())
+            else if (!flagged && ((distance < 65f && npc.looker.IsVisible) || distance < 29f) && npc.looker.PlayerInSight())
                 prototypebot.StartCoroutine(isReady());
             else
             {
@@ -516,6 +523,7 @@ namespace BCarnellChars.Characters.States
         public override void Enter()
         {
             base.Enter();
+            flagged = true;
             prototypebot.animator.SetDefaultAnimation("Idle", 1f);
             npc.Navigator.maxSpeed = 0;
             npc.Navigator.SetSpeed(0);
@@ -524,7 +532,7 @@ namespace BCarnellChars.Characters.States
             {
                 for (int k = 0; k < CoreGameManager.Instance.setPlayers; k++)
                 {
-                    if (room.category != RoomCategory.Class || room.ec.activities.Find(x => x.room == room & !x.IsCompleted) || Vector3.Distance(npc.ec.RealRoomMax(room), npc.players[k].transform.position) <= 160f)
+                    if (room.category != RoomCategory.Class || room.ec.activities.Find(x => x.room == room & !x.IsCompleted) || Vector3.Distance(npc.ec.RealRoomMax(room), npc.players[k].transform.position) <= 260f)
                         continue;
                     //Debug.Log("Adding classroom");
                     peek.Add(room);
@@ -534,15 +542,16 @@ namespace BCarnellChars.Characters.States
                 npc.Navigator.Entity.Teleport(npc.ec.RealRoomMid(peek[Mathf.RoundToInt(UnityEngine.Random.Range(0, peek.Count - 1))]));
             else
                 prototypebot.MechFunctInvoke();
+            flagged = false;
         }
 
         public override void Update()
         {
-            passedTime += npc.ec.NpcTimeScale;
+            passedTime += ((BaseGameManager.Instance.FoundNotebooks / BaseGameManager.Instance.NotebookTotal) * 2) * (Time.timeScale * npc.ec.NpcTimeScale);
             float distance = Vector3.Distance(npc.ec.RealRoomMid(npc.Navigator.Entity.CurrentRoom), npc.players[0].transform.position);
             if (distance >= 200f || passedTime >= 60f)
                 prototypebot.MechFunctInvoke();
-            if (distance < 110f)
+            if (distance < 60f & !flagged)
                 prototypebot.StartCoroutine(isReady(npc.players[0]));
         }
 
