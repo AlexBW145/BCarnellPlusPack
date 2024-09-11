@@ -7,6 +7,7 @@ using System.Text;
 using UnityEngine;
 using BCarnellChars.Characters.States;
 using BCarnellChars.OtherStuff;
+using System.Linq;
 
 namespace BCarnellChars.Characters
 {
@@ -31,7 +32,7 @@ namespace BCarnellChars.Characters
 
         private float normSpeed = 12f;
         private float runSpeed = 20f;
-        private float initialCooldown = 15f;
+        private float initialCooldown = 25f;
         private float calloutChance = 0.05f;
 
         private bool isDead = false;
@@ -44,12 +45,11 @@ namespace BCarnellChars.Characters
 
         public bool ItemFits(Items item)
         {
-            return item == (EnumExtensions.GetFromExtendedName<Items>("BHammer") | EnumExtensions.GetFromExtendedName<Items>("Hammer"));
+            return new string[] {"BHammer".ToLower(), "Hammer".ToLower()}.Contains(item.ToStringExtended().ToLower()) && playing && !isDead;
         }
         public void InsertItem(PlayerManager player, EnvironmentController ec)
         {
-            if (playing)
-                fuckingDies();
+            fuckingDies();
         }
 
         private void Awake()
@@ -71,7 +71,7 @@ namespace BCarnellChars.Characters
         private void Start()
         {
             if (BasePlugin.RadarModExists && ec != null)
-                Singleton<BaseGameManager>.Instance.Ec.map.AddArrow(transform, RadarSupport.RPSGuyColor.Value);
+                BaseGameManager.Instance.Ec.map.AddArrow(transform, RadarSupport.RPSGuyColor.Value);
         }
 
         public override void Initialize()
@@ -170,7 +170,6 @@ namespace BCarnellChars.Characters
                 audMan.PlaySingle(audCalls[num]);
             }*/
         }
-
         public void StartRPS(PlayerManager player)
         {
             playing = true;

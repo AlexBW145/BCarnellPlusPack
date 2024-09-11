@@ -15,7 +15,7 @@ namespace BCarnellChars.Characters.States
             erbot = errbot;
         }
 
-        public override void OnStateTriggerStay(Collider other)
+        public override void OnStateTriggerEnter(Collider other)
         {
             erbot.Jammed(other);
         }

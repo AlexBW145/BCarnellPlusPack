@@ -23,6 +23,7 @@ namespace BCarnellChars.GeneratorStuff
             Direction direction = tile.RandomUncoveredDirection(new System.Random());
             chalkboo.transform.parent = tile.TileTransform;
             chalkboo.transform.rotation = direction.ToRotation();
+            chalkboo.transform.position += chalkboo.transform.forward * -0.1f;
             tile.HardCoverWall(direction, true);
             transform.position = tile.room.ec.RealRoomMid(tile.room) + Vector3.up * 5f;
 

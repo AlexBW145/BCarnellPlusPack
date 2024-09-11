@@ -63,7 +63,7 @@ namespace BCarnellChars.Characters
             Teleport();
             audMan.SetLoop(false);
             audMan.FlushQueue(true);
-            behaviorStateMachine.ChangeState(new ERRORBOT_Cooldown(this, this, UnityEngine.Random.RandomRangeInt(60, 120)));
+            behaviorStateMachine.ChangeState(new ERRORBOT_Cooldown(this, this, UnityEngine.Random.RandomRangeInt(90, 120)));
             behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 99));
             navigator.maxSpeed = 0;
             navigator.SetSpeed(0);
@@ -128,8 +128,8 @@ namespace BCarnellChars.Characters
         };
         public static void AddLockedInRuleBreak(string rule) // Remember that you need to call this on a PostLoad function. (Don't you dare call it in during gameplay time...)
         {
-            if (lockedinRuleBreaks.Contains(rule) | rule == "") {
-                Debug.LogWarning(rule == "" ? "String cannot be blank for a locked in rule break!" : "ERROR-BOT_ITEM-STEALER already has a locked in rule break: " + rule);
+            if (lockedinRuleBreaks.Contains(rule) | string.IsNullOrEmpty(rule)) {
+                Debug.LogWarning(string.IsNullOrEmpty(rule) ? "String cannot be blank for a locked in rule break!" : "ERROR-BOT_ITEM-STEALER already has a locked in rule break: " + rule);
                 return;
             }
 
@@ -167,15 +167,15 @@ namespace BCarnellChars.Characters
 
         public void Jammed(Collider other)
         {
-            if (other.CompareTag("GrapplingHook") || other.GetComponent<ITM_BSODA>() || other.GetComponent<SiegeCartBalls>()) // Pierced
+            if (other.CompareTag("GrapplingHook") || other.GetComponent<ITM_BSODA>() || other.GetComponent<SiegeCartBalls>() || other.GetComponent<Gum>()) // Pierced
             {
                 looker.ReflectionSetVariable("layerMask", regularMask);
-                spriteRenderer[1].color = other.GetComponent<ITM_BSODA>() ? Color.blue : Color.grey;
-                behaviorStateMachine.ChangeState(new ERRORBOT_Cooldown(this, this, UnityEngine.Random.RandomRangeInt(60, 120)));
+                spriteRenderer[1].color = other.GetComponent<ITM_BSODA>() ? Color.blue : other.GetComponent<Gum>() ? Color.magenta : Color.grey;
+                behaviorStateMachine.ChangeState(new ERRORBOT_Cooldown(this, this, 120f));
                 behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 99));
                 navigator.maxSpeed = 0;
                 navigator.SetSpeed(0);
-                audMan.PlaySingle(other.GetComponent<ITM_BSODA>() ? splat : bang);
+                audMan.PlaySingle((other.GetComponent<ITM_BSODA>() || other.GetComponent<Gum>()) ? splat : bang);
             }
         }
     }

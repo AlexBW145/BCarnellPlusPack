@@ -19,9 +19,7 @@ namespace BCarnellChars.Characters.States
             base.Enter();
             npc.looker.Blink();
             if (!npc.Navigator.HasDestination)
-            {
                 ChangeNavigationState(new NavigationState_WanderRandom(npc, 0));
-            }
         }
 
         public override void Update()

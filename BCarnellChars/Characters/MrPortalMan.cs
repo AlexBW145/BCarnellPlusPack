@@ -62,11 +62,6 @@ namespace BCarnellChars.Characters
             base.Initialize();
             if (!gameObject.GetComponent<CullAffector>())
                 gameObject.AddComponent<CullAffector>();
-            portalmanCam.enabled = true;
-            outputCam = Instantiate(outputCamPre, transform, false);
-            outputCam.gameObject.SetActive(true);
-            outputCam.enabled = true;
-            spriteRenderer[1].sprite = AssetLoader.SpriteFromTexture2D(Render(outputCam.targetTexture), 34f);
             behaviorStateMachine.ChangeState(new MrPortalMan_Cooldown(this, UnityEngine.Random.RandomRangeInt(40, 80)));
             behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 0));
             navigator.maxSpeed = 0;
@@ -91,9 +86,8 @@ namespace BCarnellChars.Characters
             for (int i = 0; i < num; i++)
             {
                 if (list.Count <= 0)
-                {
                     break;
-                }
+
                 int index = UnityEngine.Random.Range(0, list.Count);
                 SpawnBoard(list[index]);
                 list.RemoveAt(index);
@@ -101,13 +95,17 @@ namespace BCarnellChars.Characters
             for (int i = 0; i < num2; i++)
             {
                 if (list2.Count <= 0)
-                {
                     break;
-                }
+
                 int index = UnityEngine.Random.Range(0, list2.Count);
                 SpawnBoard(list2[index].room);
                 list2.RemoveAt(index);
             }
+            portalmanCam.enabled = true;
+            outputCam = outputCamPre; // It was already cloned wdym??
+            outputCam.gameObject.SetActive(true);
+            outputCam.enabled = true;
+            spriteRenderer[1].sprite = AssetLoader.SpriteFromTexture2D(Render(outputCam.targetTexture), 34f);
         }
 
         private void SpawnBoard(RoomController room)
@@ -118,14 +116,16 @@ namespace BCarnellChars.Characters
             while (!flag && _spawnedPortals.Count > 0)
             {
                 cell = _spawnedPortals[UnityEngine.Random.Range(0, _spawnedPortals.Count)];
-                if (cell.HasFreeWall & !ec.TrapCheck(cell) & portals.TrueForAll(x => (cell.CenterWorldPosition - x.CellPos).magnitude > 250f)) // Side note: I can't decide on magnitudes without experimenting with them in-game.
+                if (cell.HasFreeWall & portals.TrueForAll(x => (cell.CenterWorldPosition - x.CellPos).magnitude > 200f)) // Side note: I can't decide on magnitudes without experimenting with them in-game.
                 {
-                    portals.Add(Instantiate(portalPre, cell.TileTransform).Spawn(cell));
-                    flag = true;
+                    if (!ec.TrapCheck(cell)) {
+                        portals.Add(Instantiate(portalPre, cell.TileTransform).Spawn(cell));
+                        flag = true;
+                    }
                 }
-                else
-                {
+                if (!flag) {
                     _spawnedPortals.Remove(cell);
+                    flag = true;
                 }
             }
         }
@@ -212,6 +212,7 @@ namespace BCarnellChars.Characters
 
         private IEnumerator hideFade()
         {
+            StopCoroutine(showFade());
             float alpha = 1f;
             while (spriteRenderer[0].color.a > 0)
             {
@@ -227,6 +228,7 @@ namespace BCarnellChars.Characters
 
         private IEnumerator showFade()
         {
+            StopCoroutine(hideFade());
             float alpha = 0f;
             while (spriteRenderer[0].color.a < 1)
             {

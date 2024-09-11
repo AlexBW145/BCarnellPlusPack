@@ -1,37 +1,82 @@
 ﻿using BCarnellChars.Characters;
+using BCarnellChars.OtherStuff;
 using MTM101BaldAPI;
 using MTM101BaldAPI.Reflection;
+using MTM101BaldAPI.Registers;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Experimental.AI;
 
 namespace BCarnellChars.ItemStuff
 {
     public class ITM_Hammer : Item
     {
         private RaycastHit hit;
+        [Range(0,3)] public int duration = 3;
 
         public override bool Use(PlayerManager pm)
         {
-            Destroy(gameObject);
-            if (Physics.Raycast(pm.transform.position, Singleton<CoreGameManager>.Instance.GetCamera(pm.playerNumber).transform.forward, out hit, pm.pc.reach, LayerMask.GetMask("Default", "Windows")))
+            bool accepted = false;
+            bool instaDestroy = false;
+            //Debug.Log(duration);
+            if (FindObjectOfType<RockPaperScissors>(false) != null) {
+                FindObjectOfType<RockPaperScissors>(false).death();
+                accepted = true;
+            }
+            bool raycasted = Physics.Raycast(pm.transform.position, CoreGameManager.Instance.GetCamera(pm.playerNumber).transform.forward, out hit, Mathf.Min(pm.pc.reach, pm.ec.MaxRaycast), LayerMask.GetMask("Default", "Block Raycast", "NPCs", "Windows"), QueryTriggerInteraction.Collide);
+            if (raycasted && !accepted)
             {
-                Window component = hit.transform.GetComponent<Window>();
-                if (component != null && !(bool)component.ReflectionGetVariable("broken"))
+                if (hit.transform.gameObject.GetComponent<IItemAcceptor>() != null)
                 {
-                    component.Break(true);
-                    return true;
+                    IItemAcceptor[] components = hit.transform.GetComponents<IItemAcceptor>();
+                    foreach (IItemAcceptor itemAcceptor in components)
+                    {
+                        if (itemAcceptor.ItemFits(BasePlugin.bcppAssets.Get<ItemObject>("Items/BHammer").itemType) && !accepted)
+                        {
+                            itemAcceptor.InsertItem(pm, pm.ec);
+                            accepted = true;
+                            if (hit.transform.GetComponent<SecuredSwingingDoor>() != null)
+                                instaDestroy = true;
+                        }
+                    }
+                }
+                if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Windows"))
+                {
+                    Window component = hit.transform.GetComponent<Window>();
+                    if (component != null && !component.IsOpen)
+                    {
+                        component.Break(true);
+                        accepted = true;
+                    }
+                }
+                else if (hit.transform.CompareTag("StandardDoor"))
+                {
+                    Door component = hit.transform.GetComponent<Door>();
+                    if (component != null && component.locked)
+                    {
+                        component.Unlock();
+                        component.OpenTimed(10f, true);
+                        accepted = true;
+                        component.transform.GetComponentInChildren<AudioManager>()?.PlaySingle(BasePlugin.bcppAssets.Get<SoundObject>("Items/UnsafeHammer/DestroyDoor"));
+                    }
+                }
+                else if (hit.transform.gameObject.GetComponent<CoinDoor>() != null)
+                {
+                    hit.transform.gameObject.GetComponent<CoinDoor>().InsertItem(pm, pm.ec);
+                    accepted = true;
+                    instaDestroy = true;
                 }
             }
-            if (pm.ec.Npcs.Find(x => x.Character == EnumExtensions.GetFromExtendedName<Character>("RPSGuy")))
+            Destroy(gameObject);
+            if (accepted)
             {
-                RPSGuy component2 = pm.ec.Npcs.Find(x => x.Character == EnumExtensions.GetFromExtendedName<Character>("RPSGuy")).gameObject.GetComponent<RPSGuy>();
-                if (component2 != null && component2.Playing)
-                {
-                    component2.fuckingDies();
-                    return true;
-                }
+                if (duration > 1 && duration <= 3 && !instaDestroy)
+                    pm.itm.SetItem(duration == 2 ? BasePlugin.bcppAssets.Get<ItemObject>("Items/BHammerLow") : BasePlugin.bcppAssets.Get<ItemObject>("Items/BHammerMid"), pm.itm.selectedItem);
+                else if (duration <= 1 || instaDestroy)
+                    CoreGameManager.Instance.audMan.PlaySingle(BasePlugin.bcppAssets.Get<SoundObject>("Items/UnsafeHammer/DurationBreak")); 
+                return (duration <= 1 || instaDestroy);
             }
             return false;
         }

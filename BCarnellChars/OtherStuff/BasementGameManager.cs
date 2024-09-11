@@ -12,8 +12,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEngine.ParticleSystem.PlaybackState;
 
 namespace BCarnellChars.OtherStuff
 {
@@ -36,7 +34,7 @@ namespace BCarnellChars.OtherStuff
         public Canvas overlay;
 
         private static float lightonChance = 0.2f;
-        private static System.Random lightonRNG = new System.Random();
+        private static System.Random lightonRNG;
 
         public CustomImageAnimator overlayAnimator;
         public static List<List<Sprite>> jumpscareFrames = new List<List<Sprite>>();
@@ -44,6 +42,12 @@ namespace BCarnellChars.OtherStuff
         public override void Initialize()
         {
             singleton = this;
+            lightonRNG = new System.Random(CoreGameManager.Instance.Seed());
+            if (levelNo > CoreGameManager.Instance.lastLevelNumber)
+            {
+                CoreGameManager.Instance.SetLives(defaultLives);
+                CoreGameManager.Instance.lastLevelNumber = levelNo;
+            }
             base.Initialize();
             ambience = gameObject.GetComponentInChildren<Ambience>();
             audMan = gameObject.AddComponent<AudioManager>();
@@ -77,18 +81,18 @@ namespace BCarnellChars.OtherStuff
             {
                 audMan.QueueAudio(BasePlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/AmbientIntro"), true);
                 audMan.QueueAudio(BasePlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/AmbientLoop"));
+                audMan.SetLoop(true);
             }
             BeginSpoopMode();
         }
 
-        protected override void Update()
+        protected override void VirtualUpdate()
         {
-            base.Update();
-            if (audMan & ec && !audMan.loop && !audMan.maintainLoop && audMan.soundQueue[0] == BasePlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/AmbientLoop"))
+            /*if (audMan & ec && !audMan.loop && !audMan.maintainLoop && audMan.soundQueue[0] == BasePlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/AmbientLoop"))
             {
                 audMan.SetLoop(true);
                 audMan.maintainLoop = true;
-            }
+            }*/
         }
 
         public override void BeginSpoopMode()
@@ -98,11 +102,10 @@ namespace BCarnellChars.OtherStuff
                 ec.Npcs.Find(x => x.gameObject.GetComponent<PrototypeBot>()).Despawn();
                 return;
             }
-            ec.SetAllLights(false);
             foreach (Cell light in ec.lights)
             {
-                if (lightonRNG.NextDouble() < (double)lightonChance)
-                    ec.SetLight(true, light);
+                if (!(lightonRNG.NextDouble() < lightonChance))
+                    light.SetPower(false);
             }
 
             ec.MaxRaycast = 250f;
@@ -147,8 +150,11 @@ namespace BCarnellChars.OtherStuff
 
         public override void LoadNextLevel()
         {
+            CoreGameManager.Instance.saveMapAvailable = false;
             for (int i = 0; i < CoreGameManager.Instance.Lives; i++)
-                CoreGameManager.Instance.AddPoints(CoreGameManager.Instance.GetPointsThisLevel(0), 0, false, false);
+            {
+                CoreGameManager.Instance.AddPoints(CoreGameManager.Instance.GetPointsThisLevel(0), 0, playAnimation: false, includeInLevelTotal: false);
+            }
 
             PrepareToLoad();
             elevatorScreen = Instantiate(elevatorScreenPre);
@@ -160,28 +166,36 @@ namespace BCarnellChars.OtherStuff
                 num = levelObject.timeBonusVal;
             }
 
-            CoreGameManager.Instance.AddPoints(num, 0, false, false);
+            CoreGameManager.Instance.AddPoints(num, 0, playAnimation: false, includeInLevelTotal: false);
             CoreGameManager.Instance.AwardGradeBonus();
             elevatorScreen.ShowResults(time, num);
-            if (CoreGameManager.Instance.GetPoints(0) > 0 && !levelObject.finalLevel)
-                elevatorScreen.QueueShop();
             if (CoreGameManager.Instance.SaveEnabled && MTM101BaldiDevAPI.SaveGamesEnabled && levelObject.name == "Basement1"
                 && CoreGameManager.Instance.currentMode != Mode.Free && levelObject.finalLevel)
             {
                 BCPPSave.Instance.basementCompleted = true;
                 BCPPSave.Instance.Save();
             }
+        }
 
+        protected override void LoadSceneObject(SceneObject sceneObject, bool restarting)
+        {
+            CoreGameManager.Instance.nextLevel = sceneObject;
+            if (!levelObject.finalLevel || restarting)
+            {
+                base.LoadSceneObject(Resources.FindObjectsOfTypeAll<SceneObject>().First(x => x.levelTitle == "PIT"), restarting);
+                return;
+            }
+            
+            base.LoadSceneObject(sceneObject, restarting);
         }
 
         public override void RestartLevel()
         {
+            CoreGameManager.Instance.saveMapAvailable = true;
             PrepareToLoad();
             elevatorScreen = Instantiate(elevatorScreenPre);
             elevatorScreen.OnLoadReady += base.RestartLevel;
             elevatorScreen.Initialize();
-            if (CoreGameManager.Instance.GetPoints(0) > 0)
-                elevatorScreen.QueueShop();
         }
 
         public void EndGame(Transform player, PrototypeBot bot)
@@ -243,17 +257,8 @@ namespace BCarnellChars.OtherStuff
     {
         public GameButton buttonPre;
 
-        private List<TileShape> tileShapes = new List<TileShape>
-        {
-            TileShape.Corner,
-            TileShape.Single
-        };
-
-        private int maxAttempts = 10;
-
         public override void Build(EnvironmentController ec, LevelBuilder builder, RoomController room, System.Random cRng)
         {
-            int num = 0;
             List<RoomController> facultyRoom = ec.rooms.FindAll(x => x.category == RoomCategory.Faculty);
             //Debug.Log("Faculties found:" + facultyRoom.Count);
             if (facultyRoom.Count <= 0)
@@ -261,20 +266,28 @@ namespace BCarnellChars.OtherStuff
                 Debug.LogWarning("WTF NOTHING???");
                 return;
             }
-            List<Cell> tilesOfShape = facultyRoom[Mathf.RoundToInt(UnityEngine.Random.Range(0, facultyRoom.Count - 1))].GetTilesOfShape(tileShapes, true);
-            Cell cell = null;
-            while (cell == null && tilesOfShape.Count > 0 && num < maxAttempts)
+            List<Cell> tilesOfShape = facultyRoom[Mathf.RoundToInt(UnityEngine.Random.Range(0, facultyRoom.Count - 1))].AllTilesNoGarbage(false, false);
+            for (int i = 0; i < tilesOfShape.Count; i++)
+                if (!tilesOfShape[i].HasFreeWall || (tilesOfShape[i].shape != TileShape.Corner && tilesOfShape[i].shape != TileShape.Single) || tilesOfShape[i].room.category != RoomCategory.Faculty
+                    || tilesOfShape[i].offLimits)
+                    tilesOfShape.RemoveAt(i--);
+            int index;
+            Direction direct;
+            while (tilesOfShape.Count > 0)
             {
-                int index = cRng.Next(0, tilesOfShape.Count);
-                num++;
-                if (!tilesOfShape[index].HasFreeWall)
-                    tilesOfShape.Remove(tilesOfShape[index]);
+                index = cRng.Next(0, tilesOfShape.Count);
+                direct = tilesOfShape[index].RandomUncoveredDirection(cRng);
+                if (direct != Direction.Null && !tilesOfShape[index].Hidden)
+                {
+                    if (GameButton.BuildInArea(ec, tilesOfShape[index].position, tilesOfShape[index].position, 1, gameObject.AddComponent<SwitchNextFloorBCPP>().gameObject, buttonPre, cRng) == null)
+                        Debug.LogWarning("WTF FAILURE???");
+                    else break;
+                    tilesOfShape.RemoveAt(index);
+                }
                 else
-                    cell = tilesOfShape[index];
+                    tilesOfShape.RemoveAt(index);
             }
-            if (cell != null)
-                if (GameButton.BuildInArea(ec, cell.position, cell.position, 1, gameObject.AddComponent<SwitchNextFloorBCPP>().gameObject, buttonPre, cRng) == null)
-                    Debug.LogWarning("WTF FAILURE???");
+            Debug.LogWarning("WTF FAILURE???");
         }
     }
 }

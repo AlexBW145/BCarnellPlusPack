@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using System.Linq;
 
 namespace BCarnellChars.OtherStuff
 {
@@ -13,6 +14,8 @@ namespace BCarnellChars.OtherStuff
 
         public Material[] originalOverlays = new Material[0];
         private bool lockOnStart = true;
+        private int attemptsofBreak = 0;
+        private int maximumAttempts = 5;
 
         private void Start()
         {
@@ -41,10 +44,19 @@ namespace BCarnellChars.OtherStuff
 
         public void InsertItem(PlayerManager player, EnvironmentController ec)
         {
+        }
+        
+        private void AttemptBreak()
+        {
+            attemptsofBreak++;
+            if (attemptsofBreak > UnityEngine.Random.Range(attemptsofBreak, maximumAttempts+2))
+                UnlockFully();
+        }
+
+        private void UnlockFully()
+        {
             for (int i = 0; i < swingDoor.overlayLocked.Length; i++)
-            {
                 swingDoor.overlayLocked[i] = originalOverlays[i];
-            }
 
             swingDoor.Unlock();
             //player.itm.AddItem(ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey")).value);
@@ -53,7 +65,11 @@ namespace BCarnellChars.OtherStuff
 
         public bool ItemFits(Items item)
         {
-            return item == EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey");
+            if (new string[] { "BHammer".ToLower(), "Hammer".ToLower() }.Contains(item.ToStringExtended().ToLower()))
+                AttemptBreak();
+            else if (item == EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey"))
+                UnlockFully();
+            return item == EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey") || new string[] { "BHammer".ToLower(), "Hammer".ToLower() }.Contains(item.ToStringExtended().ToLower());
         }
     }
 }

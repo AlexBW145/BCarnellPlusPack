@@ -16,25 +16,38 @@ namespace BCarnellChars.OtherStuff
     public class ToProfitCardCost : MonoBehaviour, IClickable<int>
     {
         private float profitCardChance = 0.5f;
-        private System.Random profitCardRng = new System.Random();
+        private System.Random profitCardRng = FindObjectOfType<LevelBuilder>(false) != null ? FindObjectOfType<LevelBuilder>(false).controlledRNG : new System.Random();
 
         private float freeChance = 0.05f;
-        private System.Random freeRng = new System.Random();
+        private System.Random freeRng = FindObjectOfType<LevelBuilder>(false) != null ? FindObjectOfType<LevelBuilder>(false).controlledRNG : new System.Random();
+        private SodaMachine vending;
 
-        private void Start()
+        public void Begin()
         {
             if (BaseGameManager.Instance != null && BaseGameManager.Instance.Ec != null)
             {
-                SodaMachine component = gameObject.GetComponent<SodaMachine>();
-                if (component != null && CoreGameManager.Instance.sceneObject.levelObject != null)
+                vending = gameObject.GetComponent<SodaMachine>();
+                if (vending != null && CoreGameManager.Instance.sceneObject.levelObject != null)
                 {
                     // Conflicts begone if any other currency mod exists...
-                    if ((ItemObject)component.ReflectionGetVariable("requiredItem") != Resources.FindObjectsOfTypeAll<ItemObject>().ToList().Find(x => x.itemType == Items.Quarter))
+                    if ((ItemObject)vending.ReflectionGetVariable("requiredItem") != Resources.FindObjectsOfTypeAll<ItemObject>().ToList().Find(x => x.itemType == Items.Quarter))
                         return;
                     // Now onto this ez fix!
+                    if (DateTime.Now.Day == 1 && DateTime.Now.Month == 4)
+                    {
+                        vending.ReflectionSetVariable("requiredItem", Resources.FindObjectsOfTypeAll<ItemObject>().ToList().Find(x => x.itemType == Items.Quarter));
+                        MeshRenderer meshRender = gameObject.GetComponent<MeshRenderer>();
+                        MaterialModifier.ChangeMaterial(meshRender, [.. meshRender.GetSharedMaterialArray(), BasePlugin.freeInsert]);
+                        if (Chainloader.PluginInfos.ContainsKey("pixelguy.pixelmodding.baldiplus.pixelinternalapi"))
+                            AccessTools.Field(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
+                                .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent"), "requiredItems")
+                                .SetValue(gameObject.GetComponent(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
+                                .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent")), new List<Items> { Items.Quarter });
+                        return;
+                    }
                     if (profitCardRng.NextDouble() < profitCardChance)
                     {
-                        component.ReflectionSetVariable("requiredItem", BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard"));
+                        vending.ReflectionSetVariable("requiredItem", BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard"));
                         MeshRenderer meshRender = gameObject.GetComponent<MeshRenderer>();
                         MaterialModifier.ChangeMaterial(meshRender, [..meshRender.GetSharedMaterialArray(), BasePlugin.profitCardInsert]);
                         if (Chainloader.PluginInfos.ContainsKey("pixelguy.pixelmodding.baldiplus.pixelinternalapi")) // Geez, thanks doc...
@@ -45,7 +58,7 @@ namespace BCarnellChars.OtherStuff
                     }
                     else if (freeRng.NextDouble() < freeChance) // Chances are super low, I hope you don't waste your time finding one...
                     {
-                        component.ReflectionSetVariable("requiredItem", Resources.FindObjectsOfTypeAll<ItemObject>().ToList().Find(x => x.itemType == Items.None));
+                        vending.ReflectionSetVariable("requiredItem", Resources.FindObjectsOfTypeAll<ItemObject>().ToList().Find(x => x.itemType == Items.None));
                         MeshRenderer meshRender = gameObject.GetComponent<MeshRenderer>();
                         MaterialModifier.ChangeMaterial(meshRender, [..meshRender.GetSharedMaterialArray(), BasePlugin.freeInsert]);
                         if (Chainloader.PluginInfos.ContainsKey("pixelguy.pixelmodding.baldiplus.pixelinternalapi")) // All because of THIS very easy thing??
@@ -60,15 +73,14 @@ namespace BCarnellChars.OtherStuff
 
         public void Clicked(int player) // FREE!!
         {
-            SodaMachine component = gameObject.GetComponent<SodaMachine>();
-            if (component != null)
+            if (vending != null)
             {
-                ItemObject itemObject = (ItemObject)component.ReflectionGetVariable("requiredItem");
-                if (itemObject.itemType == Items.None && (int)component.ReflectionGetVariable("usesLeft") > 0)
+                ItemObject itemObject = (ItemObject)vending.ReflectionGetVariable("requiredItem");
+                if (itemObject.itemType == Items.None && (int)vending.ReflectionGetVariable("usesLeft") > 0)
                 {
                     CoreGameManager.Instance.audMan
                         .PlaySingle((SoundObject)BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard").item.GetComponent<ITM_Acceptable>().ReflectionGetVariable("audUse"));
-                    component.ReflectionInvoke("InsertItem", [CoreGameManager.Instance.GetPlayer(player), BaseGameManager.Instance.Ec]);
+                    vending.ReflectionInvoke("InsertItem", [CoreGameManager.Instance.GetPlayer(player), BaseGameManager.Instance.Ec]);
                 }
             }
         }
@@ -83,7 +95,8 @@ namespace BCarnellChars.OtherStuff
 
         public bool ClickableHidden()
         {
-            return true;
+            ItemObject item = (ItemObject)vending.ReflectionGetVariable("requiredItem");
+            return item.itemType != Items.None && (int)vending.ReflectionGetVariable("usesLeft") > 0;
         }
 
         public bool ClickableRequiresNormalHeight()

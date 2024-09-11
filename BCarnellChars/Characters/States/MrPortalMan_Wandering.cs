@@ -28,7 +28,7 @@ namespace BCarnellChars.Characters.States
             if (currentAteFood >= numberOfFoodNeed)
                 portalMan.Rest();
 
-            foreach (NPC npc in portalMan.ec.Npcs)
+            /*foreach (NPC npc in portalMan.ec.Npcs)
             {
                 if (npc != portalMan)
                 {
@@ -37,7 +37,7 @@ namespace BCarnellChars.Characters.States
                         currentTarget = npc.GetComponent<Entity>();
                     break;
                 }
-            }
+            }*/
 
             if (!portalMan.Navigator.HasDestination && currentTarget == null)
                 portalMan.Questioning();

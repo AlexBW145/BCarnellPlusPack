@@ -25,7 +25,8 @@ namespace BCarnellEditor
     [BepInPlugin("alexbw145.baldiplus.bcarnelleditor", "B. Carnell Chars + Plus Level Editor Compatibility", "1.1.0.0")]
     [BepInDependency("alexbw145.baldiplus.bcarnellchars", "1.1.0")]
     [BepInDependency("mtm101.rulerp.baldiplus.leveleditor", BepInDependency.DependencyFlags.HardDependency)]
-    [BepInDependency("mtm101.rulerp.bbplus.baldidevapi", "4.2.0.0")]
+    [BepInDependency("mtm101.rulerp.baldiplus.levelloader", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency("mtm101.rulerp.bbplus.baldidevapi", "5.0.0.0")]
     [BepInProcess("BALDI.exe")]
     public class Plugin : BaseUnityPlugin
     {
@@ -72,11 +73,11 @@ namespace BCarnellEditor
             PlusLevelLoaderPlugin.Instance.npcAliases.Add("siegecanoncart", NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("SiegeCanonCart")).value);
             PlusLevelLoaderPlugin.Instance.npcAliases.Add("mrportalman", NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("MrPortalMan")).value);
 
-            foreach (SodaMachine soda in Resources.FindObjectsOfTypeAll<SodaMachine>()) // Might be too flexible I mean...
+            foreach (SodaMachine soda in Resources.FindObjectsOfTypeAll<SodaMachine>().ToList().FindAll(x => x.gameObject.GetComponent<ToProfitCardCost>())) // Might be too flexible I mean...
             {
-                if (!BaldiLevelEditorPlugin.editorObjects.Exists(x => x.prefab.gameObject.name.ToLower().Contains(soda.name.ToLower())))
+                if (!BaldiLevelEditorPlugin.editorObjects.Exists(x => x.prefab.gameObject.name.ToLower().Contains(soda.name.ToLower())) || BaldiLevelEditorPlugin.editorObjects.Exists(x => x.name.ToLower() == soda.name.ToLower() + "profit"))
                     continue;
-                //Debug.Log("Found SodaMachine: " + soda + ", which is: " + BaldiLevelEditorPlugin.editorObjects.Find(x => x.prefab.gameObject.name.ToLower().Contains(soda.name.ToLower())).name);
+                Debug.Log("Found SodaMachine: " + soda + ", which is: " + BaldiLevelEditorPlugin.editorObjects.Find(x => x.prefab.gameObject.name.ToLower().Contains(soda.name.ToLower())).name);
                 string name = BaldiLevelEditorPlugin.editorObjects.Find(x => x.prefab.gameObject.name.ToLower().Contains(soda.name.ToLower())).name;
                 GameObject sodaProfitCard = Instantiate(soda).gameObject;
                 sodaProfitCard.name = soda.name + " (ProfitCard)";
@@ -159,6 +160,16 @@ namespace BCarnellEditor
         }
     }
 
+    public class BCPP_ObjectTool : ObjectTool
+    {
+        public override Sprite editorSprite => BasePlugin.bcppAssets.Get<Sprite>("EditorUI/Object_" + _object);
+        private string _object;
+        public BCPP_ObjectTool(string obj) : base(obj)
+        {
+            _object = obj;
+        }
+    }
+
     public class InfLockedSwingEditorVisual : DoorEditorVisual
     {
         public override void SetupMaterials(MeshRenderer renderer, bool outside)
@@ -175,7 +186,7 @@ namespace BCarnellEditor
         static void Postfix(PlusLevelEditor __instance)
         {
             __instance.toolCats.Find(x => x.name == "doors").tools.Add(new BCPP_SwingingDoorTool("inflocked"));
-            __instance.toolCats.Find(x => x.name == "objects").tools.AddRange([..Plugin.sodaToolcats, new BCPP_RotateAndPlacePrefab("bcpp_randomitemmachine")]);
+            __instance.toolCats.Find(x => x.name == "objects").tools.AddRange([..Plugin.sodaToolcats, new BCPP_ObjectTool("bcpp_randomitemmachine")]);
             __instance.toolCats.Find(x => x.name == "characters").tools.AddRange([
                 new BCPP_NPCPropertyTool("rpsguy"),
                 new BCPP_NPCPropertyTool("errorbot"),
@@ -207,24 +218,6 @@ namespace BCarnellEditor
                     icon.transform.SetParent(__result.transform, false);
                 }
             }
-        }
-    }
-
-    // Useless rn...
-    [HarmonyPatch(typeof(CustomLevelLoader), "LoadLevel")]
-    class VendingMachineStopRNG
-    {
-        static void Prefix()
-        {
-            BasePlugin.inLevelEditor = true;
-        }
-    }
-    [HarmonyPatch(typeof(CoreGameManager), "ReturnToMenu")]
-    class ResetVariable
-    {
-        static void Prefix()
-        {
-            BasePlugin.inLevelEditor = false;
         }
     }
 }

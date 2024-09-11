@@ -43,7 +43,7 @@ namespace BCarnellChars.Patches
         }
     }
 
-    [HarmonyPatch(typeof(ItemManager), "UseItem")]
+    [HarmonyPatch(typeof(ItemManager), "UseItem"), HarmonyPriority(Priority.VeryHigh)]
     class NeverRemoveDat
     {
         static bool Prefix(ItemManager __instance, ref bool ___disabled) 
