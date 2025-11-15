@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace BCarnellChars.Characters.States
 {
@@ -15,9 +12,10 @@ namespace BCarnellChars.Characters.States
             erbot = errbot;
         }
 
-        public override void OnStateTriggerEnter(Collider other)
+        public override void OnStateTriggerStay(Collider other, bool isValid)
         {
-            erbot.Jammed(other);
+            if (isValid)
+                erbot.Jammed(other);
         }
     }
 }

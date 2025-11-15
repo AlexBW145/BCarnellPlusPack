@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace BCarnellChars.Characters.States
 {
     public class RPSGuy_Wandering : RPSGuy_StateBase
     {
-        private float calloutTime = 3f;
-
         public RPSGuy_Wandering(NPC npc, RPSGuy rpsguy)
             : base(npc, rpsguy)
         {
@@ -22,29 +17,18 @@ namespace BCarnellChars.Characters.States
                 ChangeNavigationState(new NavigationState_WanderRandom(npc, 0));
         }
 
-        public override void Update()
+        public override void OnStateTriggerEnter(Collider other, bool isValid)
         {
-            base.Update();
-            calloutTime -= Time.deltaTime * npc.TimeScale;
-            if (calloutTime <= 0f)
-            {
-                rpsGuy.CalloutChance();
-                calloutTime = 3f;
-            }
-        }
-
-        public override void OnStateTriggerEnter(Collider other)
-        {
-            base.OnStateTriggerEnter(other);
+            base.OnStateTriggerEnter(other, isValid);
             if (other.CompareTag("Player"))
             {
                 PlayerManager component = other.GetComponent<PlayerManager>();
-                if (!component.Tagged)
+                if (!component.Tagged && !component.Invisible && isValid)
                 {
                     rpsGuy.StartRPS(component);
                 }
             }
-            else if (other.CompareTag("NPC"))
+            else if (other.CompareTag("NPC") && isValid)
             {
                 switch (other.GetComponent<NPC>().Character)
                 {

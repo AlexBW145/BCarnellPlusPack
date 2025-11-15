@@ -43,7 +43,7 @@ namespace BCarnellChars.OtherStuff
                 // Imagine using the mod menu for this...
                 textScaler.scaleFactor = Mathf.RoundToInt(PlayerFileManager.Instance.resolutionY / 360f);
             }
-            instructionsTmp.text = string.Format(LocalizationManager.Instance.GetLocalizedText("Hud_RPSGuy_Instructions"), InputManager.Instance.GetInputButtonName("Interact"), InputManager.Instance.GetInputButtonName("Run"), InputManager.Instance.GetInputButtonName("LookBack"));
+            instructionsTmp.text = string.Format(LocalizationManager.Instance.GetLocalizedText("Hud_RPSGuy_Instructions"), InputManager.Instance.GetInputButtonName("Interact", "InGame", false), InputManager.Instance.GetInputButtonName("Run", "InGame", false), InputManager.Instance.GetInputButtonName("LookBack", "InGame", false));
             instructionsTmp.gameObject.SetActive(false);
             cover.gameObject.SetActive(false);
             you.gameObject.SetActive(false);
@@ -72,15 +72,15 @@ namespace BCarnellChars.OtherStuff
                 opponentChoice = Mathf.RoundToInt(UnityEngine.Random.Range(0f, 2f)); //Pick a random type between 0 and 2
 
                 // Cannot use switch statements over this
-                if (Singleton<InputManager>.Instance.GetDigitalInput("Interact", true)) // Rock
+                if (InputManager.Instance.GetDigitalInput("Interact", true)) // Rock
                     playerChoice = 0;
-                else if (Singleton<InputManager>.Instance.GetDigitalInput("Run", true)) // Paper
+                else if (InputManager.Instance.GetDigitalInput("Run", true)) // Paper
                     playerChoice = 1;
-                else if (Singleton<InputManager>.Instance.GetDigitalInput("LookBack", true)) // Scissors
+                else if (InputManager.Instance.GetDigitalInput("LookBack", true)) // Scissors
                     playerChoice = 2;
 
-                if (Singleton<InputManager>.Instance.GetDigitalInput("Interact", true) || Singleton<InputManager>.Instance.GetDigitalInput("Run", true)
-                    || Singleton<InputManager>.Instance.GetDigitalInput("LookBack", true))
+                if (InputManager.Instance.GetDigitalInput("Interact", true) || InputManager.Instance.GetDigitalInput("Run", true)
+                    || InputManager.Instance.GetDigitalInput("LookBack", true))
                     ResultRPS();
             }
         }
@@ -114,7 +114,7 @@ namespace BCarnellChars.OtherStuff
             publicActive = false;
             //if its a tie
             if (playerChoice == 0 & opponentChoice == 0 || playerChoice == 1 & opponentChoice == 1 || playerChoice == 2 & opponentChoice == 2) {
-                instructionsTmp.text = string.Format(LocalizationManager.Instance.GetLocalizedText("Hud_RPSGuy_Instructions"), InputManager.Instance.GetInputButtonName("Interact"), InputManager.Instance.GetInputButtonName("Run"), InputManager.Instance.GetInputButtonName("LookBack"));
+                instructionsTmp.text = string.Format(LocalizationManager.Instance.GetLocalizedText("Hud_RPSGuy_Instructions"), InputManager.Instance.GetInputButtonName("Interact", "InGame", false), InputManager.Instance.GetInputButtonName("Run", "InGame", false), InputManager.Instance.GetInputButtonName("LookBack", "InGame", false));
                 youChose.sprite = Resources.FindObjectsOfTypeAll<Sprite>().ToList().Find(x => x.name == "Transparent");
                 opponentChose.sprite = Resources.FindObjectsOfTypeAll<Sprite>().ToList().Find(x => x.name == "Transparent");
             }
@@ -188,10 +188,8 @@ namespace BCarnellChars.OtherStuff
         }
 
         private readonly float transitionTime = 1.1666667f;
-        public bool publicActive = false;
-        private bool pickedChoice = false;
-        private int playerChoice;
-        private int opponentChoice;
+        public bool publicActive = false, pickedChoice = false;
+        private int playerChoice, opponentChoice;
 
         private float checkDelay;
 
@@ -200,16 +198,13 @@ namespace BCarnellChars.OtherStuff
         private Canvas textCanvas;
         private CanvasScaler textScaler;
         private TMP_Text instructionsTmp;
-        private Image cover;
-        private RawImage you;
-        private RawImage opponent;
-        private Image youChose;
-        private Image opponentChose;
+        private Image cover, youChose, opponentChose;
+        private RawImage you, opponent;
         public RPSGuy rps;
         public EnvironmentController ec;
         public PlayerManager player;
 
-        public List<SoundObject> hitSounds = new List<SoundObject>();
-        public List<Sprite> chosenSprites = new List<Sprite>();
+        [SerializeField] internal List<SoundObject> hitSounds = new List<SoundObject>();
+        [SerializeField] internal List<Sprite> chosenSprites = new List<Sprite>();
     }
 }

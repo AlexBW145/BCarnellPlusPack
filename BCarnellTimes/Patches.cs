@@ -1,10 +1,11 @@
 ﻿using BBTimes;
 using BBTimes.CustomComponents;
-using BBTimes.CustomComponents.CustomDatas;
 using BBTimes.CustomContent.CustomItems;
 using BBTimes.CustomContent.Events;
+using BBTimes.CustomContent.NPCs;
 using BBTimes.ModPatches.GeneratorPatches;
 using BBTimes.Plugin;
+using BCarnellChars;
 using BCarnellChars.Characters;
 using BCarnellChars.Characters.States;
 using BCarnellChars.ItemStuff;
@@ -33,7 +34,7 @@ namespace BCarnellTimes
                 if (component2 != null && component2.Playing)
                 {
                     component2.fuckingDies();
-                    MonoBehaviour.Destroy(__instance.gameObject);
+                    GameObject.Destroy(__instance.gameObject);
                     __result = true;
                     return false;
                 }
@@ -50,49 +51,72 @@ namespace BCarnellTimes
             if (Physics.Raycast(pm.transform.position, Singleton<CoreGameManager>.Instance.GetCamera(pm.playerNumber).transform.forward, out var raycastHit, pm.pc.reach, LayerMask.GetMask("Default", "Windows")))
             {
                 CustomWindowComponent component = raycastHit.transform.GetComponent<CustomWindowComponent>();
-                if (component != null)
+                if (component != null && !component.gameObject.GetComponent<Window>().IsOpen)
                 {
-                    raycastHit.transform.GetComponent<Window>().Break(true);
-                    MonoBehaviour.Destroy(__instance.gameObject);
-                    if (!component.unbreakable)
+                    if (component.unbreakable)
+                    {
+                        raycastHit.transform.GetComponent<Window>().Break(true);
+                        GameObject.Destroy(__instance.gameObject);
+                        __result = false;
+                        return false;
+                    }
+                    else
                         pm.RuleBreak("breakingproperty", 3f, 0.15f);
-                    //Debug.LogWarning("That's a " + (component.unbreakable ? "metal window, dumbass!" : "window..."));
-                    __result = !component.unbreakable;
-                    return false;
                 }
             }
             return true;
         }
     }
 
-    [HarmonyPatch(typeof(PostRoomCreation), "ExecutePostRoomTasks")]
+    // New API feature introduced, useless.
+    /*[HarmonyPatch(typeof(PostRoomCreation), "ExecutePostRoomTasks")]
     class WelcomeToTheUnderground
     {
         static bool Prefix()
         {
-            return PostRoomCreation.i.ld.name != "Basement1";
+            return PostRoomCreation.i.ld.name != "Basement1" && PostRoomCreation.i.ld.name != "BasementBoss";
         }
-    }
+    }*/
 
     [HarmonyPatch(typeof(BasementGameManager), "BeginSpoopMode")]
     class HowWasTheFall
     {
+        [Obsolete("Blackout Event has been removed")]
         public static SoundObject audOff;
         static void Postfix()
         {
             if (CoreGameManager.Instance.currentMode == Mode.Free)
                 return;
-            CoreGameManager.Instance.audMan.PlaySingle(audOff);
+            //CoreGameManager.Instance.audMan.PlaySingle(audOff);
         }
     }
 
-    // Useless
-    /*[HarmonyPatch(typeof(ERRORBOT), "Jammed")]
+    [HarmonyPatch(typeof(Faker), nameof(Faker.Initialize))]
+    class FakeBCPPSounds // Faker does not apply possible sounds from BCPP, likely because BCPP gets created after BBT.
+    {
+        static void Postfix(ref SoundObject[] ___soundsToEmit)
+        {
+            ___soundsToEmit = ___soundsToEmit.AddRangeToArray(BCarnellChars.BasePlugin.bcppAssets.GetAll<SoundObject>().ToList().FindAll(c =>
+
+                c.soundKey.Contains("Vfx_RPS") ||
+                c.soundKey.Contains("Vfx_ERRORBOT") ||
+                c.soundKey.Contains("Vfx_MrPortalMan") ||
+                c.soundKey.Contains("Vfx_MrRobber")
+#if DEBUG
+                 ||
+                c.soundKey.Contains("Sfx_BCBoss")
+#endif
+                ).ToArray());
+        }
+    }
+
+    // ITM_Gum does not have the same interaction triggers as Gum, useless.
+    /*[HarmonyPatch(typeof(ERRORBOT), nameof(ERRORBOT.Jammed))]
     class Gummed
     {
         static void Postfix(ERRORBOT __instance, Collider other, ref AudioManager ___audMan, ref SoundObject ___splat)
         {
-            if (other.GetComponent<ITM_Gum>())
+            if (other.name.StartsWith("ObjItmOb_GUM_Name"))
             {
                 __instance.looker.ReflectionSetVariable("layerMask", __instance.regularMask);
                 __instance.spriteRenderer[1].color = Color.magenta;

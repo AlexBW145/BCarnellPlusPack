@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
-using UnityEngine.UIElements;
-
-namespace BCarnellChars.Characters.States
+﻿namespace BCarnellChars.Characters.States
 {
     public class ERRORBOT_NoItemsMode : ERRORBOT_StateBase
     {
@@ -21,7 +15,6 @@ namespace BCarnellChars.Characters.States
             float distance = (erbot.transform.position - player.transform.position).magnitude;
             if (!erbot.looker.PlayerInSight() && distance >= 45f)
                 erbot.Alert(player);
-
         }
     }
 }

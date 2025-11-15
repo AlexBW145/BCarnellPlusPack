@@ -1,15 +1,6 @@
 ﻿using BCarnellChars.Characters.States;
-using MTM101BaldAPI.AssetTools;
-using MTM101BaldAPI;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
-using UnityEngine.UIElements;
-using System.Collections;
-using MTM101BaldAPI.Registers;
-using HarmonyLib;
 using MTM101BaldAPI.Reflection;
 using BCarnellChars.OtherStuff;
 
@@ -17,42 +8,18 @@ namespace BCarnellChars.Characters
 {
     public class ERRORBOT : NPC
     {
-        private AudioManager audMan;
-        private AudioManager staticMan;
+        [SerializeField] internal AudioManager audMan, staticMan;
 
-        private SoundObject audAlarm;
-        private SoundObject[] audItemGet;
-        private SoundObject audScan;
-        private SoundObject bang;
-        private SoundObject splat;
+        [SerializeField] internal SoundObject audAlarm, audScan, bang, splat;
+        [SerializeField] internal SoundObject[] audItemGet;
 
         // WELL, I GUESS THAT THIS BOT IS STUPIDLY ANNOYING... THEN MAKE IT STOP MOVING WHEN THE PLAYER IS LOOKING AT ITS POSITION! (And that's why camMask exists...)
         public LayerMask regularMask => LayerMask.GetMask("Default", "Block Raycast", "Player", "Windows");
         public LayerMask camMask => LayerMask.GetMask("Player");
 
-        private void Awake()
-        {
-            audMan = gameObject.GetComponents<AudioManager>()[0];
-            audMan.audioDevice = gameObject.AddComponent<AudioSource>();
-            staticMan = gameObject.GetComponents<AudioManager>()[1];
-
-            audAlarm = BasePlugin.bcppAssets.Get<SoundObject>("ERRORBOT/Alarm");
-            audItemGet = [
-                BasePlugin.bcppAssets.Get<SoundObject>("ERRORBOT/MineNow"), BasePlugin.bcppAssets.Get<SoundObject>("ERRORBOT/ByeToNeeds")
-                ];
-            audScan = BasePlugin.bcppAssets.Get<SoundObject>("ERRORBOT/Scanning");
-            bang = BasePlugin.bcppAssets.Get<SoundObject>("ERRORBOT/Jammed");
-            splat = BasePlugin.bcppAssets.Get<SoundObject>("ERRORBOT/Sprayed");
-        }
-
-        private void Start()
-        {
-            if (BasePlugin.RadarModExists && ec != null)
-                Singleton<BaseGameManager>.Instance.Ec.map.AddArrow(transform, RadarSupport.ERRORBOTColor.Value);
-        }
-
         public override void Initialize()
         {
+            this.ChangeRadarColor();
             base.Initialize();
             StartCooldown();
         }
@@ -124,12 +91,13 @@ namespace BCarnellChars.Characters
         protected static HashSet<string> lockedinRuleBreaks = new HashSet<string>() // In case of compats...
         {
             "Faculty",
-            "Escaping"
+            "Escaping",
+            "AfterHours"
         };
         public static void AddLockedInRuleBreak(string rule) // Remember that you need to call this on a PostLoad function. (Don't you dare call it in during gameplay time...)
         {
-            if (lockedinRuleBreaks.Contains(rule) | string.IsNullOrEmpty(rule)) {
-                Debug.LogWarning(string.IsNullOrEmpty(rule) ? "String cannot be blank for a locked in rule break!" : "ERROR-BOT_ITEM-STEALER already has a locked in rule break: " + rule);
+            if (lockedinRuleBreaks.Contains(rule) | string.IsNullOrWhiteSpace(rule)) {
+                Debug.LogWarning(string.IsNullOrWhiteSpace(rule) ? "String cannot be blank for a locked in rule break!" : "ERROR-BOT_ITEM-STEALER already has a locked in rule break: " + rule);
                 return;
             }
 
@@ -162,12 +130,15 @@ namespace BCarnellChars.Characters
         {
             behaviorStateMachine.ChangeState(new ERRORBOT_FinalCooldown(this, this, 0.2f));
             Singleton<CoreGameManager>.Instance.audMan.PlayRandomAudio(audItemGet);
-            player.itm.RemoveRandomItem();
+            if (!navigator.Entity.Squished)
+                player.itm.RemoveRandomItem();
         }
 
         public void Jammed(Collider other)
         {
-            if (other.CompareTag("GrapplingHook") || other.GetComponent<ITM_BSODA>() || other.GetComponent<SiegeCartBalls>() || other.GetComponent<Gum>()) // Pierced
+            if (other.CompareTag("GrapplingHook") || other.GetComponent<ITM_GrapplingHook>()
+                || other.GetComponent<ITM_BSODA>() || other.GetComponent<SiegeCartBalls>()
+                || other.GetComponent<Gum>()) // Pierced
             {
                 looker.ReflectionSetVariable("layerMask", regularMask);
                 spriteRenderer[1].color = other.GetComponent<ITM_BSODA>() ? Color.blue : other.GetComponent<Gum>() ? Color.magenta : Color.grey;

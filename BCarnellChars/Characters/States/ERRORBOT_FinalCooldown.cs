@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace BCarnellChars.Characters.States
 {
@@ -25,7 +22,7 @@ namespace BCarnellChars.Characters.States
             }
         }
 
-        public override void OnStateTriggerStay(Collider other)
+        public override void OnStateTriggerStay(Collider other, bool isValid)
         {
         }
     }

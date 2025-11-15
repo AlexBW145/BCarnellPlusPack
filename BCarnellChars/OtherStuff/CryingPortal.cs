@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace BCarnellChars.GeneratorStuff
 {
@@ -20,7 +16,7 @@ namespace BCarnellChars.GeneratorStuff
             cell = tile;
             chalkboo = transform.Find("Chalkbaord").gameObject;
             var quad = chalkboo.transform.Find("Quad").gameObject;
-            Direction direction = tile.RandomUncoveredDirection(new System.Random());
+            Direction direction = tile.RandomUncoveredDirection(new System.Random(CoreGameManager.Instance.Seed()));
             chalkboo.transform.parent = tile.TileTransform;
             chalkboo.transform.rotation = direction.ToRotation();
             chalkboo.transform.position += chalkboo.transform.forward * -0.1f;

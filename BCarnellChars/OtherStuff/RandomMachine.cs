@@ -1,68 +1,81 @@
 ﻿using BepInEx.Bootstrap;
 using HarmonyLib;
-using MTM101BaldAPI;
-using MTM101BaldAPI.Reflection;
 using MTM101BaldAPI.Registers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Reflection;
 using UnityEngine;
 
 namespace BCarnellChars.OtherStuff
 {
     [RequireComponent(typeof(SodaMachine))]
-    public class ToProfitCardCost : MonoBehaviour, IClickable<int>
+    public class ToProfitCardCost : EnvironmentObject, IClickable<int>
     {
-        private float profitCardChance = 0.5f;
-        private System.Random profitCardRng = FindObjectOfType<LevelBuilder>(false) != null ? FindObjectOfType<LevelBuilder>(false).controlledRNG : new System.Random();
+        internal static ItemObject Quarter;
+        private System.Random 
+            profitCardRng = FindObjectOfType<LevelBuilder>(false) != null ? FindObjectOfType<LevelBuilder>(false).controlledRNG : new System.Random(),
+            freeRng = FindObjectOfType<LevelBuilder>(false) != null ? FindObjectOfType<LevelBuilder>(false).controlledRNG : new System.Random();
 
-        private float freeChance = 0.05f;
-        private System.Random freeRng = FindObjectOfType<LevelBuilder>(false) != null ? FindObjectOfType<LevelBuilder>(false).controlledRNG : new System.Random();
+        private float profitCardChance = 0.5f, freeChance = 0.05f;
         private SodaMachine vending;
+
+        private static FieldInfo
+            _requiredItem = AccessTools.DeclaredField(typeof(SodaMachine), "requiredItem"),
+            _usesLeft = AccessTools.DeclaredField(typeof(SodaMachine), "usesLeft"),
+            _audUse = AccessTools.DeclaredField(typeof(ITM_Acceptable), "audUse");
+        private static MethodInfo _InsertItem = AccessTools.Method(typeof(SodaMachine), "InsertItem");
+
+        public override void LoadingFinished() => Begin();
 
         public void Begin()
         {
-            if (BaseGameManager.Instance != null && BaseGameManager.Instance.Ec != null)
+            if (ec != null)
             {
                 vending = gameObject.GetComponent<SodaMachine>();
-                if (vending != null && CoreGameManager.Instance.sceneObject.levelObject != null)
+                if (vending != null && BaseGameManager.Instance.levelObject != null)
                 {
                     // Conflicts begone if any other currency mod exists...
-                    if ((ItemObject)vending.ReflectionGetVariable("requiredItem") != Resources.FindObjectsOfTypeAll<ItemObject>().ToList().Find(x => x.itemType == Items.Quarter))
+                    if ((ItemObject)_requiredItem.GetValue(vending) != Quarter)
                         return;
-                    // Now onto this ez fix!
                     if (DateTime.Now.Day == 1 && DateTime.Now.Month == 4)
                     {
-                        vending.ReflectionSetVariable("requiredItem", Resources.FindObjectsOfTypeAll<ItemObject>().ToList().Find(x => x.itemType == Items.Quarter));
+                        _requiredItem.SetValue(vending, Quarter);
                         MeshRenderer meshRender = gameObject.GetComponent<MeshRenderer>();
                         MaterialModifier.ChangeMaterial(meshRender, [.. meshRender.GetSharedMaterialArray(), BasePlugin.freeInsert]);
                         if (Chainloader.PluginInfos.ContainsKey("pixelguy.pixelmodding.baldiplus.pixelinternalapi"))
-                            AccessTools.Field(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
+                            if (gameObject.GetComponent(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
+                                .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent")) != null)
+                                AccessTools.Field(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
                                 .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent"), "requiredItems")
                                 .SetValue(gameObject.GetComponent(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
                                 .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent")), new List<Items> { Items.Quarter });
                         return;
                     }
-                    if (profitCardRng.NextDouble() < profitCardChance)
+                    // Now onto this ez fix!
+                    if (profitCardRng.NextDouble() < (double)profitCardChance)
                     {
-                        vending.ReflectionSetVariable("requiredItem", BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard"));
+                        _requiredItem.SetValue(vending, BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard"));
                         MeshRenderer meshRender = gameObject.GetComponent<MeshRenderer>();
                         MaterialModifier.ChangeMaterial(meshRender, [..meshRender.GetSharedMaterialArray(), BasePlugin.profitCardInsert]);
                         if (Chainloader.PluginInfos.ContainsKey("pixelguy.pixelmodding.baldiplus.pixelinternalapi")) // Geez, thanks doc...
-                            AccessTools.Field(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
+                            if (gameObject.GetComponent(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
+                                .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent")) != null)
+                                AccessTools.Field(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
                                 .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent"), "requiredItems")
                                 .SetValue(gameObject.GetComponent(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
                                 .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent")), new List<Items> { BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard").itemType });
                     }
-                    else if (freeRng.NextDouble() < freeChance) // Chances are super low, I hope you don't waste your time finding one...
+                    else if (freeRng.NextDouble() < (double)freeChance) // Chances are super low, I hope you don't waste your time finding one...
                     {
-                        vending.ReflectionSetVariable("requiredItem", Resources.FindObjectsOfTypeAll<ItemObject>().ToList().Find(x => x.itemType == Items.None));
+                        _requiredItem.SetValue(vending, ItemMetaStorage.Instance.FindByEnum(Items.None).value);
                         MeshRenderer meshRender = gameObject.GetComponent<MeshRenderer>();
                         MaterialModifier.ChangeMaterial(meshRender, [..meshRender.GetSharedMaterialArray(), BasePlugin.freeInsert]);
                         if (Chainloader.PluginInfos.ContainsKey("pixelguy.pixelmodding.baldiplus.pixelinternalapi")) // All because of THIS very easy thing??
-                            AccessTools.Field(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
+                            if (gameObject.GetComponent(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
+                                .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent")) != null)
+                                AccessTools.Field(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
                                 .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent"), "requiredItems")
                                 .SetValue(gameObject.GetComponent(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
                                 .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent")), new List<Items> { Items.None });
@@ -75,12 +88,12 @@ namespace BCarnellChars.OtherStuff
         {
             if (vending != null)
             {
-                ItemObject itemObject = (ItemObject)vending.ReflectionGetVariable("requiredItem");
-                if (itemObject.itemType == Items.None && (int)vending.ReflectionGetVariable("usesLeft") > 0)
+                ItemObject itemObject = (ItemObject)_requiredItem.GetValue(vending);
+                if (itemObject.itemType == Items.None && (int)_usesLeft.GetValue(vending) > 0)
                 {
                     CoreGameManager.Instance.audMan
-                        .PlaySingle((SoundObject)BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard").item.GetComponent<ITM_Acceptable>().ReflectionGetVariable("audUse"));
-                    vending.ReflectionInvoke("InsertItem", [CoreGameManager.Instance.GetPlayer(player), BaseGameManager.Instance.Ec]);
+                        .PlaySingle((SoundObject)_audUse.GetValue(BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard").item.GetComponent<ITM_Acceptable>()));
+                    _InsertItem.Invoke(vending, [CoreGameManager.Instance.GetPlayer(player), ec]);
                 }
             }
         }
@@ -95,21 +108,19 @@ namespace BCarnellChars.OtherStuff
 
         public bool ClickableHidden()
         {
-            ItemObject item = (ItemObject)vending.ReflectionGetVariable("requiredItem");
-            return item.itemType != Items.None && (int)vending.ReflectionGetVariable("usesLeft") > 0;
+            if (vending == null) return true;
+            ItemObject item = (ItemObject)_requiredItem.GetValue(vending);
+            return item.itemType != Items.None || (int)_usesLeft.GetValue(vending) <= 0;
         }
 
-        public bool ClickableRequiresNormalHeight()
-        {
-            return false;
-        }
+        public bool ClickableRequiresNormalHeight() => true;
     }
 
     public class RandomItemMachine : EnvironmentObject, IItemAcceptor // SodaMachine is only for materials, not sprite renderers.
     {
         public static HashSet<WeightedItemObject> ModItems = new HashSet<WeightedItemObject>();
-        [SerializeField] private WeightedItemObject[] potentialItems;
-        [SerializeField] private ItemObject requiredItem;
+        [SerializeField] internal WeightedItemObject[] potentialItems;
+        [SerializeField] internal ItemObject requiredItem;
 
         public SpriteRenderer render;
         public Sprite outOf;
@@ -120,51 +131,7 @@ namespace BCarnellChars.OtherStuff
         {
             usesLeft = UnityEngine.Random.RandomRangeInt(3, 10);
             render = gameObject.GetComponentInChildren<SpriteRenderer>();
-            requiredItem = BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard");
-            potentialItems = [
-                new WeightedItemObject()
-                {
-                    selection = BasePlugin.bcppAssets.Get<ItemObject>("Items/BHammer"),
-                    weight = 80
-                },
-                new WeightedItemObject()
-                {
-                    selection = BasePlugin.bcppAssets.Get<ItemObject>("Items/UnsecuredKey"),
-                    weight = 60
-                },
-                new WeightedItemObject()
-                {
-                    selection = BasePlugin.bcppAssets.Get<ItemObject>("Items/SecuredLock"),
-                    weight = 80
-                },
-
-                new WeightedItemObject()
-                {
-                    selection = Resources.FindObjectsOfTypeAll<ItemObject>().ToList().Find(x => x.itemType == Items.NanaPeel), // Ain't no way that ItemMetaStorage.Instance.Get() is useless nowadays...
-                    weight = 90
-                },
-                new WeightedItemObject()
-                {
-                    selection = Resources.FindObjectsOfTypeAll<ItemObject>().ToList().Find(x => x.itemType == Items.Apple),
-                    weight = 55
-                },
-                new WeightedItemObject()
-                {
-                    selection = Resources.FindObjectsOfTypeAll<ItemObject>().ToList().Find(x => x.itemType == Items.PrincipalWhistle),
-                    weight = 90
-                },
-                new WeightedItemObject()
-                {
-                    selection = Resources.FindObjectsOfTypeAll<ItemObject>().ToList().Find(x => x.itemType == Items.PortalPoster),
-                    weight = 55
-                },
-                new WeightedItemObject()
-                {
-                    selection = Resources.FindObjectsOfTypeAll<ItemObject>().ToList().Find(x => x.itemType == Items.Boots),
-                    weight = 80
-                },
-                ..ModItems
-            ];
+            potentialItems = potentialItems.AddRangeToArray(ModItems.ToArray());
         }
 
         public void InsertItem(PlayerManager pm, EnvironmentController ec)

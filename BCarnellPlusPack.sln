@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.8.34511.84
+VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BBTimes", "..\New-Baldis-Basics-Times\BBTimes.csproj", "{26B390DB-B0EF-4AF6-928D-71079ECBC822}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BCarnellEditor", "BCarnellEditor\BCarnellEditor.csproj", "{302390B9-04EB-4210-8A3D-113886B9CBFF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BCarnellTimes", "BCarnellTimes\BCarnellTimes.csproj", "{4D7A96C3-B131-4596-9ACE-900B7A53B9E5}"
@@ -13,7 +11,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BCarnellChars", "BCarnellCh
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BCarnellEndless", "BCarnellEndless\BCarnellEndless.csproj", "{9AB98B58-356C-41C3-9F7C-111C7EDFCECA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BCarnellTeacher", "BCarnellTeacher\BCarnellTeacher.csproj", "{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BCarnellTeacher", "BCarnellTeacher\BCarnellTeacher.csproj", "{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TeacherAPI", "TeacherAPI", "{140A9C9A-E989-4191-A351-3754A6EAEE27}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PrototypeBotAnywhere", "PrototypeBotAnywhere\PrototypeBotAnywhere.csproj", "{78AA05C5-96FE-47D4-AE4F-C52FA89417D6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BCarnellModesInBBCRInBBP", "BCarnellModesInBBCRInBBP\BCarnellModesInBBCRInBBP.csproj", "{4B4E857D-B751-4674-A3CF-C85045C3F64D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BCarnellMiscCompats", "BCarnellMiscCompats\BCarnellMiscCompats\BCarnellMiscCompats.csproj", "{C011096F-00FF-488E-A31F-CA04AFF9CC4A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,12 +28,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{26B390DB-B0EF-4AF6-928D-71079ECBC822}.Cheat|Any CPU.ActiveCfg = Cheat|Any CPU
-		{26B390DB-B0EF-4AF6-928D-71079ECBC822}.Cheat|Any CPU.Build.0 = Cheat|Any CPU
-		{26B390DB-B0EF-4AF6-928D-71079ECBC822}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{26B390DB-B0EF-4AF6-928D-71079ECBC822}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{26B390DB-B0EF-4AF6-928D-71079ECBC822}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{26B390DB-B0EF-4AF6-928D-71079ECBC822}.Release|Any CPU.Build.0 = Release|Any CPU
 		{302390B9-04EB-4210-8A3D-113886B9CBFF}.Cheat|Any CPU.ActiveCfg = Debug|Any CPU
 		{302390B9-04EB-4210-8A3D-113886B9CBFF}.Cheat|Any CPU.Build.0 = Debug|Any CPU
 		{302390B9-04EB-4210-8A3D-113886B9CBFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -58,9 +58,31 @@ Global
 		{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78AA05C5-96FE-47D4-AE4F-C52FA89417D6}.Cheat|Any CPU.ActiveCfg = Debug|Any CPU
+		{78AA05C5-96FE-47D4-AE4F-C52FA89417D6}.Cheat|Any CPU.Build.0 = Debug|Any CPU
+		{78AA05C5-96FE-47D4-AE4F-C52FA89417D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78AA05C5-96FE-47D4-AE4F-C52FA89417D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78AA05C5-96FE-47D4-AE4F-C52FA89417D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78AA05C5-96FE-47D4-AE4F-C52FA89417D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B4E857D-B751-4674-A3CF-C85045C3F64D}.Cheat|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B4E857D-B751-4674-A3CF-C85045C3F64D}.Cheat|Any CPU.Build.0 = Debug|Any CPU
+		{4B4E857D-B751-4674-A3CF-C85045C3F64D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B4E857D-B751-4674-A3CF-C85045C3F64D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B4E857D-B751-4674-A3CF-C85045C3F64D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B4E857D-B751-4674-A3CF-C85045C3F64D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C011096F-00FF-488E-A31F-CA04AFF9CC4A}.Cheat|Any CPU.ActiveCfg = Debug|Any CPU
+		{C011096F-00FF-488E-A31F-CA04AFF9CC4A}.Cheat|Any CPU.Build.0 = Debug|Any CPU
+		{C011096F-00FF-488E-A31F-CA04AFF9CC4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C011096F-00FF-488E-A31F-CA04AFF9CC4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C011096F-00FF-488E-A31F-CA04AFF9CC4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C011096F-00FF-488E-A31F-CA04AFF9CC4A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD} = {140A9C9A-E989-4191-A351-3754A6EAEE27}
+		{78AA05C5-96FE-47D4-AE4F-C52FA89417D6} = {140A9C9A-E989-4191-A351-3754A6EAEE27}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3289EFEB-B444-4DF5-88BC-94857B4E2CB2}

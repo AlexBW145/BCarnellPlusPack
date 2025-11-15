@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BCarnellChars.Characters.States
+﻿namespace BCarnellChars.Characters.States
 {
     public class MrPortalMan_StateBase : NpcState
     {

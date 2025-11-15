@@ -1,13 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "yDIdu8yTeUIA2ZtuvqnUFmT67KqYla72Ll7WLU/sDhXDN/18YQoS1FVaIVje088nDUv3ix6P3MWuSpRv9lJykg==",
+  "dgSpecHash": "QxHmFvrBWNI=",
   "success": true,
-  "projectFilePath": "C:\\Users\\alex1\\source\\repos\\BCarnellPlusPack\\BCarnellTimes\\BCarnellTimes.csproj",
+  "projectFilePath": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTimes\\BCarnellTimes.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\alex1\\.nuget\\packages\\bepinex.analyzers\\1.0.8\\bepinex.analyzers.1.0.8.nupkg.sha512",
     "C:\\Users\\alex1\\.nuget\\packages\\bepinex.baselib\\5.4.20\\bepinex.baselib.5.4.20.nupkg.sha512",
     "C:\\Users\\alex1\\.nuget\\packages\\bepinex.core\\5.4.21\\bepinex.core.5.4.21.nupkg.sha512",
-    "C:\\Users\\alex1\\.nuget\\packages\\bepinex.plugininfoprops\\1.1.0\\bepinex.plugininfoprops.1.1.0.nupkg.sha512",
     "C:\\Users\\alex1\\.nuget\\packages\\harmonyx\\2.7.0\\harmonyx.2.7.0.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.netcore.targets\\1.1.0\\microsoft.netcore.targets.1.1.0.nupkg.sha512",

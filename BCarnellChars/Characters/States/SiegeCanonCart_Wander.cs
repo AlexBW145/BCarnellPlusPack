@@ -1,11 +1,4 @@
-﻿using BepInEx.Logging;
-using MTM101BaldAPI.Reflection;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
-using UnityEngine.UI;
-using static UnityEngine.GraphicsBuffer;
+﻿using UnityEngine;
 
 namespace BCarnellChars.Characters.States
 {
@@ -20,17 +13,12 @@ namespace BCarnellChars.Characters.States
 
         private NavigationState targetState;
 
-        private Vector3 nextTarget;
-        private Vector3 _rotation;
+        private Vector3 nextTarget, _rotation;
         private IntVector2 currentStandardTargetPos;
         //private IntVector2 standardTargetPos;
 
-        private float _angleDiff;
+        private float _angleDiff, shootyFireTime, shootyCooldown, unseenDelay;
 
-        private float shootyFireTime;
-        private float shootyCooldown;
-
-        private float unseenDelay;
         //private float previousFrameSpeed;
         //private bool playerInSight;
 

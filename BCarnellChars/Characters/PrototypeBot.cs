@@ -1,87 +1,40 @@
 ﻿using BCarnellChars.Characters.States;
 using BCarnellChars.OtherStuff;
-using MonoMod.Utils;
+using HarmonyLib;
 using MTM101BaldAPI;
-using MTM101BaldAPI.Components;
-using MTM101BaldAPI.Reflection;
+using MTM101BaldAPI.Components.Animation;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
 
 namespace BCarnellChars.Characters
 {
     public class PrototypeBot : NPC
     {
-        private AudioManager audMan;
-        public CustomSpriteAnimator animator;
-        public static List<List<Sprite>> animStuff = new List<List<Sprite>>();
+        [SerializeField] internal AudioManager audMan;
+        [SerializeField] internal CustomSpriteRendererAnimator animator;
 
         public AudioManager AudMan => audMan;
-        private WeightedSelection<SoundObject>[] jumpscares;
-        public WeightedSelection<SoundObject>[] loseSounds => jumpscares;
-        public SoundObject faststompSnd;
-        private SoundObject impatientSnd;
-        private SoundObject ceilingclimbSnd;
+        [SerializeField] internal WeightedSoundObject[] jumpscares;
+        public WeightedSoundObject[] loseSounds => jumpscares;
+        [SerializeField] internal SoundObject faststompSnd, impatientSnd, ceilingclimbSnd, stunnedSnd;
 
-        private Action[] mechFuncts => new Action[]
-        {
+        private Action[] mechFuncts => [
             SneakySnitch,
             CeilingClimb,
             DoorPrank
-        };
-
-        private void Awake()
-        {
-            audMan = gameObject.GetComponent<AudioManager>();
-            audMan.ReflectionSetVariable("subtitleColor", new Color(0.3089626f, 0.1634033f, 0.6792453f, 1f));
-            audMan.ReflectionSetVariable("overrideSubtitleColor", true);
-
-            jumpscares = [
-                new WeightedSelection<SoundObject>()
-                {
-                    selection = BasePlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/Jumpscare_01"),
-                    weight = 90,
-                },
-                new WeightedSelection<SoundObject>()
-                {
-                    selection = BasePlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/Jumpscare_02"),
-                    weight = 90,
-                },
-                new WeightedSelection<SoundObject>()
-                {
-                    selection = BasePlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/Jumpscare_03"),
-                    weight = 90,
-                },
-                new WeightedSelection<SoundObject>()
-                {
-                    selection = BasePlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/Jumpscare_04"),
-                    weight = 90,
-                }
             ];
-            faststompSnd = BasePlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/FastStomp");
-            impatientSnd = BasePlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/Waiting");
-            ceilingclimbSnd = BasePlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/Ceiling");
-        }
 
-        private void Start()
-        {
-            if (BasePlugin.RadarModExists && ec != null)
-                Singleton<BaseGameManager>.Instance.Ec.map.AddArrow(transform, new Color(0.3089626f, 0.1634033f, 0.6792453f, 1f));
-        }
+        internal PlayerManager[] players => ec.Players;
 
         public override void Initialize()
         {
-            animator.animations.Add("Idle", new CustomAnimation<Sprite>(animStuff[0].ToArray(), .9f));
-            animator.animations.Add("Running", new CustomAnimation<Sprite>(animStuff[1].ToArray(), .3f));
-            animator.animations.Add("Climbing", new CustomAnimation<Sprite>(animStuff[2].ToArray(), .8f));
-            animator.animations.Add("ClimbOut", new CustomAnimation<Sprite>(animStuff[3].ToArray(), .7f));
 
+            this.ChangeRadarColor();
             base.Initialize();
+            animator.ec = ec;
             behaviorStateMachine.ChangeState(new PrototypeBot_StateBase(this, this));
             behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 99));
             navigator.maxSpeed = 10;
@@ -92,6 +45,7 @@ namespace BCarnellChars.Characters
 
         public void CaughtPlayer(PlayerManager player)
         {
+            behaviorStateMachine.ChangeState(new PrototypeBot_Kill(this, this));
             if (BasementGameManager.BasementInstance != null)
                 BasementGameManager.BasementInstance.EndGame(player.transform, this);
             else if (CoreGameManager.Instance != null & ec.GetBaldi() != null)
@@ -116,8 +70,9 @@ namespace BCarnellChars.Characters
             audMan.FlushQueue(true);
             audMan.SetLoop(true);
             audMan.maintainLoop = true;
-            audMan.QueueAudio(BasePlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/Stunned"), true);
-            yield return new WaitForSecondsEnviromentTimescale(ec, time);
+            audMan.QueueAudio(stunnedSnd, true);
+            audMan.maintainLoop = false;
+            yield return new WaitForSecondsEnvironmentTimescale(ec, time);
             audMan.FlushQueue(true);
             mechFuncts[Mathf.RoundToInt(UnityEngine.Random.Range(0f, mechFuncts.Length - 1f))].Invoke();
         }
@@ -125,35 +80,34 @@ namespace BCarnellChars.Characters
         // Action Functions
         private void SneakySnitch()
         {
-            behaviorStateMachine.ChangeState(new PrototypeBot_Sneak(this, this, players[UnityEngine.Random.RandomRangeInt(0, players.Count-1)]));
-            behaviorStateMachine.ChangeNavigationState(new NavigationState_TargetPlayer(this, 99, players[UnityEngine.Random.RandomRangeInt(0, players.Count - 1)].transform.position));
+            behaviorStateMachine.ChangeState(new PrototypeBot_Sneak(this, this, players[0])); // UnityEngine.Random.RandomRangeInt(0, players.Length-1)
+            behaviorStateMachine.ChangeNavigationState(new NavigationState_TargetPlayer(this, 99, players[0].transform.position));
             audMan.FlushQueue(true);
             audMan.SetLoop(true);
             audMan.maintainLoop = true;
             audMan.QueueAudio(impatientSnd, true);
+            audMan.maintainLoop = false;
         }
         private void CeilingClimb()
         {
-            behaviorStateMachine.ChangeState(new PrototypeBot_Ceiling(this, this));
             behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 0));
+            behaviorStateMachine.ChangeState(new PrototypeBot_Ceiling(this, this));
             audMan.FlushQueue(true);
             audMan.SetLoop(true);
             audMan.maintainLoop = true;
             audMan.QueueAudio(ceilingclimbSnd, true);
+            audMan.maintainLoop = false;
         }
         private void DoorPrank()
         {
             audMan.FlushQueue(true);
-            audMan.SetLoop(false);
-            audMan.maintainLoop = false;
             behaviorStateMachine.ChangeState(new PrototypeBot_Prank(this, this));
             behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 0));
         }
         private void TeleportToSides() // This thing busted...
         {
             DoorPrank();
-            /*audMan.SetLoop(false);
-            audMan.maintainLoop = false;
+            /*audMan.FlushQueue(true);
             behaviorStateMachine.ChangeState(new PrototypeBot_Corner(this, this));
             behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 1));*/
         }
@@ -166,6 +120,15 @@ namespace BCarnellChars.Characters.States
     {
         protected PrototypeBot prototypebot;
         protected internal bool flagged = false; // Was the bot teleporting infront of you a threat?
+        protected static FieldInfo 
+            _hiddenByLight = AccessTools.DeclaredField(typeof(PlayerManager), "hiddenByLight"),
+            _hides = AccessTools.DeclaredField(typeof(Entity), "hides");
+        protected bool IsActuallyHidden(PlayerManager player)
+        {
+            if ((bool)_hiddenByLight.GetValue(player) && (int)_hides.GetValue(player.plm.Entity) > 2)
+                return true;
+            return !(bool)_hiddenByLight.GetValue(player) && player.Invisible;
+        }
 
         public PrototypeBot_StateBase(NPC npc, PrototypeBot bot)
             : base(npc)
@@ -173,12 +136,10 @@ namespace BCarnellChars.Characters.States
             prototypebot = bot;
         }
 
-        public override void OnStateTriggerStay(Collider other)
+        public override void OnStateTriggerStay(Collider other, bool isValid)
         {
-            if (!other.CompareTag("Player"))
-            {
+            if (!other.CompareTag("Player") || flagged)
                 return;
-            }
 
             prototypebot.looker.Raycast(other.transform, Vector3.Magnitude(prototypebot.transform.position - other.transform.position), out var targetSighted);
             if (!targetSighted)
@@ -187,16 +148,22 @@ namespace BCarnellChars.Characters.States
             }
 
             PlayerManager component = other.GetComponent<PlayerManager>();
-            if (!component.invincible)
+            if (!component.invincible && isValid)
             {
                 prototypebot.CaughtPlayer(component);
             }
         }
 
-        public override void Hear(Vector3 position, int value)
+        public override void Hear(GameObject source, Vector3 position, int value)
         {
             if (value >= 112 && Mathf.RoundToInt(Vector3.Distance(npc.transform.position, position)) < (245 + value))
-                prototypebot.behaviorStateMachine.ChangeState(new PrototypeBot_Chase(prototypebot, prototypebot, position));
+            {
+                if (readyEnumerator == null)
+                {
+                    readyEnumerator = IsReady(position);
+                    prototypebot.StartCoroutine(readyEnumerator);
+                }
+            }
             else if (!npc.Navigator.HasDestination && npc.behaviorStateMachine.currentState.GetType().Equals(typeof(PrototypeBot_StateBase)))
                 prototypebot.MechFunctInvoke();
         }
@@ -216,12 +183,18 @@ namespace BCarnellChars.Characters.States
 
         protected void Rumble(float duration)
         {
-            float num = Vector3.Distance(npc.transform.position, npc.players[0].transform.position);
+            float num = Vector3.Distance(npc.transform.position, prototypebot.players[0].transform.position);
             if (num < 100f)
             {
-                float signedAngle = Vector3.SignedAngle(npc.transform.position - npc.players[0].transform.position, npc.players[0].transform.forward, Vector3.up);
+                float signedAngle = Vector3.SignedAngle(npc.transform.position - prototypebot.players[0].transform.position, prototypebot.players[0].transform.forward, Vector3.up);
                 InputManager.Instance.Rumble(1f - num / 100f, duration, signedAngle);
             }
+        }
+
+        protected IEnumerator readyEnumerator;
+        internal virtual IEnumerator IsReady(Vector3 pos)
+        {
+            yield break;
         }
     }
 
@@ -232,16 +205,16 @@ namespace BCarnellChars.Characters.States
         {
         }
 
-        public override void OnStateTriggerStay(Collider other)
+        public override void OnStateTriggerStay(Collider other, bool isValid)
         {
         }
-        public override void Hear(Vector3 position, int value)
+        public override void Hear(GameObject source, Vector3 position, int value)
         {
         }
         public override void Enter()
         {
             base.Enter();
-            prototypebot.animator.SetDefaultAnimation("Idle", 2f);
+            prototypebot.animator.SetDefaultAnimation("Idle", 2f, true);
             npc.Navigator.SetSpeed(0f);
             npc.Navigator.maxSpeed = 0f;
             npc.behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(npc, 99));
@@ -261,13 +234,13 @@ namespace BCarnellChars.Characters.States
         {
             base.Enter();
             flagged = true;
-            prototypebot.animator.SetDefaultAnimation("Climbing", 1f);
+            prototypebot.animator.SetDefaultAnimation("Climbing", 1f, true);
             npc.Navigator.maxSpeed = 30;
             npc.Navigator.SetSpeed(30);
             npc.Navigator.Entity.SetGrounded(false);
             for (int k = 0; k < CoreGameManager.Instance.setPlayers; k++)
-                npc.Navigator.Entity.IgnoreEntity(npc.players[k].plm.Entity, true);
-            player = npc.players[Mathf.RoundToInt(UnityEngine.Random.Range(0, npc.players.Count - 1))];
+                npc.Navigator.Entity.IgnoreEntity(prototypebot.players[k].plm.Entity, true);
+            player = prototypebot.players[0];
             bool flag = false;
             int attempts = 0;
             while (!flag && attempts < maxattempts)
@@ -278,28 +251,27 @@ namespace BCarnellChars.Characters.States
                 attempts++;
                 if (!flag)
                     break;
-                if (Vector3.Distance(npc.transform.position, npc.players[0].transform.position) > ((250f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z))
-                    || Vector3.Distance(npc.transform.position, npc.players[0].transform.position) <= ((180f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)))
+                if (Vector3.Distance(npc.transform.position, player.transform.position) > ((250f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z))
+                    || Vector3.Distance(npc.transform.position, player.transform.position) <= ((180f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)))
                     flag = false;
             }
             if (attempts >= maxattempts)
                 prototypebot.MechFunctInvoke();
             flagged = false;
         }
-
         public override void Update()
         {
-            if (player == null | flagged)
+            if (player == null || flagged)
                 return;
             elaspedTime += Time.deltaTime * npc.TimeScale;
             if (elaspedTime >= 55f)
                 prototypebot.MechFunctInvoke();
-            if (player.plm.Entity.CurrentRoom.type != RoomType.Hall | player.Invisible) // Is this fair enough??
+            if (player.plm.Entity.CurrentRoom?.type != RoomType.Hall || IsActuallyHidden(player)) // Is this fair enough??
             {
-                if (npc.Navigator.HasDestination && (npc.ec.CellFromPosition(player.transform.position).room.type != RoomType.Hall | player.Invisible)
+                if (npc.Navigator.HasDestination && npc.ec.CellFromPosition(player.transform.position)?.room?.type != RoomType.Hall
                     && !npc.behaviorStateMachine.CurrentNavigationState.GetType().Equals(typeof(NavigationState_TargetPosition)))
                     npc.Navigator.ClearDestination();
-                if (!npc.Navigator.HasDestination || npc.ec.CellFromPosition(npc.Navigator.CurrentDestination).room.type != RoomType.Hall)
+                if (!npc.Navigator.HasDestination || npc.ec.CellFromPosition(npc.Navigator.CurrentDestination)?.room?.type != RoomType.Hall)
                 {
                     List<Cell> hall = npc.ec.FindHallways()[UnityEngine.Random.RandomRangeInt(0, npc.ec.FindHallways().Count - 1)];
                     ChangeNavigationState(new NavigationState_TargetPosition(npc, 99, hall[Mathf.RoundToInt(UnityEngine.Random.Range(0, hall.Count - 1))].CenterWorldPosition));
@@ -307,12 +279,18 @@ namespace BCarnellChars.Characters.States
                 return;
             }
             float distance = Vector3.Distance(npc.transform.position, player.transform.position);
-            if (distance <= ((400f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)))
+            if (distance <= ((400f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)) && !IsActuallyHidden(player))
             {
                 ChangeNavigationState(new NavigationState_TargetPlayer(npc, 99, player.transform.position));
                 Rumble(0.1f);
                 if (distance <= ((80f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)) && npc.looker.PlayerInSight(player))
-                    prototypebot.StartCoroutine(animationPlay());
+                {
+                    if (readyEnumerator == null)
+                    {
+                        readyEnumerator = IsReady(player.transform.position);
+                        prototypebot.StartCoroutine(readyEnumerator);
+                    }
+                }
             }
             else
             {
@@ -324,25 +302,39 @@ namespace BCarnellChars.Characters.States
                     flag = true;
                     if (!flag)
                         break;
-                    if (Vector3.Distance(npc.transform.position, npc.players[0].transform.position) > ((250f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z))
-                        && Vector3.Distance(npc.transform.position, npc.players[0].transform.position) <= ((180f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)))
+                    if (Vector3.Distance(npc.transform.position, prototypebot.players[0].transform.position) > ((250f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z))
+                        && Vector3.Distance(npc.transform.position, prototypebot.players[0].transform.position) <= ((180f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)))
                         flag = false;
                 }
             }
         }
 
-        private IEnumerator animationPlay()
+        public override void DestinationEmpty()
         {
+            if (player.plm.Entity.CurrentRoom?.type != RoomType.Hall | player.Invisible) // Is this fair enough??
+            {
+                List<Cell> hall = npc.ec.FindHallways()[UnityEngine.Random.RandomRangeInt(0, npc.ec.FindHallways().Count - 1)];
+                ChangeNavigationState(new NavigationState_TargetPosition(npc, 99, hall[Mathf.RoundToInt(UnityEngine.Random.Range(0, hall.Count - 1))].CenterWorldPosition));
+            }
+        }
+
+        internal override IEnumerator IsReady(Vector3 pos)
+        {
+            prototypebot.AudMan.FlushQueue(true);
             npc.Navigator.maxSpeed = 5f;
             npc.Navigator.SetSpeed(5f);
             prototypebot.animator.Play("ClimbOut", 1f);
-            if (prototypebot.animator.currentFrameIndex == 7)
+            yield return null;
+            while (prototypebot.animator.AnimationId == "ClimbOut")
             {
-                npc.SetSpriteRotation(180f);
-                npc.Navigator.Entity.SetBaseRotation(180f);
+                if (prototypebot.animator.AnimationFrame == 7)
+                {
+                    npc.spriteRenderer[0].SetSpriteRotation(180f);
+                    npc.Navigator.Entity.SetBaseRotation(180f);
+                }
+                yield return null;
             }
-            yield return prototypebot.animator.currentAnimationName == "ClimbOut";
-            prototypebot.behaviorStateMachine.ChangeState(new PrototypeBot_Chase(prototypebot, prototypebot, player.transform.position));
+            prototypebot.behaviorStateMachine.ChangeState(new PrototypeBot_Chase(prototypebot, prototypebot, pos));
         }
 
         public override void PlayerLost(PlayerManager player)
@@ -353,11 +345,11 @@ namespace BCarnellChars.Characters.States
 
         public override void Exit()
         {
-            npc.SetSpriteRotation(0f);
+            npc.spriteRenderer[0].SetSpriteRotation(0f);
             npc.Navigator.Entity.SetBaseRotation(0f);
             npc.Navigator.Entity.SetGrounded(true);
             for (int k = 0; k < CoreGameManager.Instance.setPlayers; k++)
-                npc.Navigator.Entity.IgnoreEntity(npc.players[k].plm.Entity, false);
+                npc.Navigator.Entity.IgnoreEntity(prototypebot.players[k].plm.Entity, false);
         }
     }
 
@@ -372,7 +364,7 @@ namespace BCarnellChars.Characters.States
         {
             base.Enter();
             flagged = true;
-            prototypebot.animator.SetDefaultAnimation("Running", 1.9f);
+            prototypebot.animator.SetDefaultAnimation("Running", 1.9f, true);
             npc.Navigator.maxSpeed = 31;
             npc.Navigator.SetSpeed(31);
             npc.Navigator.Entity.SetTrigger(false); // Don't want accidents happen...
@@ -388,14 +380,14 @@ namespace BCarnellChars.Characters.States
                 {
                     if (!flag)
                         break;
-                    if (Vector3.Distance(npc.transform.position, npc.players[k].transform.position) <= 150f && Vector3.Distance(npc.transform.position, npc.players[k].transform.position) > 250f)
+                    if (Vector3.Distance(npc.transform.position, prototypebot.players[k].transform.position) <= 150f && Vector3.Distance(npc.transform.position, prototypebot.players[k].transform.position) > 250f)
                         flag = false;
                 }
             }
             if (attempts >= maxattempts)
                 prototypebot.MechFunctInvoke();
             npc.Navigator.Entity.SetTrigger(true);
-            player = npc.players[Mathf.RoundToInt(UnityEngine.Random.Range(0, npc.players.Count - 1))];
+            player = prototypebot.players[Mathf.RoundToInt(UnityEngine.Random.Range(0, prototypebot.players.Length - 1))];
             flagged = false;
         }
 
@@ -404,7 +396,7 @@ namespace BCarnellChars.Characters.States
         {
             if (player)
             {
-                if (player.plm.Entity.CurrentRoom.type != RoomType.Hall)
+                if (player.plm.Entity.CurrentRoom?.type != RoomType.Hall)
                     prototypebot.MechFunctInvoke();
                 else
                     ChangeNavigationState(new NavigationState_TargetPlayer(npc, 99, player.transform.position));
@@ -438,7 +430,7 @@ namespace BCarnellChars.Characters.States
         {
             base.Enter();
             flagged = true;
-            prototypebot.animator.SetDefaultAnimation("Idle", 1f);
+            prototypebot.animator.SetDefaultAnimation("Idle", 1f, true);
             npc.Navigator.maxSpeed = 40;
             npc.Navigator.SetSpeed(40);
             npc.Navigator.Entity.SetTrigger(false); // Don't want accidents happen...
@@ -452,8 +444,8 @@ namespace BCarnellChars.Characters.States
                 attempts++;
                 if (!flag)
                     break;
-                if (Vector3.Distance(npc.transform.position, npc.players[0].transform.position) <= ((200f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)) ||
-                    Vector3.Distance(npc.transform.position, npc.players[0].transform.position) > ((250f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)))
+                if (Vector3.Distance(npc.transform.position, prototypebot.players[0].transform.position) <= ((200f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)) ||
+                    Vector3.Distance(npc.transform.position, prototypebot.players[0].transform.position) > ((250f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)))
                     flag = false;
             }
             npc.Navigator.Entity.SetTrigger(true);
@@ -467,7 +459,7 @@ namespace BCarnellChars.Characters.States
             float distance = Vector3.Distance(npc.transform.position, player.transform.position);
             if (distance <= ((200f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)))
             {
-                if (!player.Invisible)
+                if (!IsActuallyHidden(player))
                     ChangeNavigationState(new NavigationState_TargetPlayer(npc, 99, player.transform.position));
                 else
                     ChangeNavigationState(new NavigationState_WanderRandom(npc, 100));
@@ -479,7 +471,13 @@ namespace BCarnellChars.Characters.States
             if (distance >= ((35f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)) && !npc.looker.IsVisible)
                 npc.Navigator.SetSpeed(25f);
             else if (!flagged && ((distance < 65f && npc.looker.IsVisible) || distance < 29f) && npc.looker.PlayerInSight())
-                prototypebot.StartCoroutine(isReady());
+            {
+                if (readyEnumerator == null)
+                {
+                    readyEnumerator = IsReady(player.transform.position);
+                    prototypebot.StartCoroutine(readyEnumerator);
+                }
+            }
             else
             {
                 npc.Navigator.SetSpeed(0f);
@@ -491,12 +489,12 @@ namespace BCarnellChars.Characters.States
                 Rumble(0.1f);
         }
 
-        private IEnumerator isReady()
+        internal override IEnumerator IsReady(Vector3 pos)
         {
             npc.Navigator.maxSpeed = 0;
             npc.Navigator.SetSpeed(0);
-            yield return new WaitForSecondsNPCTimescale(npc.ec, 0.4f);
-            prototypebot.behaviorStateMachine.ChangeState(new PrototypeBot_Chase(prototypebot, prototypebot, player.transform.position));
+            yield return new WaitForSecondsNPCTimescale(npc, 0.4f);
+            prototypebot.behaviorStateMachine.ChangeState(new PrototypeBot_Chase(prototypebot, prototypebot, pos));
         }
 
         public override void PlayerInSight(PlayerManager player)
@@ -517,7 +515,7 @@ namespace BCarnellChars.Characters.States
                 ChangeNavigationState(new NavigationState_TargetPlayer(npc, 99, player.transform.position));
         }
 
-        public override void OnStateTriggerStay(Collider other)
+        public override void OnStateTriggerStay(Collider other, bool isValid)
         {
         }
     }
@@ -535,7 +533,7 @@ namespace BCarnellChars.Characters.States
         {
             base.Enter();
             flagged = true;
-            prototypebot.animator.SetDefaultAnimation("Idle", 1f);
+            prototypebot.animator.SetDefaultAnimation("Idle", 1f, true);
             npc.Navigator.maxSpeed = 0;
             npc.Navigator.SetSpeed(0);
             if (BaseGameManager.Instance.FoundNotebooks < 1) {
@@ -547,7 +545,7 @@ namespace BCarnellChars.Characters.States
             {
                 if (room == null) continue;
                 if (room.ec.activities.Find(x => x.room == room & !x.IsCompleted)
-                    || Vector3.Distance(npc.ec.RealRoomMid(room), npc.players[0].transform.position) > ((260f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)) || Vector3.Distance(npc.ec.RealRoomMid(room), npc.players[0].transform.position) <= ((230f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)))
+                    || Vector3.Distance(npc.ec.RealRoomMid(room), prototypebot.players[0].transform.position) > ((260f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)) || Vector3.Distance(npc.ec.RealRoomMid(room), prototypebot.players[0].transform.position) <= ((230f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)))
                     continue;
                 //Debug.Log("Adding classroom");
                 peek.Add(room);
@@ -555,7 +553,7 @@ namespace BCarnellChars.Characters.States
             if (peek.Count > 0) {
                 npc.Navigator.Entity.Teleport(npc.ec.RealRoomMid(peek[Mathf.RoundToInt(UnityEngine.Random.Range(0, peek.Count - 1))]));
                 float nearest = float.PositiveInfinity;
-                foreach (var tile in npc.Navigator.Entity.CurrentRoom.AllTilesNoGarbage(false, true))
+                foreach (var tile in npc.Navigator.Entity.CurrentRoom?.AllTilesNoGarbage(false, true))
                 {
                     foreach (var door in tile.doors)
                     {
@@ -578,24 +576,34 @@ namespace BCarnellChars.Characters.States
             if (nearestDoor == null)
                 return;
             passedTime += ((BaseGameManager.Instance.FoundNotebooks / BaseGameManager.Instance.NotebookTotal) * 2) * (Time.deltaTime * npc.ec.NpcTimeScale);
-            float distance = Vector3.Distance(npc.ec.RealRoomMid(npc.Navigator.Entity.CurrentRoom), npc.players[0].transform.position);
-            float doorDist = Vector3.Distance(nearestDoor.transform.position, npc.players[0].transform.position);
-            Physics.Raycast(nearestDoor.transform.position, npc.players[0].transform.position - nearestDoor.transform.position, out RaycastHit playerHit, float.PositiveInfinity, LayerMask.GetMask("Default", "Player"), QueryTriggerInteraction.Ignore);
+            float distance = Vector3.Distance(npc.ec.RealRoomMid(npc.Navigator.Entity.CurrentRoom), prototypebot.players[0].transform.position);
+            float doorDist = Vector3.Distance(nearestDoor.transform.position, prototypebot.players[0].transform.position);
+            Physics.Raycast(nearestDoor.transform.position, prototypebot.players[0].transform.position - nearestDoor.transform.position, out RaycastHit playerHit, float.PositiveInfinity, LayerMask.GetMask("Default", "Player"), QueryTriggerInteraction.Ignore);
             if (distance >= ((260f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)) || passedTime >= (20f * BaseGameManager.Instance.FoundNotebooks))
                 prototypebot.MechFunctInvoke();
             if ((doorDist < 30f | playerHit.transform.CompareTag("Player")) & !flagged)
-                prototypebot.StartCoroutine(isReady(npc.players[0]));
+            {
+                var pm = playerHit.transform.GetComponent<PlayerManager>();
+                if (pm != null && !IsActuallyHidden(pm))
+                {
+                    if (readyEnumerator == null)
+                    {
+                        readyEnumerator = IsReady(playerHit.transform.position);
+                        prototypebot.StartCoroutine(readyEnumerator);
+                    }
+                }
+            }
         }
 
         public override void PlayerInSight(PlayerManager player)
         {
-            prototypebot.StartCoroutine(isReady(player));
+            prototypebot.StartCoroutine(IsReady(player.transform.position));
         }
 
-        private IEnumerator isReady(PlayerManager player)
+        internal override IEnumerator IsReady(Vector3 pos)
         {
-            yield return new WaitForSecondsNPCTimescale(npc.ec, 0.4f);
-            prototypebot.behaviorStateMachine.ChangeState(new PrototypeBot_Chase(prototypebot, prototypebot, player.transform.position));
+            yield return new WaitForSecondsNPCTimescale(npc, 0.4f);
+            prototypebot.behaviorStateMachine.ChangeState(new PrototypeBot_Chase(prototypebot, prototypebot, pos));
         }
 
         public override void Exit()
@@ -618,15 +626,14 @@ namespace BCarnellChars.Characters.States
         public override void Enter()
         {
             base.Enter();
-            prototypebot.animator.SetDefaultAnimation("Running", 1f);
+            prototypebot.animator.SetDefaultAnimation("Running", 1f, true);
             prototypebot.AudMan.FlushQueue(true);
-            prototypebot.AudMan.SetLoop(false);
-            prototypebot.AudMan.maintainLoop = false;
             npc.Navigator.maxSpeed = 70;
             npc.Navigator.SetSpeed(70);
             ChangeNavigationState(new NavigationState_TargetPosition(npc, 9, position));
         }
 
+        private bool iAlreadyStomped;
         public override void Update()
         {
             /*if (Time.timeScale > 0f && npc.Navigator.Velocity.magnitude > 0.1f * Time.deltaTime)
@@ -641,23 +648,48 @@ namespace BCarnellChars.Characters.States
                 }
             }*/
 
-            if (prototypebot.animator.currentAnimationName == "Running" && Time.timeScale != 0)
+            if (prototypebot.animator.AnimationId == "Running" && Time.timeScale != 0)
             {
-                if (prototypebot.animator.currentFrameIndex % 3 == 0) {
+                if (prototypebot.animator.AnimationFrame % 3 == 0 && !iAlreadyStomped)
+                {
+                    iAlreadyStomped = true;
                     prototypebot.AudMan.PlaySingle(prototypebot.faststompSnd);
                     Rumble(0.3f);
                 }
+                else if (!(prototypebot.animator.AnimationFrame % 3 == 0) && iAlreadyStomped)
+                    iAlreadyStomped = false;
             }
         }
 
         public override void PlayerInSight(PlayerManager player)
         {
-            ChangeNavigationState(new NavigationState_TargetPosition(npc, 9, player.transform.position));
+            ChangeNavigationState(new NavigationState_TargetPosition(npc, 10, player.transform.position));
         }
 
         public override void DestinationEmpty()
         {
             prototypebot.MechFunctInvoke();
+        }
+
+        internal override IEnumerator IsReady(Vector3 pos)
+        {
+            ChangeNavigationState(new NavigationState_TargetPosition(npc, 9, pos));
+            yield break;
+        }
+    }
+
+    public class PrototypeBot_Kill : PrototypeBot_StateBase
+    {
+        public PrototypeBot_Kill(NPC npc, PrototypeBot bot) : base(npc, bot)
+        {
+        }
+
+        public override void Hear(GameObject source, Vector3 position, int value)
+        {
+        }
+
+        public override void OnStateTriggerStay(Collider other, bool isValid)
+        {
         }
     }
 }

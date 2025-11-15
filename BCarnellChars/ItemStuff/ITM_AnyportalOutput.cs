@@ -1,29 +1,26 @@
 ﻿using BCarnellChars.Characters;
-using BCarnellChars.GeneratorStuff;
-using System;
+using HarmonyLib;
 using System.Collections;
-using System.Collections.Generic;
-using System.Text;
+using System.Reflection;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace BCarnellChars.ItemStuff
 {
     public class ITM_AnyportalOutput : Item
     {
-        public SoundObject wrongPlacement;
-        public SoundObject outputGeneration;
-        public SoundObject destroySnd;
-        public AudioManager audMan;
+        [SerializeField] internal SoundObject wrongPlacement, outputGeneration, destroySnd;
+        [SerializeField] internal AudioManager audMan;
 
-        public Material mask;
+        [SerializeField] internal Material mask;
 
         private bool readyToUse = false;
         public bool Ready => readyToUse;
+        public PlayerManager Owner => pm;
+        [SerializeField] internal Sticker anyportalSticker;
 
         public override bool Use(PlayerManager pm)
         {
-            if (pm.ec.Npcs.Find(x => x.gameObject.GetComponent<MrPortalMan>())
+            if ((pm.ec.Npcs.Find(x => x is MrPortalMan) || StickerManager.Instance.HasSticker(anyportalSticker))
                 && pm.ec.CellFromPosition(pm.transform.position).HardCoverageFits(CellCoverage.Down)
                 && !pm.ec.CellFromPosition(pm.transform.position).HasObjectBase)
             {
@@ -68,12 +65,21 @@ namespace BCarnellChars.ItemStuff
             MaterialModifier.SetBase(quad.GetComponent<MeshRenderer>(), BasePlugin.bcppAssets.Get<RenderTexture>("MrPortalMan/ManCamRender"));
         }
 
+        private static FieldInfo
+            _hardCoverage = AccessTools.DeclaredField(typeof(Cell), "hardCoverage"),
+            _softCoverage = AccessTools.DeclaredField(typeof(Cell), "softCoverage");
         public void Break(bool instant = false)
         {
             if (readyToUse || instant)
             {
                 CoreGameManager.Instance.audMan.PlaySingle(destroySnd);
-                pm.ec.CellFromPosition(gameObject.transform.position).HardCover(~CellCoverage.Down);
+                var cell = pm.ec.CellFromPosition(gameObject.transform.position);
+                CellCoverage hard = (CellCoverage)_hardCoverage.GetValue(cell);
+                CellCoverage soft = (CellCoverage)_softCoverage.GetValue(cell);
+                hard &= ~CellCoverage.Down;
+                soft &= ~CellCoverage.Down;
+                _hardCoverage.SetValue(cell, hard);
+                _softCoverage.SetValue(cell, soft);
                 Destroy(gameObject);
             }
         }

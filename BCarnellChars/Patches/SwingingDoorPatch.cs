@@ -1,12 +1,6 @@
 ﻿using BCarnellChars.OtherStuff;
 using HarmonyLib;
 using MTM101BaldAPI;
-using MTM101BaldAPI.Registers;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
 using UnityEngine;
 
 namespace BCarnellChars.Patches
@@ -17,10 +11,10 @@ namespace BCarnellChars.Patches
         static Items _item;
         [HarmonyPatch("ItemFits")]
         [HarmonyPrefix]
-        static bool Shitty(Items item, SwingDoor __instance, ref bool __result)
+        static bool Shitty(Items item, SwingDoor __instance, ref bool __result, ref bool ___acceptsLockItem)
         {
             _item = item;
-            if (item == EnumExtensions.GetFromExtendedName<Items>("SecuredYellowLock") && !__instance.locked)
+            if (item == EnumExtensions.GetFromExtendedName<Items>("SecuredYellowLock") && !__instance.locked && ___acceptsLockItem)
             {
                 __result = true;
                 return false;
@@ -49,7 +43,7 @@ namespace BCarnellChars.Patches
         static bool Prefix(ItemManager __instance, ref bool ___disabled) 
         {
             // Infinite Uses!!
-            if (!___disabled && __instance.items[__instance.selectedItem].itemType == EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey"))
+            if ((!___disabled || (__instance.items[__instance.selectedItem].overrideDisabled && __instance.maxItem >= 0)) && __instance.items[__instance.selectedItem].itemType == EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey"))
             {
                 MonoBehaviour.Instantiate(__instance.items[__instance.selectedItem].item).Use(__instance.pm);
                 //__instance.StartCoroutine(delay(__instance.pm));

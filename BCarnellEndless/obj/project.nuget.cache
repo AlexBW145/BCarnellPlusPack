@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "xuK42rAIR9TRSEJHvbcGJ3KZVd7TYBJIn0rAmmsKfxC2JXArpRKGsGVJ25h5O42Hfmv1aZRBERPOYuAg8QWnxQ==",
+  "dgSpecHash": "23HZCnj/mbs=",
   "success": true,
-  "projectFilePath": "C:\\Users\\alex1\\source\\repos\\BCarnellPlusPack\\BCarnellEndless\\BCarnellEndless.csproj",
+  "projectFilePath": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellEndless\\BCarnellEndless.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\alex1\\.nuget\\packages\\bepinex.analyzers\\1.0.8\\bepinex.analyzers.1.0.8.nupkg.sha512",
     "C:\\Users\\alex1\\.nuget\\packages\\bepinex.baselib\\5.4.20\\bepinex.baselib.5.4.20.nupkg.sha512",

@@ -1,20 +1,13 @@
-﻿using BCarnellChars.Characters;
-using BCarnellChars.OtherStuff;
-using MTM101BaldAPI;
-using MTM101BaldAPI.Reflection;
-using MTM101BaldAPI.Registers;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using BCarnellChars.OtherStuff;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.Experimental.AI;
 
 namespace BCarnellChars.ItemStuff
 {
     public class ITM_Hammer : Item
     {
         private RaycastHit hit;
-        [Range(0,3)] public int duration = 3;
+        [SerializeField, Range(0,3)] internal int duration = 3;
 
         public override bool Use(PlayerManager pm)
         {
@@ -22,7 +15,12 @@ namespace BCarnellChars.ItemStuff
             bool instaDestroy = false;
             //Debug.Log(duration);
             if (FindObjectOfType<RockPaperScissors>(false) != null) {
-                FindObjectOfType<RockPaperScissors>(false).death();
+                var rps = FindObjectsOfType<RockPaperScissors>().ToList();
+                while (rps.Count > 0)
+                {
+                    rps[0].death();
+                    rps.RemoveAt(0);
+                }
                 accepted = true;
             }
             bool raycasted = Physics.Raycast(pm.transform.position, CoreGameManager.Instance.GetCamera(pm.playerNumber).transform.forward, out hit, Mathf.Min(pm.pc.reach, pm.ec.MaxRaycast), LayerMask.GetMask("Default", "Block Raycast", "NPCs", "Windows"), QueryTriggerInteraction.Collide);

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace BCarnellChars.Characters.States
 {
@@ -31,10 +28,10 @@ namespace BCarnellChars.Characters.States
             }
         }
 
-        public override void OnStateTriggerEnter(Collider other)
+        public override void OnStateTriggerEnter(Collider other, bool isValid)
         {
-            base.OnStateTriggerEnter(other);
-            if (other.CompareTag("NPC"))
+            base.OnStateTriggerEnter(other, isValid);
+            if (other.CompareTag("NPC") && isValid)
             {
                 switch (other.GetComponent<NPC>().Character)
                 {

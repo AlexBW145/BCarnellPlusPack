@@ -1,27 +1,39 @@
 ﻿using BCarnellChars.Characters;
 using BCarnellChars.Characters.States;
+using BCarnellChars.OtherStuff;
 using HarmonyLib;
 using MTM101BaldAPI;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 
 namespace BCarnellChars.Patches
 {
-    [HarmonyPatch(typeof(Playtime), "StartJumprope")]
+    [HarmonyPatch(typeof(Jumprope), "Start")]
     class InterruptRPS
     {
-        static void Prefix(Playtime __instance)
+        static void Prefix()
         {
-            if (GameObject.FindObjectOfType<RPSGuy>())
+            if (GameObject.FindObjectOfType<RockPaperScissors>(false) != null)
             {
-                RPSGuy rps = GameObject.FindObjectOfType<RPSGuy>();
-                if (rps.Playing && !(Jumprope)AccessTools.DeclaredField(typeof(Playtime), "currentJumprope").GetValue(__instance))
-                    rps.EndRPS(false, true);
+                var rps = GameObject.FindObjectsOfType<RockPaperScissors>(false).ToList();
+                while (rps.Count > 0)
+                {
+                    rps[0].rps.EndRPS(false, true);
+                    rps.RemoveAt(0);
+                }
             }
         }
     }
+
+    // New collision system can make Portal Man ignore squished downsides, useless.
+    /*[HarmonyPatch(typeof(Entity), nameof(Entity.Squish))]
+    class PortalManIsInvincible
+    {
+        static bool Prefix(Entity __instance) => !__instance.gameObject.GetComponent<MrPortalMan>();
+    }*/
 
     // Missed the texture made a better version in the latest API update, useless.
     /*[HarmonyPatch(typeof(CullingManager), "LateUpdate")]
@@ -73,4 +85,14 @@ namespace BCarnellChars.Patches
             }
         }
     }*/
+    [HarmonyPatch(typeof(HideableLockerBaldiInteraction), nameof(HideableLockerBaldiInteraction.Trigger))]
+    class BCarnellLockerInter
+    {
+        static bool Prefix(Baldi baldi, HideableLockerBaldiInteraction __instance)
+        {
+            if (baldi is not BCarnellBoss) return true;
+            __instance.Payload(baldi);
+            return false;
+        }
+    }
 }

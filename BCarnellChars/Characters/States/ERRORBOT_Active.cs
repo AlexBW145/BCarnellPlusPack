@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace BCarnellChars.Characters.States
 {
@@ -29,12 +26,6 @@ namespace BCarnellChars.Characters.States
             {
                 erbot.BecomeEvil(player.itm.HasItem(), player);
             }
-        }
-
-        public override void OnStateTriggerStay(Collider other)
-        {
-            base.OnStateTriggerStay(other);
-            erbot.Jammed(other);
         }
     }
 }

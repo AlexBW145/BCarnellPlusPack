@@ -30,12 +30,6 @@
           "build/BepInEx.Core.targets": {}
         }
       },
-      "BepInEx.PluginInfoProps/1.1.0": {
-        "type": "package",
-        "build": {
-          "build/_._": {}
-        }
-      },
       "HarmonyX/2.7.0": {
         "type": "package",
         "dependencies": {
@@ -653,22 +647,7 @@
           "lib/netstandard2.0/_._": {}
         }
       },
-      "BBTimes/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.6",
-        "dependencies": {
-          "BepInEx.Core": "5.0.0",
-          "BepInEx.PluginInfoProps": "1.0.0",
-          "UnityEngine.Modules": "2020.3.38"
-        },
-        "compile": {
-          "bin/placeholder/BBTimes.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/BBTimes.dll": {}
-        }
-      },
-      "BCarnellChars/1.0.0": {
+      "BCarnellChars/1.6.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -727,17 +706,6 @@
         "lib/net35/_._",
         "lib/netstandard2.0/_._",
         "tools/Install.ps1"
-      ]
-    },
-    "BepInEx.PluginInfoProps/1.1.0": {
-      "sha512": "RqM3aaGs8Hc2m0D+8aSt9mv09rCMYNIF35NB3D6KA2zSpcXJh/9ZVWrPlIUJfA8KYzodSWcCMUexEW24fjwR3w==",
-      "type": "package",
-      "path": "bepinex.plugininfoprops/1.1.0",
-      "files": [
-        ".nupkg.metadata",
-        "bepinex.plugininfoprops.1.1.0.nupkg.sha512",
-        "bepinex.plugininfoprops.nuspec",
-        "build/BepInEx.PluginInfoProps.props"
       ]
     },
     "HarmonyX/2.7.0": {
@@ -2833,12 +2801,7 @@
         "unityengine.modules.nuspec"
       ]
     },
-    "BBTimes/1.0.0": {
-      "type": "project",
-      "path": "../../New-Baldis-Basics-Times/BBTimes.csproj",
-      "msbuildProject": "../../New-Baldis-Basics-Times/BBTimes.csproj"
-    },
-    "BCarnellChars/1.0.0": {
+    "BCarnellChars/1.6.0": {
       "type": "project",
       "path": "../BCarnellChars/BCarnellChars.csproj",
       "msbuildProject": "../BCarnellChars/BCarnellChars.csproj"
@@ -2846,8 +2809,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETStandard,Version=v2.0": [
-      "BBTimes >= 1.0.0",
-      "BCarnellChars >= 1.0.0",
+      "BCarnellChars >= 1.6.0",
       "BepInEx.Analyzers >= 1.*",
       "BepInEx.Core >= 5.*",
       "NETStandard.Library >= 2.0.3",
@@ -2856,22 +2818,25 @@
   },
   "packageFolders": {
     "C:\\Users\\alex1\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\alex1\\source\\repos\\BCarnellPlusPack\\BCarnellTimes\\BCarnellTimes.csproj",
+      "projectUniqueName": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTimes\\BCarnellTimes.csproj",
       "projectName": "BCarnellTimes",
-      "projectPath": "C:\\Users\\alex1\\source\\repos\\BCarnellPlusPack\\BCarnellTimes\\BCarnellTimes.csproj",
+      "projectPath": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTimes\\BCarnellTimes.csproj",
       "packagesPath": "C:\\Users\\alex1\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\alex1\\source\\repos\\BCarnellPlusPack\\BCarnellTimes\\obj\\",
+      "outputPath": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTimes\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
         "C:\\Users\\alex1\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -2879,6 +2844,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {},
         "https://nuget.bepinex.dev/v3/index.json": {}
       },
@@ -2886,11 +2852,8 @@
         "netstandard2.0": {
           "targetAlias": "netstandard2.0",
           "projectReferences": {
-            "C:\\Users\\alex1\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\BCarnellChars.csproj": {
-              "projectPath": "C:\\Users\\alex1\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\BCarnellChars.csproj"
-            },
-            "C:\\Users\\alex1\\source\\repos\\New-Baldis-Basics-Times\\BBTimes.csproj": {
-              "projectPath": "C:\\Users\\alex1\\source\\repos\\New-Baldis-Basics-Times\\BBTimes.csproj"
+            "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\BCarnellChars.csproj": {
+              "projectPath": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\BCarnellChars.csproj"
             }
           }
         }

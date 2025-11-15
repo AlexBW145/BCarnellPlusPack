@@ -1,24 +1,22 @@
 ﻿using BCarnellChars.Characters;
+using BCarnellChars.Characters.States;
 using HarmonyLib;
 using MTM101BaldAPI;
-using MTM101BaldAPI.Components;
-using MTM101BaldAPI.Reflection;
-using MTM101BaldAPI.SaveSystem;
-using System;
+using MTM101BaldAPI.Components.Animation;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading;
 using UnityEngine;
 
 namespace BCarnellChars.OtherStuff
 {
     public class BasementGameManager : BaseGameManager
     {
+        [SerializeField] private SceneObject pitStop = Resources.FindObjectsOfTypeAll<SceneObject>().Last(x => x.levelTitle == "PIT");
         private static BasementGameManager singleton;
-        static MethodInfo EndSequence = AccessTools.DeclaredMethod(typeof(CoreGameManager), "EndSequence");
+        private static MethodInfo EndSequence = AccessTools.DeclaredMethod(typeof(CoreGameManager), "EndSequence");
+        private static FieldInfo _disableSubtitles = AccessTools.DeclaredField(typeof(AudioManager), "disableSubtitles");
         public static BasementGameManager BasementInstance => singleton;
 
         private Ambience ambience;
@@ -36,16 +34,15 @@ namespace BCarnellChars.OtherStuff
         private static float lightonChance = 0.2f;
         private static System.Random lightonRNG;
 
-        public CustomImageAnimator overlayAnimator;
-        public static List<List<Sprite>> jumpscareFrames = new List<List<Sprite>>();
+        [SerializeField] internal CustomImageAnimator overlayAnimator;
 
         public override void Initialize()
         {
             singleton = this;
             lightonRNG = new System.Random(CoreGameManager.Instance.Seed());
-            if (levelNo > CoreGameManager.Instance.lastLevelNumber)
+            if (levelNo < CoreGameManager.Instance.lastLevelNumber)
             {
-                CoreGameManager.Instance.SetLives(defaultLives);
+                CoreGameManager.Instance.SetLives(defaultLives, false);
                 CoreGameManager.Instance.lastLevelNumber = levelNo;
             }
             base.Initialize();
@@ -53,11 +50,8 @@ namespace BCarnellChars.OtherStuff
             audMan = gameObject.AddComponent<AudioManager>();
             audMan.audioDevice = gameObject.AddComponent<AudioSource>();
             audMan.useUnscaledPitch = true;
-            audMan.ReflectionSetVariable("disableSubtitles", true);
+            _disableSubtitles.SetValue(audMan, true);
             audMan.audioDevice.dopplerLevel = 0f;
-
-            overlayAnimator.animations.Add("Jump1", new CustomAnimation<Sprite>(jumpscareFrames[0].ToArray(), .6f));
-            overlayAnimator.animations.Add("Jump2", new CustomAnimation<Sprite>(jumpscareFrames[1].ToArray(), .8f));
         }
 
         private void OnDestroy()
@@ -95,6 +89,15 @@ namespace BCarnellChars.OtherStuff
             }*/
         }
 
+        public void ScaryMode()
+        {
+            audMan.FlushQueue(true);
+            audMan.QueueAudio(BasePlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/TimeOut"), true);
+            audMan.QueueAudio(BasePlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/TimeOutLoop"));
+            audMan.SetLoop(true);
+            StartCoroutine(FadeOffFog());
+        }
+
         public override void BeginSpoopMode()
         {
             if (CoreGameManager.Instance.currentMode == Mode.Free)
@@ -108,7 +111,9 @@ namespace BCarnellChars.OtherStuff
                     light.SetPower(false);
             }
 
-            ec.MaxRaycast = 250f;
+            ec.StartEventTimers();
+            ec.SetTimeLimit(ec.SurpassedGameTime + levelObject.timeLimit);
+            //ec.MaxRaycast = 250f; // Isn't the bot only supposed to have night vision?
             StartCoroutine(FadeOnFog());
         }
 
@@ -150,25 +155,26 @@ namespace BCarnellChars.OtherStuff
 
         public override void LoadNextLevel()
         {
+            int stickerBonuses = CoreGameManager.Instance.GetStickerBonuses(ec.RemainingTime, (ec.GetBaldi() != null) ? ec.NavigableDistance(ec.CellFromPosition(CoreGameManager.Instance.GetPlayer(0).transform.position), ec.CellFromPosition(ec.GetBaldi().transform.position), PathType.Nav) : 0, ec.map.PlayerDiscoveredCells);
+            CoreGameManager.Instance.AddPoints(stickerBonuses, 0, false, false, true);
             CoreGameManager.Instance.saveMapAvailable = false;
-            for (int i = 0; i < CoreGameManager.Instance.Lives; i++)
-            {
-                CoreGameManager.Instance.AddPoints(CoreGameManager.Instance.GetPointsThisLevel(0), 0, playAnimation: false, includeInLevelTotal: false);
-            }
+            CoreGameManager.Instance.saveMapPurchased = false;
+            for (int i = 0; i < 2 - CoreGameManager.Instance.Attempts; i++)
+                CoreGameManager.Instance.AddPoints(CoreGameManager.Instance.GetPointsThisLevel(0), 0, false, false, false);
 
             PrepareToLoad();
             elevatorScreen = Instantiate(elevatorScreenPre);
             elevatorScreen.OnLoadReady += base.LoadNextLevel;
             elevatorScreen.Initialize();
-            int num = 0;
             if (time <= levelObject.timeBonusLimit)
-            {
-                num = levelObject.timeBonusVal;
-            }
+                _ = levelObject.timeBonusVal;
 
-            CoreGameManager.Instance.AddPoints(num, 0, playAnimation: false, includeInLevelTotal: false);
-            CoreGameManager.Instance.AwardGradeBonus();
-            elevatorScreen.ShowResults(time, num);
+            if (problems > 0)
+                CoreGameManager.Instance.GradeVal += -Mathf.RoundToInt(gradeValue * ((float)correctProblems / (float)problems * 2f - 1f));
+
+            elevatorScreen.ShowResults(time, Mathf.RoundToInt((float)stickerBonuses * CoreGameManager.Instance.YtpMultiplier));
+            if (CoreGameManager.Instance.GetPoints(0) > 0)
+                _ = levelObject.finalLevel;
             if (CoreGameManager.Instance.SaveEnabled && MTM101BaldiDevAPI.SaveGamesEnabled && levelObject.name == "Basement1"
                 && CoreGameManager.Instance.currentMode != Mode.Free && levelObject.finalLevel)
             {
@@ -177,12 +183,14 @@ namespace BCarnellChars.OtherStuff
             }
         }
 
+        public override int CurrentStickerLevel() => 1;
+
         protected override void LoadSceneObject(SceneObject sceneObject, bool restarting)
         {
             CoreGameManager.Instance.nextLevel = sceneObject;
             if (!levelObject.finalLevel || restarting)
             {
-                base.LoadSceneObject(Resources.FindObjectsOfTypeAll<SceneObject>().First(x => x.levelTitle == "PIT"), restarting);
+                base.LoadSceneObject(pitStop, restarting);
                 return;
             }
             
@@ -201,10 +209,10 @@ namespace BCarnellChars.OtherStuff
         public void EndGame(Transform player, PrototypeBot bot)
         {
             bot.spriteBase.SetActive(false);
+            Time.timeScale = 0f;
             overlay.gameObject.SetActive(true);
             overlayAnimator.Play("Jump" + Mathf.RoundToInt(UnityEngine.Random.Range(1f, 2f)), 1f);
             overlay.worldCamera = CoreGameManager.Instance.GetCamera(player.gameObject.GetComponent<PlayerManager>().playerNumber).canvasCam;
-            Time.timeScale = 0f;
             audMan.FlushQueue(true);
             MusicManager.Instance.StopMidi();
             CoreGameManager.Instance.disablePause = true;
@@ -230,88 +238,152 @@ namespace BCarnellChars.OtherStuff
 
     public class SwitchNextFloorBCPP : MonoBehaviour, IButtonReceiver
     {
+        private EnvironmentController ec;
         private static bool but = false;
-        public static bool enabledSwitch => but;
+        internal static bool enabledSwitch => but;
+        internal TimeScaleModifier itshard = new TimeScaleModifier();
         public void ButtonPressed(bool val)
         {
             if (!but && BaseGameManager.Instance != null && CoreGameManager.Instance != null)
             {
                 CoreGameManager.Instance.audMan.PlaySingle(Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(x => x.name == "LAt_Sighted"));
-                BaseGameManager.Instance.Ec.FlickerLights(true);
+                ec.FlickerLights(true);
+                ec.AddTimeScale(itshard);
 
                 but = true;
             }
         }
 
-        void OnDestroy()
+        private void Update()
         {
+            if (but)
+            {
+                itshard.npcTimeScale += 0.01f * (Time.deltaTime * itshard.npcTimeScale);
+                itshard.environmentTimeScale += 0.01f * (Time.deltaTime * itshard.environmentTimeScale);
+            }
+        }
+
+        public void ConnectButton(GameButtonBase button)
+        {
+        }
+
+        private void OnDestroy()
+        {
+            ec.RemoveTimeScale(itshard);
             but = false;
         }
-        void Start()
+        private void Start()
         {
+            ec = BaseGameManager.Instance.Ec;
             but = false;
         }
     }
 
-    public class FacultyButtonBuilderBCPP : ObjectBuilder
+    public class FacultyButtonBuilderBCPP : StructureBuilder
     {
         public GameButton buttonPre;
 
-        public override void Build(EnvironmentController ec, LevelBuilder builder, RoomController room, System.Random cRng)
+        public override void OnGenerationFinished(LevelBuilder lg)
         {
+            System.Random rng = lg.controlledRNG;
             List<RoomController> facultyRoom = ec.rooms.FindAll(x => x.category == RoomCategory.Faculty);
-            //Debug.Log("Faculties found:" + facultyRoom.Count);
+            Debug.Log("Faculties found:" + facultyRoom.Count);
             if (facultyRoom.Count <= 0)
             {
                 Debug.LogWarning("WTF NOTHING???");
                 return;
             }
-            List<Cell> tilesOfShape = facultyRoom[Mathf.RoundToInt(UnityEngine.Random.Range(0, facultyRoom.Count - 1))].AllTilesNoGarbage(false, false);
+            List<Cell> tilesOfShape = new List<Cell>();
+            facultyRoom.Do(f => tilesOfShape.AddRange(f.AllTilesNoGarbage(false, false)));
             for (int i = 0; i < tilesOfShape.Count; i++)
-                if (!tilesOfShape[i].HasFreeWall || (tilesOfShape[i].shape != TileShape.Corner && tilesOfShape[i].shape != TileShape.Single) || tilesOfShape[i].room.category != RoomCategory.Faculty
+                if (!tilesOfShape[i].HasHardFreeWall || (tilesOfShape[i].shape != TileShapeMask.Corner && tilesOfShape[i].shape != TileShapeMask.Single) || tilesOfShape[i].room.category != RoomCategory.Faculty
                     || tilesOfShape[i].offLimits)
                     tilesOfShape.RemoveAt(i--);
+            Debug.Log("Tiles found:" + tilesOfShape.Count);
             int index;
             Direction direct;
             while (tilesOfShape.Count > 0)
             {
-                index = cRng.Next(0, tilesOfShape.Count);
-                direct = tilesOfShape[index].RandomUncoveredDirection(cRng);
+                index = rng.Next(0, tilesOfShape.Count);
+                direct = tilesOfShape[index].RandomUncoveredDirection(rng);
                 if (direct != Direction.Null && !tilesOfShape[index].Hidden)
                 {
-                    if (GameButton.BuildInArea(ec, tilesOfShape[index].position, tilesOfShape[index].position, 1, gameObject.AddComponent<SwitchNextFloorBCPP>().gameObject, buttonPre, cRng) == null)
-                        Debug.LogWarning("WTF FAILURE???");
+                    if (GameButton.BuildInArea(ec, tilesOfShape[index].position, 1, gameObject.AddComponent<SwitchNextFloorBCPP>().gameObject, buttonPre, rng) == null)
+                        Debug.LogWarning("WTF NULL???");
                     else break;
                     tilesOfShape.RemoveAt(index);
                 }
                 else
                     tilesOfShape.RemoveAt(index);
             }
-            Debug.LogWarning("WTF FAILURE???");
+            Debug.LogWarning(tilesOfShape.Count <= 0 ? "WTF FAILURE???" : "ItDone!");
+        }
+
+        protected override void Finished()
+        {
         }
     }
-}
 
-public class CustomImageAnimatorUnscaledTime : CustomImageAnimator
-{
-    protected override void VirtualUpdate()
+    public class B1TimeOut : RandomEvent
     {
-        if (!(currentAnim == ""))
-        {
-            float num = Time.unscaledDeltaTime * Speed;
-            currentAnimTime += num;
-            currentFrameTime += num;
-            if (currentFrameTime >= currentFrame.frameTime)
-            {
-                _currentFrameIndex++;
-                currentFrameTime = 0f;
-                UpdateFrame();
-            }
+        private List<Cell> lightsToTurnOn = new List<Cell>();
 
-            if (currentAnimTime >= currentAnimation.animationLength)
+        private float baldiAngerRate = 5f, baldiAngerAmount = 0f, lightOffRate = 0.1f, timeToNextAnger, timeToNextLight;
+
+        private void Update()
+        {
+            if (!active)
+                return;
+
+            timeToNextAnger -= Time.deltaTime * ec.NpcTimeScale;
+            timeToNextLight -= Time.deltaTime * ec.EnvironmentTimeScale;
+            if (timeToNextAnger <= 0f)
             {
-                Stop();
+                timeToNextAnger = baldiAngerRate + timeToNextAnger;
+                baldiAngerAmount++;
             }
+            ec.Npcs.DoIf(npc => npc.GetComponent<PrototypeBot>() != null, (npc) =>
+            {
+                if (!npc.behaviorStateMachine.currentState.GetType().Equals(typeof(PrototypeBot_Stunned)))
+                {
+                    npc.Navigator.maxSpeed = 40f + baldiAngerAmount;
+                    npc.Navigator.SetSpeed(40f + baldiAngerAmount);
+                }
+                else
+                {
+                    npc.Navigator.maxSpeed = 0f;
+                    npc.Navigator.SetSpeed(0f);
+                }
+            });
+
+            if (timeToNextLight <= 0f)
+            {
+                timeToNextLight = lightOffRate + timeToNextLight;
+                if (lightsToTurnOn.Count > 0)
+                {
+                    ec.QueueLightSourceForRegenerate(lightsToTurnOn[0]);
+                    lightsToTurnOn[0].SetPower(true);
+                    lightsToTurnOn.RemoveAt(0);
+                }
+            }
+        }
+
+        public override void Begin()
+        {
+            base.Begin();
+            BasementGameManager.BasementInstance.ScaryMode();
+            ec.lights.Do(l =>
+            {
+                l.lightColor = Color.red;
+                ec.QueueLightSourceForRegenerate(l);
+            });
+            lightsToTurnOn.AddRange(ec.lights);
+            lightsToTurnOn.Shuffle();
+            ec.CloseSchool();
+        }
+
+        public override void End()
+        {
         }
     }
 }

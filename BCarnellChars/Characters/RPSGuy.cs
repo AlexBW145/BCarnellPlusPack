@@ -1,46 +1,34 @@
-﻿using MTM101BaldAPI.AssetTools;
-using MTM101BaldAPI;
-using MTM101BaldAPI.Components;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MTM101BaldAPI;
 using UnityEngine;
 using BCarnellChars.Characters.States;
 using BCarnellChars.OtherStuff;
 using System.Linq;
+using BCarnellChars.Patches;
 
 namespace BCarnellChars.Characters
 {
     public class RPSGuy : NPC, IItemAcceptor
     {
-        private Sprite alive;
-
-        private Sprite dead;
+        [SerializeField] internal Sprite alive, dead;
 
         private RockPaperScissors curRPS;
-        public RockPaperScissors rpsPre;
+        [SerializeField] internal RockPaperScissors rpsPre;
 
-        private AudioManager audMan;
+        [SerializeField] internal AudioManager audMan;
         /*private SoundObject audCall = new SoundObject();
         private SoundObject audLetsPlay;
         private SoundObject audGo;*/
-        private SoundObject[] audCongrats;
-        private SoundObject audWannaPlay;
-        private SoundObject audFine;
-        private SoundObject audYouLose;
-        private SoundObject audDestroyed;
+        [SerializeField] internal SoundObject[] audCongrats;
+        [SerializeField] internal SoundObject audWannaPlay, audFine, audYouLose, audDestroyed;
 
-        private float normSpeed = 12f;
-        private float runSpeed = 20f;
-        private float initialCooldown = 25f;
-        private float calloutChance = 0.05f;
+        private float normSpeed = 12f, runSpeed = 20f, initialCooldown = 25f;
 
-        private bool isDead = false;
+        private bool isDead = false, playing = false;
         public bool Dead => isDead;
-        private bool playing = false;
         public bool Playing => playing;
         private readonly int streakInitial = 15;
-        private int streakPoints = 15;
+        private int StreakInitTotal => streakInitial + (streakInitial * Mathf.CeilToInt(1.05f * StickerManager.Instance.StickerValue(StickerPatches.rpsSticker)));
+        private int streakPoints;
         public int StreakPoints => streakPoints;
 
         public bool ItemFits(Items item)
@@ -52,34 +40,20 @@ namespace BCarnellChars.Characters
             fuckingDies();
         }
 
-        private void Awake()
-        {
-            audMan = gameObject.GetComponents<PropagatedAudioManager>()[0];
-            audMan.audioDevice = gameObject.AddComponent<AudioSource>();
-            alive = BasePlugin.bcppAssets.Get<Sprite>("RPSGuy/Alive");
-            dead = BasePlugin.bcppAssets.Get<Sprite>("RPSGuy/Dead");
-
-            audCongrats = [BasePlugin.bcppAssets.Get<SoundObject>("RPSGuy/LostGame"), BasePlugin.bcppAssets.Get<SoundObject>("RPSGuy/LostGameQuote2")];
-            audYouLose = BasePlugin.bcppAssets.Get<SoundObject>("RPSGuy/WonGame");
-            audDestroyed = BasePlugin.bcppAssets.Get<SoundObject>("RPSGuy/Killed");
-            audWannaPlay = BasePlugin.bcppAssets.Get<SoundObject>("RPSGuy/WannaPlay");
-            audFine = BasePlugin.bcppAssets.Get<SoundObject>("RPSGuy/LostSightOfPlayer");
-
-            spriteRenderer[0].sprite = alive;
-        }
-
-        private void Start()
-        {
-            if (BasePlugin.RadarModExists && ec != null)
-                BaseGameManager.Instance.Ec.map.AddArrow(transform, RadarSupport.RPSGuyColor.Value);
-        }
-
         public override void Initialize()
         {
+            this.ChangeRadarColor();
             base.Initialize();
+            streakPoints = StreakInitTotal;
             behaviorStateMachine.ChangeState(new RPSGuy_Wandering(this, this));
             navigator.maxSpeed = normSpeed;
             navigator.SetSpeed(normSpeed);
+        }
+
+        public override void Despawn()
+        {
+            if (curRPS != null) EndRPS(false, true);
+            base.Despawn();
         }
 
         protected override void VirtualUpdate()
@@ -118,7 +92,7 @@ namespace BCarnellChars.Characters
                 CoreGameManager.Instance.AddPoints(streakPoints, curRPS.player.playerNumber, true);
                 if (!GlobalCam.Instance.TransitionActive) GlobalCam.Instance.Transition(UiTransition.Dither, 0.01666667f);
                 audMan.PlayRandomAudio(audCongrats);
-                streakPoints += streakInitial;
+                streakPoints += StreakInitTotal;
             }
             if (destroyGame) {
                 curRPS.Destroy();
@@ -139,7 +113,7 @@ namespace BCarnellChars.Characters
         {
             if (!GlobalCam.Instance.TransitionActive) GlobalCam.Instance.Transition(UiTransition.Dither, 0.01666667f);
             audMan.PlaySingle(audYouLose);
-            streakPoints = streakInitial;
+            streakPoints = StreakInitTotal;
         }
 
         public void EndCooldown()
@@ -154,22 +128,6 @@ namespace BCarnellChars.Characters
             behaviorStateMachine.ChangeState(new RPSGuy_Wandering(this, this));
         }
 
-        public void CalloutChance()
-        {
-            if (UnityEngine.Random.value <= calloutChance)
-            {
-                RandomCallout();
-            }
-        }
-
-        private void RandomCallout()
-        {
-            /*int num = UnityEngine.Random.Range(0, audCalls.Length);
-            if (!audMan.audioDevice.isPlaying)
-            {
-                audMan.PlaySingle(audCalls[num]);
-            }*/
-        }
         public void StartRPS(PlayerManager player)
         {
             playing = true;
@@ -178,8 +136,8 @@ namespace BCarnellChars.Characters
             // IF PLAYTIME IS PLAYIN' WITH PLAYER, MAKE HER SAD BCUS SHE WAS INTERRUPTED!!
             if (player.jumpropes.Count > 0)
             {
-                Playtime playtime = FindObjectOfType<Playtime>();
-                playtime.EndJumprope(false);
+                while (player.jumpropes.Count > 0)
+                    player.jumpropes[0].End(false);
             }
             curRPS = Instantiate(rpsPre);
             curRPS.gameObject.SetActive(true);

@@ -1,10 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+	<TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>BCarnellChars</AssemblyName>
-    <Description>Template for BBPlus Mods</Description>
-    <Version>1.0.0</Version>
+    <Description>B. Carnell's Monumental Alphabetical Class in Baldi's Basics Plus</Description>
+    <Version>1.6.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
@@ -18,32 +18,84 @@
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
   </ItemGroup>
+
+	<ItemGroup>
+		<None Remove="bcarnellpluspack.hiddenassets\AudioClip\*.wav" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="bcarnellpluspack.hiddenassets\AudioClip\*.wav" />
+	</ItemGroup>
   
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="BaldisBasicsPlusAdvanced">
+      <HintPath>..\lib\BaldisBasicsPlusAdvanced.dll</HintPath>
+    </Reference>
+    <Reference Include="BBPDiscordRPC">
+      <HintPath>..\..\BaldiBasicsPlusDiscordRichPressence\bin\Release\netstandard2.0\BBPDiscordRPC.dll</HintPath>
+    </Reference>
+    <Reference Include="BBPPlayables_Core">
+      <HintPath>..\lib\BBPPlayables_Core.dll</HintPath>
+    </Reference>
+    <Reference Include="ModdedModesAPI">
+      <HintPath>..\lib\ModdedModesAPI.dll</HintPath>
     </Reference>
     <Reference Include="MTM101BaldAPI">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\MTM101BaldAPI.dll</HintPath>
+      <HintPath>D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\MTM101BaldAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="NavMeshComponents">
+      <HintPath>D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\NavMeshComponents.dll</HintPath>
+    </Reference>
+    <Reference Include="PlusLevelStudio">
+      <HintPath>..\lib\PlusLevelStudio.dll</HintPath>
+    </Reference>
+    <Reference Include="PlusStudioLevelFormat">
+      <HintPath>..\lib\PlusStudioLevelFormat.dll</HintPath>
+    </Reference>
+    <Reference Include="PlusStudioLevelLoader">
+      <HintPath>..\lib\PlusStudioLevelLoader.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipeline.Universal.ShaderLibrary">
+      <HintPath>D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\Unity.RenderPipeline.Universal.ShaderLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Core.Runtime">
+      <HintPath>D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Core.ShaderLibrary">
+      <HintPath>D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\Unity.RenderPipelines.Core.ShaderLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary">
+      <HintPath>D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Universal.Runtime">
+      <HintPath>D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Universal.Shaders">
+      <HintPath>D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\Unity.RenderPipelines.Universal.Shaders.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+      <HintPath>D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UIElementsModule">
-      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\UnityEngine.UIElementsModule.dll</HintPath>
+      <HintPath>D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\UnityEngine.UIElementsModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UIElementsNativeModule">
-      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\UnityEngine.UIElementsNativeModule.dll</HintPath>
+      <HintPath>D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\UnityEngine.UIElementsNativeModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UIModule">
-      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+      <HintPath>D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\UnityEngine.UIModule.dll</HintPath>
     </Reference>
   </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="alexbw145.baldiplus.bcarnellchars\Texture2D\NPCs\RPS Guy\" />
-  </ItemGroup>
+
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	    <Exec Command="echo F|xcopy /Y &quot;$(ProjectDir)bin\$(Configuration)\netstandard2.0\$(AssemblyName).dll&quot; &quot;D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\BCPP\$(AssemblyName).dll&quot;" />
+	    <Exec Command="echo F|xcopy /Y &quot;$(ProjectDir)bin\$(Configuration)\netstandard2.0\$(AssemblyName).pdb&quot; &quot;D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\BCPP\$(AssemblyName).pdb&quot;" />
+		<Exec Command="  xcopy /S /Q /Y /F &quot;$(ProjectDir)alexbw145.baldiplus.bcarnellchars\&quot; &quot;D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BALDI_Data\StreamingAssets\Modded\alexbw145.baldiplus.bcarnellchars\&quot;" />
+    </Target>
 </Project>

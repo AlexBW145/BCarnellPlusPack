@@ -1,64 +1,40 @@
 ﻿using BCarnellChars.Characters.States;
 using BCarnellChars.GeneratorStuff;
 using BCarnellChars.ItemStuff;
-using BCarnellChars.Patches;
 using HarmonyLib;
-using MTM101BaldAPI;
 using MTM101BaldAPI.AssetTools;
 using MTM101BaldAPI.Components;
-using MTM101BaldAPI.Reflection;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Reflection;
 using UnityEngine;
 
 namespace BCarnellChars.Characters
 {
     public class MrPortalMan : NPC
     {
-        private AudioManager audMan;
-        private SoundObject audHungry;
-        private SoundObject audWhere;
-        private SoundObject audFulfilled;
-        private SoundObject teleport;
+        [SerializeField] internal AudioManager audMan;
+        [SerializeField] internal SoundObject audHungry, audWhere, audFulfilled, teleport;
 
-        public CryingPortal portalPre;
+        [SerializeField] internal CryingPortal portalPre;
         private List<Cell> _spawnedPortals = new List<Cell>();
         private List<CryingPortal> portals = new List<CryingPortal>();
 
-        private List<TileShape> tileShapes = new List<TileShape>()
-        {
-            TileShape.Corner,
-            TileShape.Single
-        };
+        private TileShapeMask tileShapes = TileShapeMask.Corner | TileShapeMask.Single;
         [SerializeField] private float hallspawnPercent = 15f;
 
         public Camera portalmanCam;
-        public Camera outputCamPre;
+        [SerializeField] internal Camera outputCamPre;
         private Camera outputCam;
         public Camera OutputCam => outputCam;
         private CryingPortal currentOutput;
 
-        private void Awake()
-        {
-            audMan = gameObject.GetComponents<AudioManager>()[0];
-
-            audHungry = BasePlugin.bcppAssets.Get<SoundObject>("MrPortalMan/Hungry");
-            audWhere = BasePlugin.bcppAssets.Get<SoundObject>("MrPortalMan/WhereIs");
-            audFulfilled = BasePlugin.bcppAssets.Get<SoundObject>("MrPortalMan/Fullfilled");
-            teleport = Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(b => b.name == "Teleport");
-        }
-
-        private void Start()
-        {
-            if (BasePlugin.RadarModExists && ec != null)
-                Singleton<BaseGameManager>.Instance.Ec.map.AddArrow(transform, RadarSupport.MrPortalManColor.Value);
-        }
-
         public override void Initialize()
         {
+            BasePlugin.bcppAssets.Get<RenderTexture>("MrPortalMan/ManCamRender").Release();
+            BasePlugin.bcppAssets.Get<RenderTexture>("MrPortalMan/OutputCamRender").Release();
+            this.ChangeRadarColor();
             base.Initialize();
             if (!gameObject.GetComponent<CullAffector>())
                 gameObject.AddComponent<CullAffector>();
@@ -69,6 +45,7 @@ namespace BCarnellChars.Characters
             foreach (SpriteRenderer render in spriteRenderer)
                 render.gameObject.SetActive(false);
             Navigator.Entity.SetTrigger(false);
+            Navigator.Entity.SetInteractionState(false);
 
             List<RoomController> list = new List<RoomController>();
             foreach (RoomController room in ec.rooms)
@@ -79,7 +56,7 @@ namespace BCarnellChars.Characters
             foreach (List<Cell> subcell in ec.FindHallways())
                 foreach (Cell cell in subcell)
                 {
-                    if (cell.HasFreeWall && !cell.offLimits && cell.shape == TileShape.Straight && cell.room.type == RoomType.Hall)
+                    if (cell.HasHardFreeWall && !cell.offLimits && cell.shape == TileShapeMask.Straight && cell.room.type == RoomType.Hall)
                         list2.Add(cell);
                 }    
             int num2 = Mathf.RoundToInt(list2.Count * (hallspawnPercent / 100f));
@@ -110,15 +87,15 @@ namespace BCarnellChars.Characters
 
         private void SpawnBoard(RoomController room)
         {
-            _spawnedPortals = room.GetTilesOfShape(room.type == RoomType.Hall ? [TileShape.Straight] : tileShapes, true);
+            _spawnedPortals = room.GetTilesOfShape(room.type == RoomType.Hall ? TileShapeMask.Straight : tileShapes, true);
             Cell cell = null;
             bool flag = false;
             while (!flag && _spawnedPortals.Count > 0)
             {
                 cell = _spawnedPortals[UnityEngine.Random.Range(0, _spawnedPortals.Count)];
-                if (cell.HasFreeWall & portals.TrueForAll(x => (cell.CenterWorldPosition - x.CellPos).magnitude > 200f)) // Side note: I can't decide on magnitudes without experimenting with them in-game.
+                if (cell.HasHardFreeWall & portals.TrueForAll(x => (cell.CenterWorldPosition - x.CellPos).magnitude > 200f)) // Side note: I can't decide on magnitudes without experimenting with them in-game.
                 {
-                    if (!ec.TrapCheck(cell)) {
+                    if (!ec.TrapCheck(cell) && cell.RandomUncoveredDirection(new System.Random(CoreGameManager.Instance.Seed())) != Direction.Null) {
                         portals.Add(Instantiate(portalPre, cell.TileTransform).Spawn(cell));
                         flag = true;
                     }
@@ -149,6 +126,7 @@ namespace BCarnellChars.Characters
             foreach (SpriteRenderer render in spriteRenderer)
                 render.gameObject.SetActive(true);
             Navigator.Entity.SetTrigger(true);
+            Navigator.Entity.SetInteractionState(true);
             StartCoroutine(showFade());
         }
 
@@ -159,6 +137,9 @@ namespace BCarnellChars.Characters
                 audMan.PlaySingle(audWhere);
         }
 
+        private static FieldInfo
+            _maxPressure = AccessTools.DeclaredField(typeof(ITM_GrapplingHook), "maxPressure"),
+            _pm = AccessTools.DeclaredField(typeof(Item), "pm");
         public void TeleportAnIdiot(Entity idiot)
         {
             if (idiot.CompareTag("NPC") && !idiot.GetComponent<Navigator>().isActiveAndEnabled)
@@ -171,17 +152,21 @@ namespace BCarnellChars.Characters
             {
                 audMan.PlaySingle(teleport);
                 if (idiot.GetComponent<AudioManager>() != null) idiot.GetComponent<AudioManager>().PlaySingle(teleport);
-                if (idiot.gameObject.GetComponent<ITM_GrapplingHook>()) idiot.GetComponent<ITM_GrapplingHook>().ReflectionSetVariable("maxPressure", 0f); ;
+                if (idiot.gameObject.GetComponent<ITM_GrapplingHook>()) _maxPressure.SetValue(idiot.GetComponent<ITM_GrapplingHook>(), 0f);
             }
             else
             {
                 CoreGameManager.Instance.audMan.PlaySingle(teleport);
-                if (FindObjectOfType<ITM_GrapplingHook>())
-                    FindObjectOfType<ITM_GrapplingHook>().ReflectionSetVariable("maxPressure", 0f);
+                var grapplings = FindObjectsOfType<ITM_GrapplingHook>(false).Where(x => ((PlayerManager)_pm.GetValue(x)).plm.Entity == idiot).ToList();
+                while (grapplings.Count > 0)
+                {
+                    _maxPressure.SetValue(grapplings[0], 0f);
+                    grapplings.RemoveAt(0);
+                }
             }
-            if (idiot.CompareTag("Player") && FindObjectsOfType<ITM_AnyportalOutput>().Count(x => x.Ready) > 0)
+            if (idiot.CompareTag("Player") && FindObjectsOfType<ITM_AnyportalOutput>().Count(x => x.Ready && x.Owner == idiot.gameObject?.GetComponent<PlayerManager>()) > 0)
             {
-                List<ITM_AnyportalOutput> placedOutputs = FindObjectsOfType<ITM_AnyportalOutput>().ToList().FindAll(x => x.Ready);
+                List<ITM_AnyportalOutput> placedOutputs = FindObjectsOfType<ITM_AnyportalOutput>().ToList().FindAll(x => x.Ready && x.Owner == idiot.gameObject?.GetComponent<PlayerManager>());
                 int index = Mathf.RoundToInt(UnityEngine.Random.Range(0f, placedOutputs.Count - 1));
                 idiot.Teleport(ec.CellFromPosition(placedOutputs[index].transform.position).CenterWorldPosition);
                 idiot.transform.rotation = placedOutputs[index].transform.rotation;
@@ -204,6 +189,7 @@ namespace BCarnellChars.Characters
             audMan.PlaySingle(audFulfilled);
             StartCoroutine(hideFade());
             Navigator.Entity.SetTrigger(false);
+            Navigator.Entity.SetInteractionState(false);
             behaviorStateMachine.ChangeState(new MrPortalMan_Cooldown(this, UnityEngine.Random.RandomRangeInt(40, 80)));
             behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 0));
             navigator.maxSpeed = 0;
@@ -249,8 +235,6 @@ namespace BCarnellChars.Characters
             foreach (CryingPortal portal in portals)
                 Destroy(portal.gameObject);
             portals.Clear();
-            if (gameObject.GetComponent<CullAffector>())
-                Destroy(gameObject.GetComponent<CullAffector>());
             foreach (ITM_AnyportalOutput plac in FindObjectsOfType<ITM_AnyportalOutput>()) // No purpose of existing if Mr. Portal Man has despawned
                 if (plac.isActiveAndEnabled) plac.Break(true);
         }
@@ -262,24 +246,29 @@ namespace BCarnellChars.Characters
                 Destroy(spriteRenderer[1].sprite.texture);
                 Destroy(spriteRenderer[1].sprite);
             }
+            BasePlugin.bcppAssets.Get<RenderTexture>("MrPortalMan/ManCamRender").Release();
+            BasePlugin.bcppAssets.Get<RenderTexture>("MrPortalMan/OutputCamRender").Release();
         }
 
         private void SwitchOutput()
         {
+            portalmanCam.targetTexture.Release();
+            //outputCam.targetTexture.Release();
             int random = UnityEngine.Random.Range(0, portals.Count);
             outputCam.transform.SetParent(portals[random].transform, false);
+            outputCam.transform.position = portals[random].CellPos;
             outputCam.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+            /*if (currentOutput != null && currentOutput.gameObject.GetComponent<CullAffector>())
+                Destroy(currentOutput.GetComponent<CullAffector>());*/
             currentOutput = portals[random];
-            if (!outputCam.gameObject.GetComponent<CullAffector>())
-                currentOutput.gameObject.AddComponent<CullAffector>();
+            /*if (!currentOutput.gameObject.GetComponent<CullAffector>())
+                currentOutput.gameObject.AddComponent<CullAffector>();*/
             if (spriteRenderer[1].sprite != null)
             {
                 Destroy(spriteRenderer[1].sprite.texture);
                 Destroy(spriteRenderer[1].sprite); // I don't want to fill up de assets!
             }
             spriteRenderer[1].sprite = AssetLoader.SpriteFromTexture2D(Render(outputCam.targetTexture), 34f);
-            if (outputCam.gameObject.GetComponent<CullAffector>())
-                Destroy(outputCam.GetComponent<CullAffector>());
             spriteRenderer[1].sprite.name = "Spr_PortalOutputRenderTextSpr";
         }
 

@@ -14,8 +14,7 @@ namespace BCarnellChars.OtherStuff
 
         public Material[] originalOverlays = new Material[0];
         private bool lockOnStart = true;
-        private int attemptsofBreak = 0;
-        private int maximumAttempts = 5;
+        private int attemptsofBreak = 0, maximumAttempts = 5;
 
         private void Start()
         {
@@ -67,9 +66,9 @@ namespace BCarnellChars.OtherStuff
         {
             if (new string[] { "BHammer".ToLower(), "Hammer".ToLower() }.Contains(item.ToStringExtended().ToLower()))
                 AttemptBreak();
-            else if (item == EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey"))
+            else if (item == EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey") || item.ToStringExtended().ToLower() == "IOU".ToLower())
                 UnlockFully();
-            return item == EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey") || new string[] { "BHammer".ToLower(), "Hammer".ToLower() }.Contains(item.ToStringExtended().ToLower());
+            return item == EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey") || item.ToStringExtended().ToLower() == "IOU".ToLower() || new string[] { "BHammer".ToLower(), "Hammer".ToLower() }.Contains(item.ToStringExtended().ToLower());
         }
     }
 }
