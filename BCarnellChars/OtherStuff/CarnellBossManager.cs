@@ -1,19 +1,17 @@
 ﻿using BCarnellChars.Characters;
+using BepInEx.Bootstrap;
 using HarmonyLib;
 using MTM101BaldAPI;
 using MTM101BaldAPI.Components;
 using MTM101BaldAPI.PlusExtensions;
-using MTM101BaldAPI.Reflection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Audio;
-using UnityEngine.Events;
-using UnityEngine.UI;
 
 namespace BCarnellChars.OtherStuff
 {
@@ -39,6 +37,8 @@ namespace BCarnellChars.OtherStuff
         {
             CoreGameManager.Instance.SetRandomSeed(); // For the funny...
         }
+
+        private static readonly FieldInfo _seedText = AccessTools.DeclaredField(typeof(ElevatorScreen), "seedText");
 
         protected new void Start()
         {
@@ -136,8 +136,7 @@ namespace BCarnellChars.OtherStuff
                     hud.SetNotebookDisplay(false);
                 }
                 foreach (Cell cell in ec.AllCells())
-                    ec.UpdateLightingAtCell(cell);
-                ec.UpdateQueuedLightChanges();
+                    ec.QueueLightSourceForRegenerate(cell);
                 /*foreach (var profit in GameObject.FindObjectsOfType<ToProfitCardCost>(true).Where(profit => profit.gameObject.scene == ec.gameObject.scene))
                     profit.Begin();*/
                 foreach (var banan in FindObjectsOfType<ITM_NanaPeel>(false))
@@ -161,7 +160,8 @@ namespace BCarnellChars.OtherStuff
 
         public override void Initialize()
         {
-            if (CoreGameManager.Instance.currentMode == Mode.Free || CoreGameManager.Instance.lifeMode == LifeMode.Explorer || !BCPPSave.Instance.basementCompleted)
+            if (CoreGameManager.Instance.currentMode == Mode.Free || CoreGameManager.Instance.lifeMode == LifeMode.Explorer || !BCPPSave.Instance.basementCompleted
+                || Chainloader.PluginInfos.ContainsKey("com.exmagikguy.baldi.loguscheats"))
             {
                 DogcheckBCPP.SendToDogcheckScreen();
                 Destroy(gameObject);
@@ -183,7 +183,7 @@ namespace BCarnellChars.OtherStuff
                     }
                 }
             }
-            var text = ElevatorScreen.Instance.ReflectionGetVariable("seedText") as TMP_Text;
+            var text = _seedText.GetValue(ElevatorScreen.Instance) as TMP_Text;
             text.text = CoreGameManager.Instance.Seed().ToString();
             ec.SetAllLights(false);
             foreach (Cell light in ec.lights)
@@ -417,7 +417,7 @@ namespace BCarnellChars.OtherStuff
         protected override void LoadSceneObject(SceneObject sceneObject, bool restarting)
         {
             CoreGameManager.Instance.nextLevel = sceneObject;
-            if ((!levelObject.finalLevel || restarting) && CoreGameManager.Instance.GetPoints(0) > 0)
+            if (!levelObject.finalLevel || restarting)
                 base.LoadSceneObject(pitStop, restarting);
             else
                 base.LoadSceneObject(sceneObject, restarting);
@@ -442,7 +442,7 @@ namespace BCarnellChars.OtherStuff
         [SerializeField] internal LevelBuilder generatorPre, loaderPre;
         [SerializeField] internal Vector3 ecPos = Vector3.zero;
         private IEnumerator waitForGenerator;
-        public Action<LevelBuilder, BaseGameManager> onReady = (lb, gm) => { };
+        public Action<LevelBuilder, BaseGameManager> onReady;
         public BaseGameManager baseGameManager = BaseGameManager.Instance;
         public bool Ready { get; private set; } = false;
 
@@ -498,7 +498,7 @@ namespace BCarnellChars.OtherStuff
             while (lb.levelInProgress && !lb.levelCreated)
                 yield return null;
             Ready = true;
-            onReady.Invoke(lb, gm);
+            onReady?.Invoke(lb, gm);
         }
     }
 

@@ -24,11 +24,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Text;
 using TMPro;
 using UnityCipher;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 using UnityEngine.UI;
 
 namespace BCarnellChars
@@ -2558,11 +2560,11 @@ namespace BCarnellChars
             thesilent.outerEdgeBuffer = 6;
             thesilent.bridgeTurnChance = 10;
             thesilent.additionTurnChance = 5;
-            thesilent.forcedItems = [ItemMetaStorage.Instance.FindByEnum(Items.ChalkEraser).value, ItemMetaStorage.Instance.FindByEnum(Items.ZestyBar).value, ItemMetaStorage.Instance.FindByEnum(Items.AlarmClock).value, ItemMetaStorage.Instance.FindByEnum(Items.Teleporter).value,
-            ItemMetaStorage.Instance.FindByEnum(Items.ChalkEraser).value, ItemMetaStorage.Instance.FindByEnum(Items.ZestyBar).value, ItemMetaStorage.Instance.FindByEnum(Items.AlarmClock).value, ItemMetaStorage.Instance.FindByEnum(Items.Teleporter).value,
-            ItemMetaStorage.Instance.FindByEnum(Items.ChalkEraser).value, ItemMetaStorage.Instance.FindByEnum(Items.ZestyBar).value, ItemMetaStorage.Instance.FindByEnum(Items.AlarmClock).value,
-            ItemMetaStorage.Instance.FindByEnum(Items.ChalkEraser).value, ItemMetaStorage.Instance.FindByEnum(Items.ZestyBar).value, ItemMetaStorage.Instance.FindByEnum(Items.AlarmClock).value,
-            ItemMetaStorage.Instance.FindByEnum(Items.ChalkEraser).value, ItemMetaStorage.Instance.FindByEnum(Items.ZestyBar).value, ItemMetaStorage.Instance.FindByEnum(Items.AlarmClock).value,];
+            thesilent.forcedItems = [ItemMetaStorage.Instance.FindByEnum(Items.InvisibilityElixir).value, ItemMetaStorage.Instance.FindByEnum(Items.ChalkEraser).value, ItemMetaStorage.Instance.FindByEnum(Items.ZestyBar).value, ItemMetaStorage.Instance.FindByEnum(Items.AlarmClock).value, ItemMetaStorage.Instance.FindByEnum(Items.Teleporter).value,
+            ItemMetaStorage.Instance.FindByEnum(Items.InvisibilityElixir).value, ItemMetaStorage.Instance.FindByEnum(Items.ChalkEraser).value, ItemMetaStorage.Instance.FindByEnum(Items.ZestyBar).value, ItemMetaStorage.Instance.FindByEnum(Items.AlarmClock).value, ItemMetaStorage.Instance.FindByEnum(Items.Teleporter).value,
+            ItemMetaStorage.Instance.FindByEnum(Items.InvisibilityElixir).value, ItemMetaStorage.Instance.FindByEnum(Items.ChalkEraser).value, ItemMetaStorage.Instance.FindByEnum(Items.ZestyBar).value, ItemMetaStorage.Instance.FindByEnum(Items.AlarmClock).value,
+            ItemMetaStorage.Instance.FindByEnum(Items.InvisibilityElixir).value, ItemMetaStorage.Instance.FindByEnum(Items.ChalkEraser).value, ItemMetaStorage.Instance.FindByEnum(Items.ZestyBar).value, ItemMetaStorage.Instance.FindByEnum(Items.AlarmClock).value,
+            ItemMetaStorage.Instance.FindByEnum(Items.InvisibilityElixir).value, ItemMetaStorage.Instance.FindByEnum(Items.ChalkEraser).value, ItemMetaStorage.Instance.FindByEnum(Items.ZestyBar).value, ItemMetaStorage.Instance.FindByEnum(Items.AlarmClock).value,];
             thesilent.potentialItems = [.. Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").potentialItems.Where(i => i.selection.itemType != Items.AlarmClock && i.selection.itemType != Items.DietBsoda)];
 
             var deadends = Instantiate(lBoss);
@@ -2587,14 +2589,13 @@ namespace BCarnellChars
             deadends.maxSpecialRooms = 0;
             deadends.additionTurnChance = 10;
             deadends.bridgeTurnChance = 10;
-            deadends.forcedItems = [ItemMetaStorage.Instance.FindByEnum(Items.Bsoda).value, ItemMetaStorage.Instance.FindByEnum(Items.Teleporter).value,
-            ItemMetaStorage.Instance.FindByEnum(Items.Bsoda).value, ItemMetaStorage.Instance.FindByEnum(Items.Teleporter).value,
-            ItemMetaStorage.Instance.FindByEnum(Items.Bsoda).value, ItemMetaStorage.Instance.FindByEnum(Items.Teleporter).value,
-            ItemMetaStorage.Instance.FindByEnum(Items.Bsoda).value, ItemMetaStorage.Instance.FindByEnum(Items.Teleporter).value,
-            ItemMetaStorage.Instance.FindByEnum(Items.Bsoda).value, ItemMetaStorage.Instance.FindByEnum(Items.Teleporter).value,
-            ItemMetaStorage.Instance.FindByEnum(Items.Bsoda).value, ItemMetaStorage.Instance.FindByEnum(Items.Teleporter).value,
-                ItemMetaStorage.Instance.FindByEnum(Items.Teleporter).value];
-            deadends.potentialItems = [.. Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").potentialItems.Where(i => i.selection.itemType != Items.Teleporter && i.selection.itemType != Items.DietBsoda)];
+            deadends.forcedItems = [ItemMetaStorage.Instance.FindByEnum(Items.InvisibilityElixir).value,ItemMetaStorage.Instance.FindByEnum(Items.Bsoda).value, ItemMetaStorage.Instance.FindByEnum(Items.Teleporter).value,
+            ItemMetaStorage.Instance.FindByEnum(Items.InvisibilityElixir).value,ItemMetaStorage.Instance.FindByEnum(Items.Bsoda).value, ItemMetaStorage.Instance.FindByEnum(Items.Teleporter).value,
+            ItemMetaStorage.Instance.FindByEnum(Items.InvisibilityElixir).value,ItemMetaStorage.Instance.FindByEnum(Items.Bsoda).value, ItemMetaStorage.Instance.FindByEnum(Items.Teleporter).value,
+            ItemMetaStorage.Instance.FindByEnum(Items.InvisibilityElixir).value,ItemMetaStorage.Instance.FindByEnum(Items.Bsoda).value, ItemMetaStorage.Instance.FindByEnum(Items.Teleporter).value,
+            ItemMetaStorage.Instance.FindByEnum(Items.InvisibilityElixir).value,ItemMetaStorage.Instance.FindByEnum(Items.Bsoda).value, ItemMetaStorage.Instance.FindByEnum(Items.Teleporter).value,
+            ItemMetaStorage.Instance.FindByEnum(Items.InvisibilityElixir).value,ItemMetaStorage.Instance.FindByEnum(Items.Bsoda).value, ItemMetaStorage.Instance.FindByEnum(Items.Teleporter).value];
+            deadends.potentialItems = [.. Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").potentialItems.Where(i => i.selection.itemType != Items.InvisibilityElixir && i.selection.itemType != Items.Teleporter && i.selection.itemType != Items.DietBsoda)];
 
             lsubBoss = [partWhereJustHalls, roomsDuh, thesilent, deadends];
             lBoss.roomGroup = lBoss.roomGroup.AddToArray(new RoomGroup()
@@ -2615,66 +2616,6 @@ namespace BCarnellChars
 
             });
 
-            /*var _new = new GameObject("not _", typeof(AudioManager), typeof(AudioSource));
-            _new.ConvertToPrefab(false);
-            Underscore _ = _new.AddComponent<Underscore>();
-            _.audioManager = _.gameObject.AddComponent<AudioManager>();
-            _.audioSource = _.gameObject.AddComponent<AudioSource>();
-            _.faceSource = _.gameObject.AddComponent<AudioSource>();
-            _.ambience = bcppAssets.Get<LoopingSoundObject>("_");
-            var happy = bcppAssets.Get<SoundObject>("_/Talk");
-            var nothappy = bcppAssets.Get<SoundObject>("_/AngryTalk");
-            var eventalready = new UnityEngine.Events.UnityEvent();
-            eventalready.AddListener(() =>
-            {
-                if (BCPPSave.Instance.death)
-                    CoreGameManager.Instance.Quit();
-                else
-                    _.OpenPopup(true);
-            });
-            _.lineData = [new ConsoleLineData()
-            {
-                textType = ConsoleTextType.Normal,
-                text = "...",
-                characterSpeed = 0.1f,
-                characterSound = [happy]
-            },
-            new ConsoleLineData()
-            {
-                textType = ConsoleTextType.Normal,
-                text = BCPPSave.Instance.death ? "You again..." : "...",
-                characterSpeed = 0.1f,
-                characterSound = [happy]
-            },
-            new ConsoleLineData()
-            {
-                textType = ConsoleTextType.Normal,
-                text = BCPPSave.Instance.death ? "I have nothing more to show, go away." : "",
-                characterSpeed = 0.1f,
-                newScreen = true,
-                characterSound = [happy],
-                OnFinished = eventalready,
-                acceptJump = 4,
-                denyJump = 3,
-            },
-            new ConsoleLineData()
-            {
-                textType = ConsoleTextType.Normal,
-                text = "Do it...",
-                newScreen = true,
-                characterSpeed = 0.5f,
-                characterSound = [nothappy],
-                OnFinished = eventalready,
-                acceptJump = 4,
-                denyJump = 3,
-            },
-            new ConsoleLineData()
-            {
-                textType = ConsoleTextType.Normal,
-                text = "",
-                characterSpeed = 0.2f,
-                characterSound = [happy]
-            }];*/
             yield return "Finalizing...";
             GeneratorManagement.Register(this, GenerationModType.Addend, (floorName, floorNum, ld) =>
             {
@@ -3129,9 +3070,26 @@ namespace BCarnellChars
             foreach (var soda in basicobjects)
                 LevelLoaderAdds.ConvertMachineToProfitAcceptable(soda.Key, soda.Value);
             // Sugaku characters should not appear for whatever reasons...
-            lBasement.additionalNPCs = 0;
+            sBasement.additionalNPCs = 0;
             lBasement.minEvents = 0;
             lBasement.maxEvents = 0;
+            sPac.additionalNPCs = 0;
+            sPac.potentialNPCs = [];
+            lPac.minEvents = 0;
+            lPac.maxEvents = 0;
+            lPac.forcedStructures = [];
+            lPac.potentialStructures = [];
+            lPac.minSpecialBuilders = 0;
+            lPac.maxSpecialBuilders = 0;
+            lPac.minSize = new IntVector2(55, 55);
+            lPac.maxSize = lPac.minSize;
+            if (lPac is CustomLevelObject && Chainloader.PluginInfos.ContainsKey("pixelguy.pixelmodding.baldiplus.bbextracontent"))
+            {
+                var lpac = lPac as CustomLevelObject;
+                lpac.SetCustomModValue("pixelguy.pixelmodding.baldiplus.bbextracontent", "Times_EnvConfig_ExtraWindowsToSpawn", new List<object>());
+                lpac.SetCustomModValue("pixelguy.pixelmodding.baldiplus.bbextracontent", "Times_GenConfig_DisableOutside", true);
+                lpac.SetCustomModValue("pixelguy.pixelmodding.baldiplus.bbextracontent", "Times_EnvConfig_MathMachineNumballsMinMax", new IntVector2(1, 1));
+            }
         }
     }
 
