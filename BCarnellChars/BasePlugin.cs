@@ -391,6 +391,13 @@ namespace BCarnellChars
                 ]);
             bcppAssets.Add<Cubemap>("PacSkybox", AssetLoader.CubemapFromMod(this, "Texture2D", "PACVirtual.png"));
 
+            // This seems better to use...
+            float bcarnellSize = 80f;
+            bcppAssets.Add("BCarnellBoss/Walk", AssetLoader.SpritesFromSpritesheet(12, 1, bcarnellSize, Vector2.one / 2f, AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "Real B. Carnell", "RealBWalk.png")));
+            bcppAssets.Add("BCarnellBoss/SawShoot", AssetLoader.SpritesFromSpritesheet(7, 1, bcarnellSize, Vector2.one / 2f, AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "Real B. Carnell", "RealBShoot.png")));
+            bcppAssets.Add("BCarnellBoss/BoostPre", AssetLoader.SpritesFromSpritesheet(5, 1, bcarnellSize, Vector2.one / 2f, AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "Real B. Carnell", "RealBBoostPre.png")));
+            bcppAssets.Add("BCarnellBoss/Boosting", AssetLoader.SpriteFromMod(this, Vector2.one / 2f, bcarnellSize, "Texture2D", "NPCs", "Real B. Carnell", "RealBBoosting.png"));
+
             // SoundObjects
             bcppAssets.AddRange<SoundObject>([
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "Hit 15.wav"), "Nothing", SoundType.Effect, Color.white, 0f),
@@ -2257,6 +2264,15 @@ namespace BCarnellChars
                 .IgnorePlayerVisibility()
                 .SetMetaTags(["BCPP", "adv_exclusion_hammer_immunity", "boss"])
                 .Build();
+            realbcarnell.animator = realbcarnell.gameObject.AddComponent<CustomSpriteRendererAnimator>();
+            realbcarnell.animator.renderer = realbcarnell.spriteRenderer[0];
+            realbcarnell.animator.timeScale = TimeScaleType.Npc;
+            realbcarnell.animator.AddAnimation("Slap", new SpriteAnimation(12, bcppAssets.Get<Sprite[]>("BCarnellBoss/Walk")));
+            realbcarnell.animator.AddAnimation("SlapIdle", new SpriteAnimation([bcppAssets.Get<Sprite[]>("BCarnellBoss/Walk").Last()], 1f));
+            realbcarnell.animator.AddAnimation("Shoot", new SpriteAnimation(9 * 2, bcppAssets.Get<Sprite[]>("BCarnellBoss/SawShoot")));
+            realbcarnell.animator.AddAnimation("BoostPre", new SpriteAnimation(5, bcppAssets.Get<Sprite[]>("BCarnellBoss/BoostPre")));
+            realbcarnell.animator.AddAnimation("Boosting", new SpriteAnimation([bcppAssets.Get<Sprite>("BCarnellBoss/Boosting")], 1f));
+            realbcarnell.animator.AddAnimation("BoostOut", new SpriteAnimation(bcppAssets.Get<Sprite[]>("BCarnellBoss/Walk"), 0.5f));
             realbcarnell.dialIntro = [
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_Intro1.wav"), "Vfx_BCarnell_Dial", SoundType.Voice, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_Intro2.wav"), "Vfx_BCarnell_Dial", SoundType.Voice, new Color(0.01960784f, 0.3607843f, 0.7568628f)),

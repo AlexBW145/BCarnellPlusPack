@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using BCarnellChars.Characters;
+using HarmonyLib;
 using MTM101BaldAPI;
 using System.Collections.Generic;
 using System.Reflection;
@@ -87,6 +88,13 @@ namespace BCarnellChars.OtherStuff
 
         private float speed = 90;
         internal float time = 90;
+
+        internal void Initialize(BCarnellBoss boss)
+        {
+            entity.Initialize(boss.ec, transform.position);
+            entity.CopyStatusEffects(boss.Navigator.Entity);
+            ec = boss.ec;
+        }
 
         private void Update()
         {

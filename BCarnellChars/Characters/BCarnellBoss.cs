@@ -2,6 +2,7 @@
 using BCarnellChars.OtherStuff;
 using BepInEx.Bootstrap;
 using HarmonyLib;
+using MTM101BaldAPI.Components.Animation;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
@@ -55,11 +56,12 @@ namespace BCarnellChars.Characters
             _speedCurve = AccessTools.DeclaredField(typeof(Baldi), "speedCurve"),
             _slapCurve = AccessTools.DeclaredField(typeof(Baldi), "slapCurve");
         [SerializeField, HideInInspector] private Baldi baldiBase = Resources.FindObjectsOfTypeAll<Baldi>().First(x => x.name.Contains("3"));
+        [SerializeField] internal CustomSpriteRendererAnimator animator;
 
         public override void CaughtPlayer(PlayerManager player)
         {
-            CoreGameManager.Instance.audMan.PlaySingle(BasePlugin.bcppAssets.Get<SoundObject>("BCarnellBoss/LOSE/caughtlayer"));
             base.CaughtPlayer(player);
+            CoreGameManager.Instance.audMan.PlaySingle(BasePlugin.bcppAssets.Get<SoundObject>("BCarnellBoss/LOSE/caughtlayer"));
         }
 
         internal void InitPhase(B2Boss phase)
@@ -114,6 +116,8 @@ namespace BCarnellChars.Characters
         public override void Initialize()
         {
             navigator.Initialize(ec);
+            navigator.Entity.SetHeight(6.5f);
+            animator.ec = ec;
             {
                 baseAnger = 5.05f;
                 baseSpeed = 55f;
@@ -126,6 +130,7 @@ namespace BCarnellChars.Characters
             extraAnger = 2f;
             behaviorStateMachine.ChangeState(new BCarnellBoss_Chase(this, this));
             behaviorStateMachine.ChangeNavigationState(new NavigationState_WanderRandom(this, 0));
+            animator.SetDefaultAnimation("SlapIdle", 1f, true);
         }
 
         protected override void VirtualUpdate()
@@ -150,6 +155,7 @@ namespace BCarnellChars.Characters
         {
             audMan.PlaySingle(stepSnd);
             SlapRumble();
+            animator.Play("Slap", 1.5f);
         }
 
         public void Attack()
@@ -189,13 +195,21 @@ namespace BCarnellChars.Characters
             return base.DistanceCheck(val);
         }
 
+        internal void SpawnSaw()
+        {
+            var saw = Instantiate(sawbladePre, transform.position + new Vector3(0f, 2f, 0f), transform.rotation).GetComponent<Sawblades>();
+            saw.Initialize(this);
+            audMan.PlaySingle(sawShoot);
+            animator.Play("Shoot", 1f);
+        }
+
         private IEnumerator ShootingSaws(float actualTimeWillWaste = 5f, float cooldown = 7f)
         {
             var players = ec.Players;
             float time = 0.2f;
             while (actualTimeWillWaste > 0f)
             {
-                behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 1));
+                behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 127));
                 actualTimeWillWaste -= TimeScale * Time.deltaTime;
                 while (time > 0f)
                 {
@@ -204,10 +218,7 @@ namespace BCarnellChars.Characters
                     yield return null;
                 }
                 transform.rotation = Quaternion.LookRotation(players[0].transform.position - transform.position, Vector3.forward);
-                var saw = Instantiate(sawbladePre, transform.position + new Vector3(0f, 2f, 0f), transform.rotation).GetComponent<Sawblades>();
-                saw.ec = ec;
-                saw.GetComponent<Entity>().Initialize(ec, saw.transform.position);
-                audMan.PlaySingle(sawShoot);
+                SpawnSaw();
                 time = 0.08f;
                 yield return null;
             }
@@ -222,16 +233,21 @@ namespace BCarnellChars.Characters
             var players = ec.Players;
             audMan.pitchModifier = 1f + (1.6f - actualTimeWillWaste);
             audMan.QueueAudio(boostCharge, true);
+            animator.Play("BoostPre", 1f, true);
+            var speed = 1f;
             while (actualTimeWillWaste > 0f)
             {
-                behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 1));
+                behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 127));
                 actualTimeWillWaste -= TimeScale * Time.deltaTime;
+                speed = 1f + (1.6f - actualTimeWillWaste);
+                animator.ChangeSpeed(speed);
                 yield return null;
             }
             isThrusting = true;
             audMan.FlushQueue(true);
             audMan.pitchModifier = 1f;
             audMan.PlaySingle(boostGo);
+            animator.Play("Boosting", 1f, true);
             if (targetPlayer)
             {
                 ClearSoundLocations();
@@ -257,6 +273,7 @@ namespace BCarnellChars.Characters
             attackCooldown = cooldown;
             Attacking = false;
             UpdateSoundTarget();
+            animator.Play("BoostOut", 1f, false);
             yield break;
         }
     }
