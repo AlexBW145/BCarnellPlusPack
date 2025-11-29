@@ -12,3 +12,9 @@ public class RPSGuySticker : ExtendedStickerData
 internal class DummySwitcherooCheck : MonoBehaviour
 {
 }
+
+public class SecuredPacket : ExtendedStickerData
+{
+    public override bool CanBeApplied() => false;
+    public override bool CanBeCovered(StickerStateData data) => false;
+}

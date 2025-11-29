@@ -1,5 +1,6 @@
 ﻿using BepInEx.Bootstrap;
 using HarmonyLib;
+using MTM101BaldAPI;
 using MTM101BaldAPI.Registers;
 using System;
 using System.Collections;
@@ -34,7 +35,7 @@ namespace BCarnellChars.OtherStuff
             if (ec != null)
             {
                 vending = gameObject.GetComponent<SodaMachine>();
-                if (vending != null && BaseGameManager.Instance.levelObject != null)
+                if (vending != null && (CoreGameManager.Instance.sceneObject.levelObject != null || (CoreGameManager.Instance.sceneObject.randomizedLevelObject?.Length ?? 0) != 0))
                 {
                     // Conflicts begone if any other currency mod exists...
                     if ((ItemObject)_requiredItem.GetValue(vending) != Quarter)
@@ -113,7 +114,7 @@ namespace BCarnellChars.OtherStuff
             return item.itemType != Items.None || (int)_usesLeft.GetValue(vending) <= 0;
         }
 
-        public bool ClickableRequiresNormalHeight() => true;
+        public bool ClickableRequiresNormalHeight() => false;
     }
 
     public class RandomItemMachine : EnvironmentObject, IItemAcceptor // SodaMachine is only for materials, not sprite renderers.
@@ -136,12 +137,13 @@ namespace BCarnellChars.OtherStuff
 
         public void InsertItem(PlayerManager pm, EnvironmentController ec)
         {
-            StartCoroutine(Delay(pm));
+            ItemManager itm = pm.itm;
+            WeightedSelection<ItemObject>[] items = potentialItems;
+            itm.AddItem(WeightedSelection<ItemObject>.RandomSelection(items));
+
             usesLeft--;
-            if (usesLeft <= 0 && render && outOf)
-            {
+            if (usesLeft <= 0 && render != null && outOf != null)
                 render.sprite = outOf;
-            }
         }
 
         public bool ItemFits(Items checkItem)
@@ -152,14 +154,6 @@ namespace BCarnellChars.OtherStuff
             }
 
             return false;
-        }
-
-        private IEnumerator Delay(PlayerManager pm)
-        {
-            yield return null;
-            ItemManager itm = pm.itm;
-            WeightedSelection<ItemObject>[] items = potentialItems;
-            itm.AddItem(WeightedSelection<ItemObject>.RandomSelection(items));
         }
     }
 }

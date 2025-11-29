@@ -180,8 +180,10 @@ namespace BCarnellChars
                 AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "UI", "RPS_Paper.png"), 1f),
                 AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "UI", "RPS_Scissors.png"), 1f),
 
-                AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "RPS Guy", "RPSDude.png"), 100),
-                AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "RPS Guy", "RPSDead.png"), 100),
+                AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "RPS Guy", "RPSDude.png"), 100f),
+                AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "RPS Guy", "RPSDead.png"), 100f),
+                AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 100f, "Texture2D", "NPCs", "RPS Guy", "RPSDudeH.png"),
+                AssetLoader.SpriteFromMod(this,Vector2.one / 2f, 100f, "Texture2D", "NPCs", "RPS Guy", "RPSDeadH.png"),
 
                 AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "ERRORBOT_ITEMSTEALER", "error-botBody", "error-botBody-1.png"), errorbodySpriteSize),
                 AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "ERRORBOT_ITEMSTEALER", "error-botBody", "error-botBody-2.png"), errorbodySpriteSize),
@@ -232,6 +234,7 @@ namespace BCarnellChars
                 AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "Items", "TASERPulse_Large.png"), 50f),
                 AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 1f, "Texture2D", "Items", "AnyportalMan_Small.png"),
                 AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 50f, "Texture2D", "Items", "AnyportalMan_Large.png"),
+                AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 50f, "Texture2D", "Items", "SecuredLockPacket.png"),
 
                 AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "randommachine_bcmac.png"), 25f),
                 AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromMod(this, "Texture2D", "randommachine_out_bcmac.png"), 25f),
@@ -240,6 +243,7 @@ namespace BCarnellChars
                 AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 1f, "Texture2D", "Stickers", "RockPaperScissorsSticker.png"),
                 AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 1f, "Texture2D", "Stickers", "ERBOTSticker.png"),
                 AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 1f, "Texture2D", "Stickers", "PortalManSticker.png"),
+                AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 1f, "Texture2D", "Stickers", "StickerPacketSecured.png"),
                 ],
                 [
                     "RPSUI/Border",
@@ -249,6 +253,8 @@ namespace BCarnellChars
 
                     "RPSGuy/Alive",
                     "RPSGuy/Dead",
+                    "RPSGuyH/Alive",
+                    "RPSGuyH/Dead",
 
                     "ERRORBOT/Body1",
                     "ERRORBOT/Body2",
@@ -299,6 +305,7 @@ namespace BCarnellChars
                     "Items/TASERPulse_Large",
                     "Items/AnyportalMan_Small",
                     "Items/AnyportalMan_Large",
+                    "Items/SecuredPacket",
 
                     "Structures/RandomMachine",
                     "Structures/RandomMachine_OutOfGoods",
@@ -306,7 +313,8 @@ namespace BCarnellChars
                     "Stickers/Switcherquartprofit",
                     "Stickers/RockPaperScissorsSticker",
                     "Stickers/ERBOTSticker",
-                    "Stickers/PortalManSticker"
+                    "Stickers/PortalManSticker",
+                    "Stickers/StickerPacketSecured"
                 ]);
             for (int frame = 1; frame <= 7; frame++) // Moving Frames
             {
@@ -740,6 +748,8 @@ namespace BCarnellChars
             rpsguy.audMan = rpsguy.gameObject.GetComponents<PropagatedAudioManager>()[0];
             rpsguy.alive = bcppAssets.Get<Sprite>("RPSGuy/Alive");
             rpsguy.dead = bcppAssets.Get<Sprite>("RPSGuy/Dead");
+            rpsguy.aliveH = bcppAssets.Get<Sprite>("RPSGuyH/Alive");
+            rpsguy.deadH = bcppAssets.Get<Sprite>("RPSGuyH/Dead");
 
             rpsguy.audCongrats = [bcppAssets.Get<SoundObject>("RPSGuy/LostGame"), bcppAssets.Get<SoundObject>("RPSGuy/LostGameQuote2")];
             rpsguy.audYouLose = bcppAssets.Get<SoundObject>("RPSGuy/WonGame");
@@ -1192,12 +1202,13 @@ namespace BCarnellChars
             yield return "Initializing Unsecured Key";
             // Something evil is brewing inside!
             ItemObject swingingdoorInfKey = new ItemBuilder(Info)
-                .SetItemComponent<ITM_Acceptable>()
+                .SetItemComponent<ITM_UnsecuredKey>()
                 .SetNameAndDescription("Itm_UnsecuredKey", "Desc_UnsecuredKey")
                 .SetSprites(bcppAssets.Get<Sprite>("Items/UnsecuredKey_Small"), bcppAssets.Get<Sprite>("Items/UnsecuredKey_Large"))
                 .SetEnum("UnsecuredYellowKey")
                 .SetShopPrice(1110)
                 .SetGeneratorCost(50)
+                .SetAsNotOverridable()
                 .SetMeta(ItemFlags.MultipleUse, ["BCPP", "technology"])
                 .Build(); //ObjectCreators.CreateItemObject("Itm_UnsecuredKey", "Desc_UnsecuredKey", bcppAssets.Get<Sprite>("Items/UnsecuredKey_Small"), bcppAssets.Get<Sprite>("Items/UnsecuredKey_Large"), EnumExtensions.ExtendEnum<Items>("UnsecuredYellowKey"), 110, 50);
             swingingdoorInfKey.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("item", EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey"));
@@ -1421,6 +1432,7 @@ namespace BCarnellChars
                 ]);
 
             yield return "Initializing Stickers";
+            MiscPatches.bcppStickerPack = EnumExtensions.ExtendEnum<StickerPackType>("BCPP");
             StickerPatches.switcherooSticker = new StickerBuilder<ExtendedStickerData>(Info)
                 .SetSprite(bcppAssets.Get<Sprite>("Stickers/Switcherquartprofit"))
                 .SetEnum("Switcherquartprofit")
@@ -1458,6 +1470,22 @@ namespace BCarnellChars
             anyportalGuy.item.GetComponent<ITM_AnyportalGuy>().destroySnd = portalman.teleport;
             anyportalGuy.item.GetComponent<ITM_AnyportalGuy>().wrongPlacement = anyportal.item.GetComponent<ITM_AnyportalOutput>().wrongPlacement;
             bcppAssets.Add<ItemObject>("Items/AnyportalGuy", anyportalGuy);
+            StickerPatches.securedPacket = new StickerBuilder<SecuredPacket>(Info)
+                .SetSprite(bcppAssets.Get<Sprite>("Stickers/StickerPacketSecured"))
+                .SetEnum("SecuredPacket")
+                .SetDuplicateOddsMultiplier(0)
+                .Build().sticker;
+            var stickerPacket = new ItemBuilder(Info)
+                .SetNameAndDescription("StickerTitle_SecuredPacket", "Desc_SecuredPacket")
+                .SetSprites(bcppAssets.Get<Sprite>("Items/SecuredPacket"), bcppAssets.Get<Sprite>("Items/SecuredPacket"))
+                .SetShopPrice(150)
+                .SetAsInstantUse()
+                .SetEnum(Items.StickerPack)
+                .SetItemComponent<ITM_StickerPack>()
+                .Build();
+            MiscPatches._securedPacket = stickerPacket;
+            MiscPatches.securedPacket = EnumExtensions.ExtendEnum<StickerPackType>("SecuredBCPP");
+            ((ITM_StickerPack)stickerPacket.item).ReflectionSetVariable("type", MiscPatches.securedPacket);
 
             yield return "Initializing v1.1 new stuff";
             // The Basement
@@ -1468,16 +1496,17 @@ namespace BCarnellChars
                 .AddLooker()
                 .AddTrigger()
                 //.IgnoreBelts()
+                .SetWanderEnterRooms()
                 .IgnorePlayerOnSpawn()
                 .AddSpawnableRoomCategories(RoomCategory.Hall, RoomCategory.Office)
                 .SetPoster(ObjectCreators.CreatePosterObject(Resources.FindObjectsOfTypeAll<Texture2D>().ToList().Find(x => x.name == "Transparent" && x.isReadable), []))
                 .SetMinMaxAudioDistance(50f, 300f)
                 .SetAudioTimescaleType(TimeScaleType.Npc)
+                .IgnorePlayerVisibility()
                 .SetForcedSubtitleColor(new Color(0.3089626f, 0.1634033f, 0.6792453f, 1f))
                 .SetMetaTags(["BCPP", "adv_exclusion_hammer_immunity"]) // Why do you not check the LevelObject from the SceneObject from the CoreGameManager??
                 .Build(); //ObjectCreators.CreateNPC<PrototypeBot>("PrototypeBot-01", EnumExtensions.ExtendEnum<Character>("PrototypeBot"), ObjectCreators.CreatePosterObject(Resources.FindObjectsOfTypeAll<Texture2D>().ToList().Find(x => x.name == "Transparent"), []), spawnableRooms: [RoomCategory.Hall, RoomCategory.Office], maxAudioDistance: 400f);
             prototypeBot.audMan = prototypeBot.gameObject.GetComponent<AudioManager>();
-            prototypeBot.looker.ReflectionSetVariable("ignorePlayerVisibility", true);
             prototypeBot.spriteRenderer[0].sprite = bcppAssets.Get<Sprite>("PrototypeBot-01/Idle");
             prototypeBot.spriteRenderer[0].transform.localPosition = new Vector3(0f, 0f, 0f);
             prototypeBot.animator = prototypeBot.gameObject.AddComponent<CustomSpriteRendererAnimator>();
@@ -1539,10 +1568,10 @@ namespace BCarnellChars
             Ambience ambObj = Instantiate(managRef.GetComponentInChildren<Ambience>(), basementManager.transform);
             basementManager.ReflectionSetVariable("ambience", ambObj);
             basementManager.overlay = Instantiate(Resources.FindObjectsOfTypeAll<Gum>().ToList().First().transform.Find("GumOverlay").gameObject, basementManager.transform).GetComponent<Canvas>();
-            basementManager.overlay.transform.Find("Image").GetComponent<Image>().sprite = bcppAssets.Get<Sprite>("PrototypeBot-01/Jumpscare");
             basementManager.overlayAnimator = basementManager.overlay.gameObject.AddComponent<CustomImageAnimator>();
             basementManager.overlayAnimator.image = basementManager.overlay.transform.Find("Image").GetComponent<Image>();
             basementManager.overlayAnimator.useScaledTime = false;
+            basementManager.overlayAnimator.image.sprite = Resources.FindObjectsOfTypeAll<Sprite>().Last(x => x.name == "Transparent");
             List<Sprite> jump1 = new List<Sprite>();
             for (int frame = 0; frame <= 10; frame++) // Jumpscare 1
                 jump1.Add(bcppAssets.Get<Sprite>("PrototypeBot-01/Jumpscare01_" + frame));
@@ -1644,8 +1673,10 @@ namespace BCarnellChars
                 };
             }
             lBasement.roomGroup.First(x => x.name == "Class").potentialRooms = lBasement.roomGroup.First(x => x.name == "Class").potentialRooms.Where(x => x.selection.activity.prefab is MathMachine).ToArray();
+            lBasement.roomGroup.First(x => x.name == "Class").stickToHallChance = 1f;
             lBasement.roomGroup.First(x => x.name == "Faculty").minRooms = 10;
             lBasement.roomGroup.First(x => x.name == "Faculty").maxRooms = 14;
+            lBasement.roomGroup.First(x => x.name == "Faculty").stickToHallChance = 1f;
             lBasement.hallWallTexs = lBasement.hallWallTexs.AddToArray(new()
             {
                 weight = 100,
@@ -1694,7 +1725,7 @@ namespace BCarnellChars
             lBasement.minSpecialRooms = 2;
             lBasement.maxSpecialRooms = 2;
             lBasement.specialRoomsStickToEdge = true;
-            lBasement.potentialSpecialRooms = [.. ((WeightedRoomAsset[])Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").potentialSpecialRooms.Clone()).Where(x => x.selection.name.ToLower().Contains("cafet"))];
+            lBasement.potentialSpecialRooms = ((WeightedRoomAsset[])Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").potentialSpecialRooms.Clone()).Where(x => x.selection.name.ToLower().Contains("cafet")).ToArray();
             //lBasement.windowChance = 0.5f;
 
             lBasement.lightMode = LightMode.Greatest;
@@ -1966,6 +1997,7 @@ namespace BCarnellChars
                 .AddSpawnableRoomCategories(RoomCategory.Null)
                 .SetMetaTags(["PAC75"])
                 .Build();
+            Red.audman = Red.GetComponent<AudioManager>();
             Red.Speed = 19f;
             Red.potentialRoomAssets = [new() { selection = ghostroom, weight = int.MaxValue }];
 
@@ -1981,6 +2013,7 @@ namespace BCarnellChars
                 .AddSpawnableRoomCategories(RoomCategory.Null)
                 .SetMetaTags(["PAC75"])
                 .Build();
+            Cyan.audman = Cyan.GetComponent<AudioManager>();
             Cyan.Speed = 15f;
 
             var Orange = new NPCBuilder<PAC75Ghost>(Info)
@@ -1995,6 +2028,7 @@ namespace BCarnellChars
                 .AddSpawnableRoomCategories(RoomCategory.Null)
                 .SetMetaTags(["PAC75"])
                 .Build();
+            Orange.audman = Orange.GetComponent<AudioManager>();
             Orange.Speed = 14f;
 
             var Pink = new NPCBuilder<PAC75Ghost>(Info)
@@ -2009,6 +2043,7 @@ namespace BCarnellChars
                 .AddSpawnableRoomCategories(RoomCategory.Null)
                 .SetMetaTags(["PAC75"])
                 .Build();
+            Pink.audman = Pink.GetComponent<AudioManager>();
             Pink.Speed = 19f;
 
             /*RoomAsset emptyRoom = ScriptableObject.CreateInstance<RoomAsset>(); // This is very stupid.
@@ -2204,7 +2239,6 @@ namespace BCarnellChars
                 .SetLevelNumber(2)
                 .SetNPCSpawnMode(GameManagerNPCAutomaticSpawn.OnSpawnExit)
                 .Build();
-            bossManager.ReflectionSetVariable("destroyOnLoad", true);
             bossManager.CurrentLevel = 2;
 
             var realbcarnell = new NPCBuilder<BCarnellBoss>(Info)
@@ -2220,6 +2254,7 @@ namespace BCarnellChars
                 .SetMinMaxAudioDistance(10f, 300f)
                 .SetWanderEnterRooms()
                 .SetAudioTimescaleType(TimeScaleType.Npc)
+                .IgnorePlayerVisibility()
                 .SetMetaTags(["BCPP", "adv_exclusion_hammer_immunity", "boss"])
                 .Build();
             realbcarnell.dialIntro = [
@@ -2230,7 +2265,6 @@ namespace BCarnellChars
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_Intro5.wav"), "Vfx_BCarnell_Dial", SoundType.Voice, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_Intro6.wav"), "Vfx_BCarnell_Dial", SoundType.Voice, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
                 ];
-            realbcarnell.looker.ReflectionSetVariable("ignorePlayerVisibility", true);
             GameObject sawblade = Instantiate(Resources.FindObjectsOfTypeAll<ITM_BSODA>().ToList().Find(x => x.name == "ITM_BSODA")).gameObject;
             sawblade.name = "Sawblade";
             Destroy(sawblade.GetComponent<ITM_BSODA>());
@@ -2281,7 +2315,23 @@ namespace BCarnellChars
                 selection = taserpulse,
                 weight = 75
             });
-            lBoss.roomGroup = [..lBoss.roomGroup.Where(x => x.name.ToLower().Contains("facult") || x.name.ToLower().Contains("offic") || x.name == "LockedRoom")];
+            roomg = lBasement.roomGroup.Where(x => x.name.ToLower().Contains("facult") || x.name.ToLower().Contains("offic") || x.name == "LockedRoom").ToArray();
+            lBoss.roomGroup = new RoomGroup[roomg.Length];
+            for (int i = 0; i < roomg.Length; i++)
+            {
+                lBoss.roomGroup[i] = new RoomGroup()
+                {
+                    ceilingTexture = roomg[i].ceilingTexture.Clone() as WeightedTexture2D[],
+                    wallTexture = roomg[i].wallTexture.Clone() as WeightedTexture2D[],
+                    floorTexture = roomg[i].floorTexture.Clone() as WeightedTexture2D[],
+                    light = roomg[i].light,
+                    maxRooms = roomg[i].maxRooms,
+                    minRooms = roomg[i].minRooms,
+                    name = roomg[i].name,
+                    potentialRooms = roomg[i].potentialRooms.Clone() as WeightedRoomAsset[],
+                    stickToHallChance = roomg[i].stickToHallChance
+                };
+            }
             lBoss.roomGroup.First(x => x.name.ToLower().Contains("facult")).wallTexture = [new WeightedTexture2D()
             {
                 selection = bcppAssets.Get<Texture2D>("Boss/PlasticWall"),
@@ -2296,9 +2346,10 @@ namespace BCarnellChars
             lBoss.roomGroup.First(x => x.name.ToLower().Contains("facult")).maxRooms = 67;
             //lBoss.windowChance = 0.2f;
             lBoss.roomGroup.First(x => x.name.ToLower().Contains("offic")).minRooms = lBoss.roomGroup.First(x => x.name.ToLower().Contains("offic")).maxRooms = 0;
-            lBasement.roomGroup.First(x => x.name == "LockedRoom").minRooms = lBasement.roomGroup.First(x => x.name == "LockedRoom").maxRooms = 6;
+            lBoss.roomGroup.First(x => x.name == "LockedRoom").minRooms = lBoss.roomGroup.First(x => x.name == "LockedRoom").maxRooms = 6;
             lBoss.minSpecialRooms = 3;
             lBoss.maxSpecialRooms = 4;
+            lBoss.specialRoomsStickToEdge = false;
             lBoss.potentialSpecialRooms = lBoss.potentialSpecialRooms.AddRangeToArray([
             new WeightedRoomAsset()
             {
@@ -2352,6 +2403,10 @@ namespace BCarnellChars
                     weight = 90
                 }
             ]);*/
+            lBoss.additionTurnChance += 9;
+            lBoss.bridgeTurnChance += 9;
+            lBoss.minReplacementHalls += 8;
+            lBoss.maxReplacementHalls += 11;
             lBoss.forcedStructures.First(x => x.parameters.prefab.ToList().Exists(x => x.selection.name.ToLower() == "DietSodaMachine".ToLower())).parameters.prefab = [.. lBoss.forcedStructures.First(x => x.parameters.prefab.ToList().Exists(x => x.selection.name.ToLower() == "DietSodaMachine".ToLower())).parameters.prefab.Where(x => x.selection.name.ToLower() != "DietSodaMachine".ToLower())];
             lBoss.potentialStructures = [.. lBoss.potentialStructures.Where(x => x.selection.prefab is not Structure_PowerLever)];
             lBoss.minPlotSize = 2;
@@ -2365,6 +2420,8 @@ namespace BCarnellChars
             lBoss.maxSize = new IntVector2(90, 95);
             lBoss.finalLevel = true;
             lBoss.timeOutEvent = null;
+            lBoss.maxItemValue = 900 * 4;
+            lBoss.duplicateItemWeightReduction = 0.50f;
 
             sBoss = ScriptableObject.CreateInstance<SceneObject>();
             sBoss.name = "BasementLevel_Boss";
@@ -2963,7 +3020,10 @@ namespace BCarnellChars
                         levelobject.SetCustomModValue("pixelguy.pixelmodding.baldiplus.bbextracontent", "Times_EnvConfig_MathMachineNumballsMinMax", new IntVector2(12, 18));
                     }
                     if (ld == sBasement)
+                    {
                         levelobject.roomGroup.First(x => x.name == "Class").potentialRooms = levelobject.roomGroup.First(x => x.name == "Class").potentialRooms.Where(x => x.selection.activity.prefab is MathMachine).ToArray();
+                        levelobject.potentialSpecialRooms = levelobject.potentialSpecialRooms.Where(x => x.selection.name.ToLower().Contains("cafet")).ToArray();
+                    }
                 }
                 else if (ld == sPac)
                 {
@@ -2971,14 +3031,14 @@ namespace BCarnellChars
                     ld.additionalNPCs = 0;
                     ld.potentialNPCs = [];
                     ld.forcedNpcs = [Red, Cyan, Orange, Pink];
-                    ld.levelObject.minEvents = 0;
-                    ld.levelObject.maxEvents = 0;
-                    ld.levelObject.forcedStructures = [];
-                    ld.levelObject.potentialStructures = [];
-                    ld.levelObject.minSpecialBuilders = 0;
-                    ld.levelObject.maxSpecialBuilders = 0;
-                    ld.levelObject.minSize = new IntVector2(75, 75);
-                    ld.levelObject.maxSize = ld.levelObject.minSize;
+                    levelobject.minEvents = 0;
+                    levelobject.maxEvents = 0;
+                    levelobject.forcedStructures = [];
+                    levelobject.potentialStructures = [];
+                    levelobject.minSpecialBuilders = 0;
+                    levelobject.maxSpecialBuilders = 0;
+                    levelobject.minSize = new IntVector2(55, 55);
+                    levelobject.maxSize = levelobject.minSize;
                     if (Chainloader.PluginInfos.ContainsKey("pixelguy.pixelmodding.baldiplus.bbextracontent"))
                     {
                         levelobject.SetCustomModValue("pixelguy.pixelmodding.baldiplus.bbextracontent", "Times_EnvConfig_ExtraWindowsToSpawn", new List<object>());
@@ -2987,24 +3047,6 @@ namespace BCarnellChars
                     }
                 }
             });
-            sPac.additionalNPCs = 0;
-            sPac.potentialNPCs = [];
-            sPac.forcedNpcs = [Red, Cyan, Orange, Pink];
-            lPac.minEvents = 0;
-            lPac.maxEvents = 0;
-            lPac.forcedStructures = [];
-            lPac.potentialStructures = [];
-            lPac.minSpecialBuilders = 0;
-            lPac.maxSpecialBuilders = 0;
-            lPac.minSize = new IntVector2(55, 55);
-            lPac.maxSize = lPac.minSize;
-            var levelobject = sPac.levelObject as CustomLevelObject;
-            if (Chainloader.PluginInfos.ContainsKey("pixelguy.pixelmodding.baldiplus.bbextracontent"))
-            {
-                levelobject.SetCustomModValue("pixelguy.pixelmodding.baldiplus.bbextracontent", "Times_EnvConfig_ExtraWindowsToSpawn", new List<object>());
-                levelobject.SetCustomModValue("pixelguy.pixelmodding.baldiplus.bbextracontent", "Times_GenConfig_DisableOutside", true);
-                levelobject.SetCustomModValue("pixelguy.pixelmodding.baldiplus.bbextracontent", "Times_EnvConfig_MathMachineNumballsMinMax", new IntVector2(1, 1));
-            }
             ModdedSaveSystem.AddSaveLoadAction(this, (isSave, path) =>
             {
 #if DEBUG

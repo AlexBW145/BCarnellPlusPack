@@ -4,6 +4,7 @@ using HarmonyLib;
 using MTM101BaldAPI;
 using MTM101BaldAPI.Registers;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using TMPro;
@@ -31,7 +32,7 @@ namespace BCarnellChars.Patches
         [HarmonyPatch(typeof(Activity), "Completed", [typeof(int)]), HarmonyPrefix]
         static bool BasementGet(int player, ref Notebook ___notebook, Activity __instance, ref bool ___bonusMode, ref bool ___completed)
         {
-            if (__instance.GetType().Equals(typeof(MathMachine)) && !___bonusMode && BasementGameManager.BasementInstance != null)
+            if (__instance is not NoActivity && !___bonusMode && BasementGameManager.BasementInstance != null)
             {
                 ___completed = true;
                 ___notebook.Hide(true);
@@ -55,9 +56,10 @@ namespace BCarnellChars.Patches
         {
             if (ec.Npcs.Find(x => x.GetComponent<PrototypeBot>()))
             {
-                ec.Npcs.Find(x => x.GetComponent<PrototypeBot>()).gameObject.GetComponent<PrototypeBot>().StopAllCoroutines();
-                ec.Npcs.Find(x => x.GetComponent<PrototypeBot>()).gameObject.GetComponent<PrototypeBot>().StartCoroutine(
-                    ec.Npcs.Find(x => x.GetComponent<PrototypeBot>()).gameObject.GetComponent<PrototypeBot>().StunHearing(___time));
+                var proto = ec.Npcs.Find(x => x.GetComponent<PrototypeBot>()).gameObject.GetComponent<PrototypeBot>();
+                proto.StopAllCoroutines();
+                proto.StartCoroutine(
+                    proto.StunHearing(___time));
             }
         }
 
@@ -169,9 +171,75 @@ paint.NET, Anim8or, Audacity, Firealpaca, GIMP, Photopea, TTSMP3 (prior to v1.1.
             if (CoreGameManager.Instance.nextLevel != null && CoreGameManager.Instance.nextLevel.GetMeta()?.tags.Contains("b-route") == true && CoreGameManager.Instance.nextLevel.levelNo < CoreGameManager.Instance.lastLevelNumber)
                 StickerManager.Instance.ClearAppliedStickers();
         }
+
+        internal static StickerPackType bcppStickerPack, securedPacket;
+        [HarmonyPatch(typeof(StickerManager), nameof(StickerManager.GiveRandomStickers)), HarmonyPostfix]
+        static void GetBCPPStickers(WeightedSticker[] potentialStickers, StickerPackType packType, int amount, bool openNow, StickerManager __instance, ref List<WeightedSticker> ____potentialStickersToAdd)
+        {
+            if (packType == bcppStickerPack)
+                __instance.GiveBCPPRandomStickers(____potentialStickersToAdd, potentialStickers, amount, openNow, false);
+            else if (packType == securedPacket)
+                __instance.GiveSecuredPacket();
+        }
+
+        internal static ItemObject _securedPacket;
+        [HarmonyPatch(typeof(StoreRoomFunction), "Restock"), HarmonyPostfix]
+        static void ChanceOfBonus(StoreRoomFunction __instance, ref Pickup[] ___stickerPickup, ref PriceTag[] ___stickerTag)
+        {
+            System.Random rng = new System.Random();
+            var bonusPacket = ItemMetaStorage.Instance.FindByEnum(Items.StickerPack).itemObjects.First(x => x.name == "StickerPack_Bonus");
+            for (int j = 0; j < ___stickerPickup.Length; j++)
+            {
+                if (___stickerPickup[j].gameObject.activeSelf && ___stickerPickup[j].item == bonusPacket
+                    && rng.NextDouble() < (double)0.35f)
+                {
+                    if (___stickerPickup[j].GetComponent<Animator>() != null)
+                        ___stickerPickup[j].GetComponent<Animator>().enabled = false;
+                    ___stickerPickup[j].AssignItem(_securedPacket);
+                    ___stickerPickup[j].price = ___stickerPickup[j].item.price;
+                    ___stickerTag[j].SetText(___stickerPickup[j].price.ToString());
+                    ___stickerPickup[j].gameObject.SetActive(true);
+                    ___stickerPickup[j].showDescription = true;
+                }
+                else if (___stickerPickup[j].item == bonusPacket && ___stickerPickup[j].GetComponent<Animator>() != null)
+                    ___stickerPickup[j].GetComponent<Animator>().enabled = true;
+            }
+        }
     }
 
-    
+    public static class BCPPStickerStuff
+    {
+        public static void GiveBCPPRandomStickers(this StickerManager __instance, List<WeightedSticker> _potentialStickersToAdd, WeightedSticker[] potentialStickers, int amount, bool openNow, bool sticky)
+        {
+            _potentialStickersToAdd.Clear();
+            var potentialBCPPStickers = new List<WeightedSticker>();
+            foreach (WeightedSticker weightedSticker in potentialStickers)
+            {
+                if (weightedSticker.selection == StickerPatches.rpsSticker
+                    || weightedSticker.selection == StickerPatches.stealerSticker
+                    || weightedSticker.selection == StickerPatches.anyportalSticker
+                    || weightedSticker.selection == StickerPatches.switcherooSticker)
+                    continue;
+                else
+                    _potentialStickersToAdd.Add(new WeightedSticker(weightedSticker.selection, Mathf.RoundToInt((float)weightedSticker.weight * __instance.GetStickerOddsMultiplier(weightedSticker.selection))));
+            }
+            potentialBCPPStickers.AddRange([
+                new WeightedSticker(StickerPatches.rpsSticker, Mathf.RoundToInt(100f * __instance.GetStickerOddsMultiplier(StickerPatches.rpsSticker))),
+                new WeightedSticker(StickerPatches.stealerSticker, Mathf.RoundToInt(100f * __instance.GetStickerOddsMultiplier(StickerPatches.stealerSticker))),
+                new WeightedSticker(StickerPatches.anyportalSticker, Mathf.RoundToInt(100f * __instance.GetStickerOddsMultiplier(StickerPatches.anyportalSticker))),
+                new WeightedSticker(StickerPatches.switcherooSticker, Mathf.RoundToInt(100f * __instance.GetStickerOddsMultiplier(StickerPatches.switcherooSticker))),
+                ]);
+
+            __instance.AddSticker(potentialBCPPStickers.RandomSelection(), openNow, sticky, openNow);
+            for (int j = 0; j < amount; j++)
+                __instance.AddSticker(_potentialStickersToAdd.RandomSelection(), openNow, sticky, openNow);
+        }
+
+        public static void GiveSecuredPacket(this StickerManager __instance)
+        {
+            __instance.AddSticker(StickerPatches.securedPacket, true, false, false);
+        }
+    }
 
     [ConditionalPatchNoMod("pixelguy.pixelmodding.baldiplus.moddedmodesapi"), HarmonyPatch(typeof(MainMenu), "Start")]
     class DoneForDay

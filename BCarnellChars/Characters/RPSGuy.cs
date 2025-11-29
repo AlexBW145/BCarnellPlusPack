@@ -1,15 +1,19 @@
-﻿using MTM101BaldAPI;
-using UnityEngine;
-using BCarnellChars.Characters.States;
+﻿using BCarnellChars.Characters.States;
 using BCarnellChars.OtherStuff;
-using System.Linq;
 using BCarnellChars.Patches;
+using MTM101BaldAPI;
+using System;
+using System.Linq;
+using UnityEngine;
 
 namespace BCarnellChars.Characters
 {
     public class RPSGuy : NPC, IItemAcceptor
     {
-        [SerializeField] internal Sprite alive, dead;
+        [SerializeField] internal Sprite alive, dead, aliveH, deadH;
+        private bool IsSeasonal => DateTime.Now.Month == 10;
+        internal Sprite AliveSpr => IsSeasonal ? aliveH : alive;
+        internal Sprite DeadSpr => IsSeasonal ? deadH : dead;
 
         private RockPaperScissors curRPS;
         [SerializeField] internal RockPaperScissors rpsPre;
@@ -43,6 +47,7 @@ namespace BCarnellChars.Characters
         public override void Initialize()
         {
             this.ChangeRadarColor();
+            spriteRenderer[0].sprite = AliveSpr;
             base.Initialize();
             streakPoints = StreakInitTotal;
             behaviorStateMachine.ChangeState(new RPSGuy_Wandering(this, this));
@@ -120,7 +125,7 @@ namespace BCarnellChars.Characters
         {
             if (isDead)
             {
-                spriteRenderer[0].sprite = alive;
+                spriteRenderer[0].sprite = AliveSpr;
                 isDead = false;
                 navigator.maxSpeed = normSpeed;
                 navigator.SetSpeed(normSpeed);
@@ -158,7 +163,7 @@ namespace BCarnellChars.Characters
             behaviorStateMachine.ChangeState(new RPSGuy_Cooldown(this, this, 30f));
             audMan.FlushQueue(true);
             audMan.PlaySingle(audDestroyed);
-            spriteRenderer[0].sprite = dead;
+            spriteRenderer[0].sprite = DeadSpr;
             navigator.maxSpeed = 0f;
             navigator.SetSpeed(0f);
         }

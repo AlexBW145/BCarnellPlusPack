@@ -28,17 +28,6 @@ namespace BCarnellChars.Characters.States
                     rpsGuy.StartRPS(component);
                 }
             }
-            else if (other.CompareTag("NPC") && isValid)
-            {
-                switch (other.GetComponent<NPC>().Character)
-                {
-                    case Character.Prize:
-                        FirstPrize prize = other.GetComponent<FirstPrize>();
-                        if (!rpsGuy.Dead && prize.Navigator.speed >= prize.slamSpeed)
-                            rpsGuy.fuckingDies();
-                        break;
-                }
-            }
         }
 
         public override void DestinationEmpty()

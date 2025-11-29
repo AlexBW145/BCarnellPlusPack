@@ -11,7 +11,11 @@ namespace BCarnellChars.Characters
 {
     public class BCarnellBoss : Baldi
     {
-        [SerializeField] internal AudioManager audMan;
+        internal AudioManager audMan
+        {
+            get => AudMan;
+            set => _audMan.SetValue(this, value);
+        }
         [SerializeField] internal GameObject sawbladePre;
 
         [SerializeField] internal SoundObject stepSnd, boostCharge, boostGo, sawShoot;
@@ -21,11 +25,17 @@ namespace BCarnellChars.Characters
         public bool AbleToAttack => attackCooldown <= 0f;
         public bool Attacking { get; private set; }
 
-        [SerializeField]
-        internal AnimationCurve speedCurve = new AnimationCurve(), slapCurve = new AnimationCurve();
+        internal AnimationCurve speedCurve
+        {
+            get => (AnimationCurve)_speedCurve.GetValue(this);
+            set => _speedCurve.SetValue(this, value);
+        }
+        internal AnimationCurve slapCurve
+        {
+            get => (AnimationCurve)_slapCurve.GetValue(this);
+            set => _slapCurve.SetValue(this, value);
+        }
 
-        public new float Delay => slapCurve.Evaluate(anger + extraAnger);
-        public new float Speed => speedCurve.Evaluate(anger) + baseSpeed + extraAnger;
         private bool isThrusting = false;
         internal enum B2Boss
         {
@@ -39,7 +49,8 @@ namespace BCarnellChars.Characters
         [SerializeField] internal B2Boss phases { get; private set; } = B2Boss.Phase0;
         [SerializeField] internal SoundObject[] dialIntro;
 
-        private static FieldInfo
+        private static readonly FieldInfo
+            _audMan = AccessTools.DeclaredField(typeof(Baldi), "audMan"),
             _smoothMove = AccessTools.DeclaredField(typeof(Baldi), "smoothMove"),
             _speedCurve = AccessTools.DeclaredField(typeof(Baldi), "speedCurve"),
             _slapCurve = AccessTools.DeclaredField(typeof(Baldi), "slapCurve");
@@ -288,7 +299,7 @@ namespace BCarnellChars.Characters.States
                 bcarnell.UpdateSoundTarget();
         }
 
-        protected static FieldInfo
+        protected static readonly FieldInfo
             _hiddenByLight = AccessTools.DeclaredField(typeof(PlayerManager), "hiddenByLight"),
             _hides = AccessTools.DeclaredField(typeof(Entity), "hides");
         protected bool IsActuallyHidden(PlayerManager player)
@@ -308,7 +319,7 @@ namespace BCarnellChars.Characters.States
             if (door.locked)
             {
                 door.Unlock();
-                door.OpenTimed(5f, makeNoise: false);
+                door.OpenTimed(5f, false);
             }
             else
             {
@@ -319,11 +330,13 @@ namespace BCarnellChars.Characters.States
 
     public class BCarnellBoss_Speaking : BCarnellBoss_StateBase
     {
+        private static readonly FieldInfo _audTimescale = AccessTools.DeclaredField(typeof(PropagatedAudioManager), "pitchTimeScaleType");
         public BCarnellBoss_Speaking(NPC npc, BCarnellBoss carnell) : base(npc, carnell) { }
 
         public override void Enter()
         {
             base.Enter();
+            _audTimescale.SetValue(bcarnell.audMan, TimeScaleType.Null);
             bcarnell.Navigator.Entity.SetTrigger(false);
             bcarnell.Navigator.Entity.SetFrozen(true);
         }
@@ -331,6 +344,7 @@ namespace BCarnellChars.Characters.States
         public override void Exit()
         {
             base.Exit();
+            _audTimescale.SetValue(bcarnell.audMan, TimeScaleType.Npc);
             bcarnell.Navigator.Entity.SetTrigger(true);
             bcarnell.Navigator.Entity.SetFrozen(false);
         }

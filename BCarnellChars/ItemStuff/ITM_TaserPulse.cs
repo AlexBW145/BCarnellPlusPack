@@ -13,11 +13,9 @@ namespace BCarnellChars.ItemStuff
         [SerializeField] internal LayerMask mask;
         [SerializeField] internal Material mat;
         [SerializeField] internal SoundObject use;
-        private MovementModifier mod = new MovementModifier(-Vector3.one, 0.4f);
 
         public override bool Use(PlayerManager pm)
         {
-            mod.movementAddend = pm.transform.forward;
             CoreGameManager.Instance.audMan.PlaySingle(use);
             chain = gameObject.AddComponent<LineRenderer>();
             chain.material = mat;
@@ -61,7 +59,6 @@ namespace BCarnellChars.ItemStuff
                         furthestPos = 0f;
                         flag++;
                         cast[j].transform.gameObject.GetComponent<AudioManager>()?.PlaySingle(BasePlugin.bcppAssets.Get<SoundObject>("Items/TASERPulse/Effect"));
-                        cast[j].transform.gameObject.GetComponent<ActivityModifier>()?.moveMods.Add(mod);
                         var npc = cast[j].transform.gameObject.GetComponent<NPC>();
                         npc.StartCoroutine(MoveModTime(npc));
                         pm.RuleBreak("Drinking", 9f);
@@ -81,11 +78,14 @@ namespace BCarnellChars.ItemStuff
         IEnumerator MoveModTime(NPC npc)
         {
             float time = 17f;
+            var mod = new MovementModifier(default, 0.2f);
+            npc.Navigator.Entity.ExternalActivity.moveMods.Add(mod);
             while (time > 0)
             {
                 if (npc == null)
                     yield break;
                 time -= 1f * (Time.deltaTime * npc.ec.EnvironmentTimeScale);
+                mod.movementAddend = -(npc.transform.forward * 0.4f);
                 yield return null;
             }
             if (npc == null)

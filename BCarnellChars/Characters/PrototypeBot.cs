@@ -21,10 +21,22 @@ namespace BCarnellChars.Characters
         public WeightedSoundObject[] loseSounds => jumpscares;
         [SerializeField] internal SoundObject faststompSnd, impatientSnd, ceilingclimbSnd, stunnedSnd;
 
-        private Action[] mechFuncts => [
-            SneakySnitch,
-            CeilingClimb,
-            DoorPrank
+        private WeightedSelection<Action>[] mechFuncts => [
+            new WeightedSelection<Action>()
+            {
+                selection = SneakySnitch,
+                weight = 111,
+            },
+            new WeightedSelection<Action>()
+            {
+                selection = CeilingClimb,
+                weight = 100,
+            },
+            new WeightedSelection<Action>()
+            {
+                selection = DoorPrank,
+                weight = 99,
+            }
             ];
 
         internal PlayerManager[] players => ec.Players;
@@ -58,10 +70,10 @@ namespace BCarnellChars.Characters
             for (int k = 0; k < CoreGameManager.Instance.setPlayers; k++)
                 Debug.Log("Distance between PrototypeBot-01 & player"+k+ ": " + Vector3.Distance(transform.position, players[k].transform.position));
 #endif
-            if (!behaviorStateMachine.currentState.GetType().Equals(typeof(PrototypeBot_Stunned)))
+            if (behaviorStateMachine.currentState is not PrototypeBot_Stunned)
             {
                 audMan.FlushQueue(true);
-                mechFuncts[Mathf.RoundToInt(UnityEngine.Random.Range(0f, mechFuncts.Length - 1f))].Invoke();
+                WeightedSelection<Action>.RandomSelection(mechFuncts).Invoke();
             }
         }
         public virtual IEnumerator StunHearing(float time)
@@ -74,7 +86,7 @@ namespace BCarnellChars.Characters
             audMan.maintainLoop = false;
             yield return new WaitForSecondsEnvironmentTimescale(ec, time);
             audMan.FlushQueue(true);
-            mechFuncts[Mathf.RoundToInt(UnityEngine.Random.Range(0f, mechFuncts.Length - 1f))].Invoke();
+            WeightedSelection<Action>.RandomSelection(mechFuncts).Invoke();
         }
 
         // Action Functions
@@ -120,7 +132,7 @@ namespace BCarnellChars.Characters.States
     {
         protected PrototypeBot prototypebot;
         protected internal bool flagged = false; // Was the bot teleporting infront of you a threat?
-        protected static FieldInfo 
+        protected static readonly FieldInfo 
             _hiddenByLight = AccessTools.DeclaredField(typeof(PlayerManager), "hiddenByLight"),
             _hides = AccessTools.DeclaredField(typeof(Entity), "hides");
         protected bool IsActuallyHidden(PlayerManager player)
@@ -245,8 +257,8 @@ namespace BCarnellChars.Characters.States
             int attempts = 0;
             while (!flag && attempts < maxattempts)
             {
-                List<Cell> hall = npc.ec.FindHallways()[UnityEngine.Random.RandomRangeInt(0, npc.ec.FindHallways().Count - 1)];
-                npc.Navigator.Entity.Teleport(hall[Mathf.RoundToInt(UnityEngine.Random.Range(0, hall.Count - 1))].CenterWorldPosition);
+                List<Cell> hall = npc.ec.mainHall.cells;
+                npc.Navigator.Entity.Teleport(hall[Mathf.RoundToInt(UnityEngine.Random.Range(0f, hall.Count - 1))].CenterWorldPosition);
                 flag = true;
                 attempts++;
                 if (!flag)
@@ -265,7 +277,10 @@ namespace BCarnellChars.Characters.States
                 return;
             elaspedTime += Time.deltaTime * npc.TimeScale;
             if (elaspedTime >= 55f)
+            {
                 prototypebot.MechFunctInvoke();
+                return;
+            }
             if (player.plm.Entity.CurrentRoom?.type != RoomType.Hall || IsActuallyHidden(player)) // Is this fair enough??
             {
                 if (npc.Navigator.HasDestination && npc.ec.CellFromPosition(player.transform.position)?.room?.type != RoomType.Hall
@@ -273,8 +288,8 @@ namespace BCarnellChars.Characters.States
                     npc.Navigator.ClearDestination();
                 if (!npc.Navigator.HasDestination || npc.ec.CellFromPosition(npc.Navigator.CurrentDestination)?.room?.type != RoomType.Hall)
                 {
-                    List<Cell> hall = npc.ec.FindHallways()[UnityEngine.Random.RandomRangeInt(0, npc.ec.FindHallways().Count - 1)];
-                    ChangeNavigationState(new NavigationState_TargetPosition(npc, 99, hall[Mathf.RoundToInt(UnityEngine.Random.Range(0, hall.Count - 1))].CenterWorldPosition));
+                    List<Cell> hall = npc.ec.mainHall.cells;
+                    ChangeNavigationState(new NavigationState_TargetPosition(npc, 99, hall[Mathf.RoundToInt(UnityEngine.Random.Range(0f, hall.Count - 1))].CenterWorldPosition));
                 }
                 return;
             }
@@ -297,7 +312,7 @@ namespace BCarnellChars.Characters.States
                 bool flag = false;
                 while (!flag)
                 {
-                    List<Cell> hall = npc.ec.FindHallways()[UnityEngine.Random.RandomRangeInt(0, npc.ec.FindHallways().Count - 1)];
+                    List<Cell> hall = npc.ec.mainHall.cells;
                     npc.Navigator.Entity.Teleport(hall[Mathf.RoundToInt(UnityEngine.Random.Range(0, hall.Count - 1))].CenterWorldPosition);
                     flag = true;
                     if (!flag)
@@ -311,10 +326,10 @@ namespace BCarnellChars.Characters.States
 
         public override void DestinationEmpty()
         {
-            if (player.plm.Entity.CurrentRoom?.type != RoomType.Hall | player.Invisible) // Is this fair enough??
+            if (player.plm.Entity.CurrentRoom?.type != RoomType.Hall | IsActuallyHidden(player)) // Is this fair enough??
             {
-                List<Cell> hall = npc.ec.FindHallways()[UnityEngine.Random.RandomRangeInt(0, npc.ec.FindHallways().Count - 1)];
-                ChangeNavigationState(new NavigationState_TargetPosition(npc, 99, hall[Mathf.RoundToInt(UnityEngine.Random.Range(0, hall.Count - 1))].CenterWorldPosition));
+                List<Cell> hall = npc.ec.mainHall.cells;
+                ChangeNavigationState(new NavigationState_TargetPosition(npc, 99, hall[Mathf.RoundToInt(UnityEngine.Random.Range(0f, hall.Count - 1))].CenterWorldPosition));
             }
         }
 
@@ -372,8 +387,8 @@ namespace BCarnellChars.Characters.States
             int attempts = 0;
             while (!flag & attempts < maxattempts)
             {
-                List<Cell> hall = npc.ec.FindHallways()[UnityEngine.Random.RandomRangeInt(0, npc.ec.FindHallways().Count - 1)];
-                npc.Navigator.Entity.Teleport(hall[Mathf.RoundToInt(UnityEngine.Random.Range(0, hall.Count - 1))].CenterWorldPosition);
+                List<Cell> hall = npc.ec.mainHall.cells;
+                npc.Navigator.Entity.Teleport(hall[Mathf.RoundToInt(UnityEngine.Random.Range(0f, hall.Count - 1))].CenterWorldPosition);
                 flag = true;
                 attempts++;
                 for (int k = 0; k < CoreGameManager.Instance.setPlayers; k++)
@@ -386,9 +401,10 @@ namespace BCarnellChars.Characters.States
             }
             if (attempts >= maxattempts)
                 prototypebot.MechFunctInvoke();
+            else
+                flagged = false;
             npc.Navigator.Entity.SetTrigger(true);
-            player = prototypebot.players[Mathf.RoundToInt(UnityEngine.Random.Range(0, prototypebot.players.Length - 1))];
-            flagged = false;
+            player = prototypebot.players[Mathf.RoundToInt(UnityEngine.Random.Range(0f, prototypebot.players.Length - 1))];
         }
 
         private PlayerManager player;
@@ -397,7 +413,10 @@ namespace BCarnellChars.Characters.States
             if (player)
             {
                 if (player.plm.Entity.CurrentRoom?.type != RoomType.Hall)
+                {
                     prototypebot.MechFunctInvoke();
+                    return;
+                }
                 else
                     ChangeNavigationState(new NavigationState_TargetPlayer(npc, 99, player.transform.position));
                 if (npc.looker.PlayerInSight())
@@ -438,39 +457,43 @@ namespace BCarnellChars.Characters.States
             int attempts = 0;
             while (!flag && attempts < maxattempts)
             {
-                List<Cell> hall = npc.ec.FindHallways()[UnityEngine.Random.RandomRangeInt(0, npc.ec.FindHallways().Count - 1)];
-                npc.Navigator.Entity.Teleport(hall[Mathf.RoundToInt(UnityEngine.Random.Range(0, hall.Count - 1))].CenterWorldPosition);
+                List<Cell> hall = npc.ec.mainHall.cells;
+                npc.Navigator.Entity.Teleport(hall[Mathf.RoundToInt(UnityEngine.Random.Range(0f, hall.Count - 1))].CenterWorldPosition);
                 flag = true;
                 attempts++;
                 if (!flag)
                     break;
-                if (Vector3.Distance(npc.transform.position, prototypebot.players[0].transform.position) <= ((200f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)) ||
-                    Vector3.Distance(npc.transform.position, prototypebot.players[0].transform.position) > ((250f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)))
+                if (Vector3.Distance(npc.transform.position, player.transform.position) > ((250f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z))
+                    || Vector3.Distance(npc.transform.position, player.transform.position) <= ((180f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)))
                     flag = false;
             }
             npc.Navigator.Entity.SetTrigger(true);
             if (attempts >= maxattempts)
                 prototypebot.MechFunctInvoke();
-            flagged = false;
+            else
+                flagged = false;
         }
 
         public override void Update()
         {
             float distance = Vector3.Distance(npc.transform.position, player.transform.position);
-            if (distance <= ((200f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)))
+            if (distance <= ((250f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)))
             {
                 if (!IsActuallyHidden(player))
                     ChangeNavigationState(new NavigationState_TargetPlayer(npc, 99, player.transform.position));
                 else
                     ChangeNavigationState(new NavigationState_WanderRandom(npc, 100));
-                if (distance < ((80f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)) && !npc.looker.IsVisible && !prototypebot.AudMan.QueuedAudioIsPlaying)
+                if (distance < ((180f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)) && !npc.looker.IsVisible && !prototypebot.AudMan.QueuedAudioIsPlaying)
                     prototypebot.AudMan.Pause(false);
             }
             else
+            {
                 prototypebot.MechFunctInvoke();
-            if (distance >= ((35f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)) && !npc.looker.IsVisible)
+                return;
+            }
+            if (distance >= ((45f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)) && !npc.looker.IsVisible)
                 npc.Navigator.SetSpeed(25f);
-            else if (!flagged && ((distance < 65f && npc.looker.IsVisible) || distance < 29f) && npc.looker.PlayerInSight())
+            else if (!flagged && ((distance < ((45f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)) && npc.looker.IsVisible) || distance < ((29f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z))) && npc.looker.PlayerInSight())
             {
                 if (readyEnumerator == null)
                 {
@@ -478,7 +501,7 @@ namespace BCarnellChars.Characters.States
                     prototypebot.StartCoroutine(readyEnumerator);
                 }
             }
-            else
+            else if (npc.looker.IsVisible)
             {
                 npc.Navigator.SetSpeed(0f);
                 if (prototypebot.AudMan.QueuedAudioIsPlaying)
@@ -551,7 +574,7 @@ namespace BCarnellChars.Characters.States
                 peek.Add(room);
             }
             if (peek.Count > 0) {
-                npc.Navigator.Entity.Teleport(npc.ec.RealRoomMid(peek[Mathf.RoundToInt(UnityEngine.Random.Range(0, peek.Count - 1))]));
+                npc.Navigator.Entity.Teleport(npc.ec.RealRoomMid(peek[Mathf.RoundToInt(UnityEngine.Random.Range(0f, peek.Count - 1))]));
                 float nearest = float.PositiveInfinity;
                 foreach (var tile in npc.Navigator.Entity.CurrentRoom?.AllTilesNoGarbage(false, true))
                 {
@@ -565,10 +588,10 @@ namespace BCarnellChars.Characters.States
                         }
                     }
                 }
+                flagged = false;
             }
             else
                 prototypebot.MechFunctInvoke();
-            flagged = false;
         }
 
         public override void Update()
@@ -580,7 +603,10 @@ namespace BCarnellChars.Characters.States
             float doorDist = Vector3.Distance(nearestDoor.transform.position, prototypebot.players[0].transform.position);
             Physics.Raycast(nearestDoor.transform.position, prototypebot.players[0].transform.position - nearestDoor.transform.position, out RaycastHit playerHit, float.PositiveInfinity, LayerMask.GetMask("Default", "Player"), QueryTriggerInteraction.Ignore);
             if (distance >= ((260f + Mathf.Min(npc.ec.levelSize.x, npc.ec.levelSize.z)) - Mathf.Max(npc.ec.levelSize.x, npc.ec.levelSize.z)) || passedTime >= (20f * BaseGameManager.Instance.FoundNotebooks))
+            {
                 prototypebot.MechFunctInvoke();
+                return;
+            }
             if ((doorDist < 30f | playerHit.transform.CompareTag("Player")) & !flagged)
             {
                 var pm = playerHit.transform.GetComponent<PlayerManager>();
@@ -597,7 +623,11 @@ namespace BCarnellChars.Characters.States
 
         public override void PlayerInSight(PlayerManager player)
         {
-            prototypebot.StartCoroutine(IsReady(player.transform.position));
+            if (readyEnumerator == null)
+            {
+                readyEnumerator = IsReady(player.transform.position);
+                prototypebot.StartCoroutine(readyEnumerator);
+            }
         }
 
         internal override IEnumerator IsReady(Vector3 pos)

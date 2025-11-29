@@ -12,7 +12,7 @@ namespace BCarnellChars.Characters
         public new float Speed;
         private float increaseSpeed = 0.1f;
         public float NewSpeed => Speed + increaseSpeed;
-        [SerializeField] private AudioManager audman;
+        [SerializeField] internal AudioManager audman;
         public new AudioManager AudMan => audman;
         public Vector3 home { get; internal set; }
 
@@ -25,7 +25,6 @@ namespace BCarnellChars.Characters
 
         void Awake()
         {
-            audman = GetComponent<AudioManager>();
             loseSounds = Resources.FindObjectsOfTypeAll<Baldi>().Last().loseSounds;
             spriteRenderer[0].sprite = craftersSprite;
         }

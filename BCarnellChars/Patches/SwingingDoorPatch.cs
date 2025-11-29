@@ -37,7 +37,7 @@ namespace BCarnellChars.Patches
         }
     }
 
-    [HarmonyPatch(typeof(ItemManager), "UseItem"), HarmonyPriority(Priority.VeryHigh)]
+    [HarmonyPatch(typeof(ItemManager), nameof(ItemManager.UseItem)), HarmonyPriority(Priority.VeryHigh)]
     class NeverRemoveDat
     {
         static bool Prefix(ItemManager __instance, ref bool ___disabled) 
@@ -45,7 +45,9 @@ namespace BCarnellChars.Patches
             // Infinite Uses!!
             if ((!___disabled || (__instance.items[__instance.selectedItem].overrideDisabled && __instance.maxItem >= 0)) && __instance.items[__instance.selectedItem].itemType == EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey"))
             {
-                MonoBehaviour.Instantiate(__instance.items[__instance.selectedItem].item).Use(__instance.pm);
+                Item item = GameObject.Instantiate(__instance.items[__instance.selectedItem].item);
+                item.Use(__instance.pm);
+                item?.PostUse(__instance.pm);
                 //__instance.StartCoroutine(delay(__instance.pm));
                 return false;
             }

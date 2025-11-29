@@ -183,7 +183,7 @@ namespace BCarnellChars.OtherStuff
             }
         }
 
-        public override int CurrentStickerLevel() => 1;
+        public override int CurrentStickerLevel() => -1;
 
         protected override void LoadSceneObject(SceneObject sceneObject, bool restarting)
         {

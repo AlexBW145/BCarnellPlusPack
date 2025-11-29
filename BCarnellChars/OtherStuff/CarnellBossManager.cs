@@ -198,7 +198,7 @@ namespace BCarnellChars.OtherStuff
             singleton = null;
         }
 
-        public override int CurrentStickerLevel() => 2;
+        public override int CurrentStickerLevel() => -2;
 
         protected override void ExitedSpawn()
         {

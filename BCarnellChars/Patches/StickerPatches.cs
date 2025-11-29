@@ -2,6 +2,7 @@
 using BCarnellChars.OtherStuff;
 using HarmonyLib;
 using MTM101BaldAPI.Registers;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,7 +11,7 @@ namespace BCarnellChars.Patches;
 [HarmonyPatch]
 internal class StickerPatches
 {
-    internal static Sticker anyportalSticker, stealerSticker, rpsSticker, switcherooSticker;
+    internal static Sticker anyportalSticker, stealerSticker, rpsSticker, switcherooSticker, securedPacket;
     internal static Items anyportalItem, profitCard;
     internal static ItemObject mrAnyportal;
     internal static System.Random anyportalRNG, stealerRNG;
@@ -115,94 +116,81 @@ internal class StickerPatches
 
     //\n\nEvery stack increases 0.1 value of the conversion\nwhere profit cards will return more quarters and profit cards will accept less quarters
     // Unused desc part ^^^
-    private static bool isPostuse = false;
-    [HarmonyPatch(typeof(ITM_Acceptable), nameof(ITM_Acceptable.PostUse)), HarmonyPrefix]
-    private static void IsPostuse() => isPostuse = true;
     [HarmonyPatch(typeof(ITM_Acceptable), nameof(ITM_Acceptable.Use)), HarmonyPrefix]
-    private static void IsUse() => isPostuse = false;
-
-    [HarmonyPatch(typeof(SodaMachine), nameof(SodaMachine.ItemFits)), HarmonyPostfix]
-    private static void SwitcherooAcceptor(Items checkItem, SodaMachine __instance, ItemObject ___requiredItem, int ___usesLeft, ref bool __result)
+    static bool SwitcherooUse(PlayerManager pm, ref bool __result, Items ___item, ref RaycastHit ___hit, ref IItemAcceptor[] ____acceptors, LayerMaskObject ___layerMask)
     {
-        if (StickerManager.Instance.StickerValue(switcherooSticker) > 0)
+        if (StickerManager.Instance.StickerValue(switcherooSticker) <= 0
+            || (___item != profitCard && ___item != Items.Quarter)) return true;
+        if (Physics.Raycast(pm.transform.position, CoreGameManager.Instance.GetCamera(pm.playerNumber).transform.forward, out ___hit, pm.pc.Reach, ___layerMask.mask))
         {
-            if (___requiredItem.itemType == Items.Quarter && checkItem == profitCard)
+            ____acceptors = ___hit.transform.GetComponents<IItemAcceptor>();
+            IItemAcceptor[] acceptors = ____acceptors;
+            foreach (IItemAcceptor itemAcceptor in acceptors)
             {
-                __result = ___usesLeft > 0;
-                if (___usesLeft > 0 && isPostuse)
+                if (itemAcceptor != null)
                 {
-                    Cell cell = __instance.Ec.CellFromPosition(__instance.transform.position);
-                    __instance.Ec.CreateItem(cell.room, ___requiredItem, new(cell.CenterWorldPosition.x, cell.CenterWorldPosition.z));
+                    var instance = ___hit.transform;
+                    if (itemAcceptor.ItemFits(profitCard) && ___item == Items.Quarter)
+                    {
+                        if (instance.GetComponent<DummySwitcherooCheck>() == null)
+                            instance.gameObject.AddComponent<DummySwitcherooCheck>();
+                        else
+                            GameObject.DestroyImmediate(instance.GetComponent<DummySwitcherooCheck>());
+                        __result = true;
+                        return false;
+                    }
+                    else if (itemAcceptor.ItemFits(Items.Quarter) && ___item == profitCard)
+                    {
+                        __result = true;
+                        return false;
+                    }
                 }
             }
-            else if (___requiredItem.itemType == profitCard && checkItem == Items.Quarter)
+        }
+        return true;
+    }
+    [HarmonyPatch(typeof(ITM_Acceptable), nameof(ITM_Acceptable.PostUse)), HarmonyPrefix]
+    static bool SwitcherooPostUse(PlayerManager pm, ITM_Acceptable __instance, Items ___item, IItemAcceptor[] ____acceptors, ref RaycastHit ___hit, SoundObject ___audUse)
+    {
+        if (StickerManager.Instance.StickerValue(switcherooSticker) <= 0
+            || (___item != profitCard && ___item != Items.Quarter)) return true;
+        IItemAcceptor[] acceptors = ____acceptors;
+        foreach (IItemAcceptor itemAcceptor in acceptors)
+        {
+            if (itemAcceptor != null)
             {
-                if (___usesLeft > 0 && !isPostuse)
+                var instance = ___hit.transform;
+                if (itemAcceptor.ItemFits(profitCard) && ___item == Items.Quarter)
                 {
-                    if (__instance.GetComponent<DummySwitcherooCheck>() == null)
-                        __instance.gameObject.AddComponent<DummySwitcherooCheck>();
-                    else
-                        GameObject.DestroyImmediate(__instance.GetComponent<DummySwitcherooCheck>());
-                    __result = true;
+                    if (instance.GetComponent<DummySwitcherooCheck>() == null)
+                        itemAcceptor.InsertItem(pm, pm.ec);
+                    GameObject.Destroy(__instance.gameObject);
+                    if (___audUse != null)
+                    {
+                        CoreGameManager.Instance.audMan.PlaySingle(___audUse);
+                    }
+                    return false;
                 }
-                else if (___usesLeft > 0 && isPostuse)
-                    __result = true;
-                else
-                    __result = false;
-            }
-        }
-        if (!isPostuse && checkItem != Items.Quarter && ___requiredItem.itemType == checkItem && __instance.GetComponent<DummySwitcherooCheck>() != null)
-            GameObject.DestroyImmediate(__instance.GetComponent<DummySwitcherooCheck>());
-    }
-    [HarmonyPatch(typeof(SodaMachine), nameof(SodaMachine.InsertItem)), HarmonyPrefix]
-    private static bool SwitcherooDoNot(SodaMachine __instance) => __instance.GetComponent<DummySwitcherooCheck>() == null;
-
-    [HarmonyPatch(typeof(TapePlayer), nameof(TapePlayer.ItemFits)), HarmonyPostfix]
-    static void SwitcherooPayphone(Items checkItem, TapePlayer __instance, Items ___requiredItem, bool ___active, ref bool __result)
-    {
-        if (StickerManager.Instance.StickerValue(switcherooSticker) > 0)
-        {
-            if (___requiredItem == Items.Quarter && checkItem == profitCard)
-            {
-                __result = !___active;
-                if (!___active && isPostuse)
-                    __instance.gameObject.AddComponent<DummySwitcherooCheck>();
-            }
-        }
-    }
-    [HarmonyPatch(typeof(TapePlayer), nameof(TapePlayer.InsertItem)), HarmonyPostfix]
-    static void PayphoneBack(PlayerManager player, EnvironmentController ec, TapePlayer __instance, Items ___requiredItem)
-    {
-        if (__instance.GetComponent<DummySwitcherooCheck>() != null && ___requiredItem == Items.Quarter)
-        {
-            player.itm.SetItem(ItemMetaStorage.Instance.FindByEnum(___requiredItem).value, player.itm.selectedItem);
-            GameObject.DestroyImmediate(__instance.GetComponent<DummySwitcherooCheck>());
-        }
-    }
-    [HarmonyPatch(typeof(RandomItemMachine), nameof(RandomItemMachine.ItemFits)), HarmonyPostfix]
-    static void GamblerSwitcheroo(Items checkItem, RandomItemMachine __instance, ItemObject ___requiredItem, int ___usesLeft, ref bool __result)
-    {
-        if (StickerManager.Instance.StickerValue(switcherooSticker) > 0)
-        {
-            if (___requiredItem.itemType == profitCard && checkItem == Items.Quarter)
-            {
-                if (___usesLeft > 0 && !isPostuse)
+                else if (itemAcceptor.ItemFits(Items.Quarter) && ___item == profitCard)
                 {
-                    if (__instance.GetComponent<DummySwitcherooCheck>() == null)
-                        __instance.gameObject.AddComponent<DummySwitcherooCheck>();
-                    else
-                        GameObject.DestroyImmediate(__instance.GetComponent<DummySwitcherooCheck>());
-                    __result = true;
+                    var quarter = ItemMetaStorage.Instance.FindByEnum(Items.Quarter).value;
+                    int slot = pm.itm.selectedItem;
+                    pm.itm.SetItem(quarter, slot);
+                    itemAcceptor.InsertItem(pm, pm.ec);
+                    if (pm.itm.items[slot] != quarter)
+                    {
+                        Cell cell = pm.ec.CellFromPosition(instance.transform.position);
+                        pm.ec.CreateItem(cell.room, quarter, new(cell.CenterWorldPosition.x, cell.CenterWorldPosition.z));
+                    }
+                    GameObject.Destroy(__instance.gameObject);
+                    if (___audUse != null)
+                    {
+                        CoreGameManager.Instance.audMan.PlaySingle(___audUse);
+                    }
+                    return false;
                 }
-                else if (___usesLeft > 0 && isPostuse)
-                    __result = true;
-                else
-                    __result = false;
             }
         }
-        if (!isPostuse && checkItem != Items.Quarter && ___requiredItem.itemType == checkItem && __instance.GetComponent<DummySwitcherooCheck>() != null)
-            GameObject.DestroyImmediate(__instance.GetComponent<DummySwitcherooCheck>());
+        return true;
     }
-    [HarmonyPatch(typeof(RandomItemMachine), nameof(RandomItemMachine.InsertItem)), HarmonyPrefix]
-    private static bool GamblerSwitcherooDoNot(RandomItemMachine __instance) => __instance.GetComponent<DummySwitcherooCheck>() == null;
 }
