@@ -62,7 +62,7 @@ namespace BCarnellChars.ItemStuff
             readyToUse = true;
             particle.Stop();
             MaterialModifier.ChangeHole(quad.GetComponent<MeshRenderer>(), mask, quad.GetComponent<MeshRenderer>().materials[1]);
-            MaterialModifier.SetBase(quad.GetComponent<MeshRenderer>(), BasePlugin.bcppAssets.Get<RenderTexture>("MrPortalMan/ManCamRender"));
+            MaterialModifier.SetBase(quad.GetComponent<MeshRenderer>(), BCPPPlugin.bcppAssets.Get<RenderTexture>("MrPortalMan/ManCamRender"));
         }
 
         private static FieldInfo

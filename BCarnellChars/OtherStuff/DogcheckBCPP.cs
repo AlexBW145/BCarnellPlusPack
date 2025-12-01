@@ -31,7 +31,7 @@ internal class DogcheckBCPP : MonoBehaviour
         var canvas = CreateCanvas("DogcheckCanvas", 10, new Vector2(480, 360), 100f, true);
         canvas.transform.SetParent(transform);
         canvas.gameObject.AddComponent<RawImage>().color = new Color(0.1f, 0.1f, 0.1f);
-        canvas.gameObject.GetComponent<RawImage>().texture = BasePlugin.bcppAssets.Get<Texture2D>("Boss/BlueBrickWall");
+        canvas.gameObject.GetComponent<RawImage>().texture = BCPPPlugin.bcppAssets.Get<Texture2D>("Boss/BlueBrickWall");
         var bg = new GameObject("ImgBG", typeof(RectTransform)).GetComponent<RectTransform>();
         bg.gameObject.layer = LayerMask.NameToLayer("UI");
         bg.transform.SetParent(canvas.transform);

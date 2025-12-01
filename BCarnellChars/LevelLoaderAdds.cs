@@ -17,24 +17,24 @@ internal static class LevelLoaderAdds
     {
         LevelLoaderPlugin.Instance.npcAliases.AddRange(new Dictionary<string, NPC>()
         {
-            { "rpsguy", BasePlugin.bcppAssets.Get<NPC>("NPCs/RPS Guy") },
-            { "errorbot", BasePlugin.bcppAssets.Get<NPC>("NPCs/ERROR-BOT_ITEM-STEALER") },
-            { "siegecanoncart", BasePlugin.bcppAssets.Get <NPC>("NPCs/Siege Cannon Cart") },
-            { "mrportalman", BasePlugin.bcppAssets.Get <NPC>("NPCs/Mr Portal Man") },
-            { "mrrobber", BasePlugin.bcppAssets.Get <NPC>("NPCs/Mr Robber") }
+            { "rpsguy", BCPPPlugin.bcppAssets.Get<NPC>("NPCs/RPS Guy") },
+            { "errorbot", BCPPPlugin.bcppAssets.Get<NPC>("NPCs/ERROR-BOT_ITEM-STEALER") },
+            { "siegecanoncart", BCPPPlugin.bcppAssets.Get <NPC>("NPCs/Siege Cannon Cart") },
+            { "mrportalman", BCPPPlugin.bcppAssets.Get <NPC>("NPCs/Mr Portal Man") },
+            { "mrrobber", BCPPPlugin.bcppAssets.Get <NPC>("NPCs/Mr Robber") }
         });
         LevelLoaderPlugin.Instance.itemObjects.AddRange(new Dictionary<string, ItemObject>()
         {
-            { "profitcard", BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard") },
-            { "bhammer", BasePlugin.bcppAssets.Get<ItemObject>("Items/BHammer") },
-            { "unsecuredyellowkey", BasePlugin.bcppAssets.Get<ItemObject>("Items/UnsecuredKey") },
-            { "securedyellowlock", BasePlugin.bcppAssets.Get<ItemObject>("Items/SecuredLock") },
-            { "anyportaloutput", BasePlugin.bcppAssets.Get<ItemObject>("Items/AnyportalOutput") },
-            { "taserpulse", BasePlugin.bcppAssets.Get<ItemObject>("Items/TASERPulse") }
+            { "profitcard", BCPPPlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard") },
+            { "bhammer", BCPPPlugin.bcppAssets.Get<ItemObject>("Items/BHammer") },
+            { "unsecuredyellowkey", BCPPPlugin.bcppAssets.Get<ItemObject>("Items/UnsecuredKey") },
+            { "securedyellowlock", BCPPPlugin.bcppAssets.Get<ItemObject>("Items/SecuredLock") },
+            { "anyportaloutput", BCPPPlugin.bcppAssets.Get<ItemObject>("Items/AnyportalOutput") },
+            { "taserpulse", BCPPPlugin.bcppAssets.Get<ItemObject>("Items/TASERPulse") }
         });
-        LevelLoaderPlugin.Instance.tileBasedObjectPrefabs.Add("inflocked", BasePlugin.bcppAssets.Get<SecuredSwingingDoor>("Obstacles/SecuredSwingingDoor").GetComponent<SwingDoor>());
-        LevelLoaderPlugin.Instance.basicObjects.Add("bcpp_randomitemmachine", BasePlugin.bcppAssets.Get<GameObject>("Structures/RandomItemMachine"));
-        LevelLoaderPlugin.Instance.skyboxAliases.Add("pac75", BasePlugin.bcppAssets.Get<Cubemap>("PacSkybox"));
+        LevelLoaderPlugin.Instance.tileBasedObjectPrefabs.Add("inflocked", BCPPPlugin.bcppAssets.Get<SecuredSwingingDoor>("Obstacles/SecuredSwingingDoor").GetComponent<SwingDoor>());
+        LevelLoaderPlugin.Instance.basicObjects.Add("bcpp_randomitemmachine", BCPPPlugin.bcppAssets.Get<GameObject>("Structures/RandomItemMachine"));
+        LevelLoaderPlugin.Instance.skyboxAliases.Add("pac75", BCPPPlugin.bcppAssets.Get<Cubemap>("PacSkybox"));
     }
 
     private static FieldInfo requiredItem = AccessTools.DeclaredField(typeof(SodaMachine), "requiredItem");
@@ -50,15 +50,15 @@ internal static class LevelLoaderAdds
         GameObject sodaProfitCard = GameObject.Instantiate(soda, MTM101BaldiDevAPI.prefabTransform).gameObject;
         sodaProfitCard.name = soda.name + " (ProfitCard)";
         GameObject.Destroy(sodaProfitCard.GetComponent<ToProfitCardCost>());
-        requiredItem.SetValue(sodaProfitCard.GetComponent<SodaMachine>(), BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard"));
-        sodaProfitCard.GetComponent<MeshRenderer>().materials = sodaProfitCard.GetComponent<MeshRenderer>().GetMaterialArray().AddToArray(BasePlugin.profitCardInsert);
+        requiredItem.SetValue(sodaProfitCard.GetComponent<SodaMachine>(), BCPPPlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard"));
+        sodaProfitCard.GetComponent<MeshRenderer>().materials = sodaProfitCard.GetComponent<MeshRenderer>().GetMaterialArray().AddToArray(BCPPPlugin.profitCardInsert);
         if (Chainloader.PluginInfos.ContainsKey("pixelguy.pixelmodding.baldiplus.pixelinternalapi")) // Not again...
             if (sodaProfitCard.GetComponent(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
                         .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent")) != null)
                 AccessTools.Field(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
                 .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent"), "requiredItems")
                 .SetValue(sodaProfitCard.GetComponent(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
-                .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent")), new List<Items> { BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard").itemType });
+                .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent")), new List<Items> { BCPPPlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard").itemType });
         LevelLoaderPlugin.Instance.basicObjects.Add(name + "_profit", sodaProfitCard);
         profitconverted.Add(name);
         // Bugfix!! The object always appear for some reason after cloning, but it shouldn't do that, right??
@@ -70,10 +70,10 @@ internal static class LevelLoaderAdds
     {
         LevelLoaderPlugin.Instance.basicObjects.AddRange(new Dictionary<string, GameObject>()
         {
-            { "b2platform_sideways", BasePlugin.bcppAssets.Get<GameObject>("B2Platform/Sideways") },
-            { "b2platform_corner", BasePlugin.bcppAssets.Get<GameObject>("B2Platform/Corner") },
-            { "b2platform_oneside", BasePlugin.bcppAssets.Get<GameObject>("B2Platform/OneSide") },
-            { "b2platform_open", BasePlugin.bcppAssets.Get<GameObject>("B2Platform/Open") }
+            { "b2platform_sideways", BCPPPlugin.bcppAssets.Get<GameObject>("B2Platform/Sideways") },
+            { "b2platform_corner", BCPPPlugin.bcppAssets.Get<GameObject>("B2Platform/Corner") },
+            { "b2platform_oneside", BCPPPlugin.bcppAssets.Get<GameObject>("B2Platform/OneSide") },
+            { "b2platform_open", BCPPPlugin.bcppAssets.Get<GameObject>("B2Platform/Open") }
         });
     }
 }

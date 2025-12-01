@@ -31,7 +31,7 @@ namespace BCarnellChars.ItemStuff
                     IItemAcceptor[] components = hit.transform.GetComponents<IItemAcceptor>();
                     foreach (IItemAcceptor itemAcceptor in components)
                     {
-                        if (itemAcceptor.ItemFits(BasePlugin.bcppAssets.Get<ItemObject>("Items/BHammer").itemType) && !accepted)
+                        if (itemAcceptor.ItemFits(BCPPPlugin.bcppAssets.Get<ItemObject>("Items/BHammer").itemType) && !accepted)
                         {
                             itemAcceptor.InsertItem(pm, pm.ec);
                             accepted = true;
@@ -57,7 +57,7 @@ namespace BCarnellChars.ItemStuff
                         component.Unlock();
                         component.OpenTimed(10f, true);
                         accepted = true;
-                        component.transform.GetComponentInChildren<AudioManager>()?.PlaySingle(BasePlugin.bcppAssets.Get<SoundObject>("Items/UnsafeHammer/DestroyDoor"));
+                        component.transform.GetComponentInChildren<AudioManager>()?.PlaySingle(BCPPPlugin.bcppAssets.Get<SoundObject>("Items/UnsafeHammer/DestroyDoor"));
                     }
                 }
                 else if (hit.transform.gameObject.GetComponent<CoinDoor>() != null)
@@ -71,9 +71,9 @@ namespace BCarnellChars.ItemStuff
             if (accepted)
             {
                 if (duration > 1 && duration <= 3 && !instaDestroy)
-                    pm.itm.SetItem(duration == 2 ? BasePlugin.bcppAssets.Get<ItemObject>("Items/BHammerLow") : BasePlugin.bcppAssets.Get<ItemObject>("Items/BHammerMid"), pm.itm.selectedItem);
+                    pm.itm.SetItem(duration == 2 ? BCPPPlugin.bcppAssets.Get<ItemObject>("Items/BHammerLow") : BCPPPlugin.bcppAssets.Get<ItemObject>("Items/BHammerMid"), pm.itm.selectedItem);
                 else if (duration <= 1 || instaDestroy)
-                    CoreGameManager.Instance.audMan.PlaySingle(BasePlugin.bcppAssets.Get<SoundObject>("Items/UnsafeHammer/DurationBreak")); 
+                    CoreGameManager.Instance.audMan.PlaySingle(BCPPPlugin.bcppAssets.Get<SoundObject>("Items/UnsafeHammer/DurationBreak")); 
                 return (duration <= 1 || instaDestroy);
             }
             return false;

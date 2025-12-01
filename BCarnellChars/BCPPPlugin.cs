@@ -17,6 +17,7 @@ using MTM101BaldAPI.Reflection;
 using MTM101BaldAPI.Registers;
 using MTM101BaldAPI.Registers.Buttons;
 using MTM101BaldAPI.SaveSystem;
+using MTM101BaldAPI.UI;
 using PlusStudioLevelFormat;
 using PlusStudioLevelLoader;
 using System;
@@ -24,13 +25,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Text;
 using TMPro;
 using UnityCipher;
 using UnityEngine;
-using UnityEngine.SocialPlatforms;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace BCarnellChars
@@ -44,9 +44,9 @@ namespace BCarnellChars
     [BepInDependency("mtm101.rulerp.baldiplus.levelstudio", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInIncompatibility("alexbw145.bbplus.rpsguy")] // This is a bad idea...
     [BepInProcess("BALDI.exe")]
-    public class BasePlugin : BaseUnityPlugin
+    public class BCPPPlugin : BaseUnityPlugin
     {
-        public static BasePlugin Instance { get; private set; }
+        public static BCPPPlugin Instance { get; private set; }
         public BCPPSave SaveData { get; private set; } = new BCPPSave();
         public static AssetManager bcppAssets = new AssetManager();
         // Makin' sure that it'll become colorful!
@@ -63,9 +63,7 @@ namespace BCarnellChars
         internal LevelObject lPac;
         internal SceneObject sPac;
 
-        internal static Material profitCardInsert;
-        internal static Material freeInsert;
-        internal static Material securedYellowSwingingDoor;
+        internal static Material profitCardInsert, freeInsert, securedYellowSwingingDoor;
 
         private void Awake()
         {
@@ -91,6 +89,8 @@ namespace BCarnellChars
                     LevelStudioAdds.ProfitIsEditorTime();
             }, LoadingEventOrder.Final);
             ModdedSaveGame.AddSaveHandler(Info); // I hate it when the same ol' mistakes happen!
+            MTM101BaldiDevAPI.AddWarningScreen(@"<color=red>B. Carnell's</color> <color=yellow>Plus Pack</color> v1.6.0 is currently work in progress right now, anything in this new version are not yet finished!
+Current Build: LONG WAIT DX EDITION", false);
         }
 
         private IEnumerator StartLoad()
@@ -617,6 +617,32 @@ namespace BCarnellChars
                 "PAC75Ghost/Wandering",
                 "PAC75Ghost/Weakened",
                 "PAC75Ghost/Fleeing"]);
+
+            GameObject notfinalnotif = Instantiate(Resources.FindObjectsOfTypeAll<Jumprope>().ToList().Last(s => s.name == "Jumprope").gameObject, MTM101BaldiDevAPI.prefabTransform);
+            notfinalnotif.name = "BCPP_NotFinalNotif";
+            DestroyImmediate(notfinalnotif.GetComponent<Jumprope>());
+            DestroyImmediate(notfinalnotif.transform.Find("RopeCanvas").gameObject);
+            DestroyImmediate(notfinalnotif.transform.Find("TextCanvas").transform.Find("Count").gameObject);
+            var text = notfinalnotif.transform.Find("TextCanvas").gameObject.GetComponentInChildren<TMP_Text>(true);
+            text.text = "<color=red>BC</color><color=yellow>PP</color> v1.6.0 Early Access";
+            text.alignment = TextAlignmentOptions.Bottom;
+            text.rectTransform.anchorMin = text.rectTransform.anchorMax = text.rectTransform.pivot = Vector2.right / 2f;
+            text.color = Color.white;
+            text.alpha = 0.55f;
+            text.font = BaldiFonts.ComicSans36.FontAsset();
+            text.fontSize = BaldiFonts.ComicSans36.FontSize();
+            notfinalnotif.SetActive(false);
+            notfinalnotif.transform.SetParent(null);
+            DontDestroyOnLoad(notfinalnotif);
+
+            SceneManager.activeSceneChanged += (current, next) =>
+            {
+                if (next.name == "Game")
+                    notfinalnotif.SetActive(true);
+                else if (current.name == "Game")
+                    notfinalnotif.SetActive(false);
+                notfinalnotif.transform.SetAsLastSibling();
+            };
         }
 
         private IEnumerator PreLoad()
@@ -660,6 +686,9 @@ namespace BCarnellChars
             bcppAssets.Remove<GameObject>("PAC75/MachineModel");
 
             yield return "Initializing RPS Guy";
+            FieldInfo 
+                _audOnStart = AccessTools.DeclaredField(typeof(AudioManager), "soundOnStart"),
+                _loopAudOnStart = AccessTools.DeclaredField(typeof(AudioManager), "loopOnStart");
             // do dis
             var rpsguy = new NPCBuilder<RPSGuy>(Info)
                 .SetName("RPS Guy")
@@ -678,25 +707,24 @@ namespace BCarnellChars
             //AccessTools.DeclaredField(typeof(Looker), "distance").SetValue(rpsguy.looker, 99f);
             PropagatedAudioManager annoying = rpsguy.gameObject.AddComponent<PropagatedAudioManager>();
             annoying.audioDevice = rpsguy.gameObject.AddComponent<AudioSource>();
-            AccessTools.DeclaredField(typeof(AudioManager), "soundOnStart").SetValue(annoying, new SoundObject[]
+            _audOnStart.SetValue(annoying, new SoundObject[]
             {
                 bcppAssets.Get<SoundObject>("RPSGuy/AmbientMusic")
             });
-            AccessTools.DeclaredField(typeof(AudioManager), "loopOnStart").SetValue(annoying, true);
+            _loopAudOnStart.SetValue(annoying, true);
             annoying.audioDevice.spatialBlend = 1;
             annoying.audioDevice.rolloffMode = AudioRolloffMode.Custom;
             annoying.audioDevice.maxDistance = 150;
             annoying.audioDevice.dopplerLevel = 0;
             annoying.audioDevice.spread = 0;
             yield return "Initializing RPSUI";
-            GameObject rockpaperscissors = Instantiate(Resources.FindObjectsOfTypeAll<Jumprope>().ToList().Find(s => s.name == "Jumprope").gameObject);
+            GameObject rockpaperscissors = Instantiate(Resources.FindObjectsOfTypeAll<Jumprope>().ToList().Last(s => s.name == "Jumprope").gameObject, MTM101BaldiDevAPI.prefabTransform);
             rockpaperscissors.name = "Rock Paper Scissors";
             Destroy(rockpaperscissors.GetComponent<Jumprope>());
             Destroy(rockpaperscissors.transform.Find("RopeCanvas").gameObject);
             Destroy(rockpaperscissors.transform.Find("TextCanvas").transform.Find("Count").gameObject);
             RawImage raw = rockpaperscissors.transform.Find("TextCanvas").gameObject.AddComponent<RawImage>();
             raw.color = new Color(0f, 0f, 0f, 0.50f); // Initial Color
-            rockpaperscissors.ConvertToPrefab(false);
             Image uhf = new GameObject("Border", typeof(Image)).GetComponent<Image>();
             uhf.gameObject.layer = LayerMask.NameToLayer("UI");
             uhf.transform.SetParent(rockpaperscissors.transform.Find("TextCanvas").transform);
@@ -769,6 +797,8 @@ namespace BCarnellChars
             rpsguy.spriteRenderer[0].sprite = rpsguy.alive;
 
             yield return "Initializing ERROR-BOT_ITEM-STEALER";
+            FieldInfo
+                _spriteSheet = AccessTools.DeclaredField(typeof(SpriteRotationMap), "spriteSheet");
             var errorbot = new NPCBuilder<ERRORBOT>(Info)
                 .SetName("ERROR-BOT_ITEM-STEALER")
                 .SetEnum("ERRORBOT")
@@ -812,11 +842,11 @@ namespace BCarnellChars
             errorbot.spriteRenderer[1].sprite = bcppAssets.Get<Sprite>("ERRORBOT/Head");
             PropagatedAudioManager staticbot = errorbot.gameObject.AddComponent<PropagatedAudioManager>();
             staticbot.audioDevice = errorbot.gameObject.AddComponent<AudioSource>();
-            AccessTools.DeclaredField(typeof(AudioManager), "soundOnStart").SetValue(staticbot, new SoundObject[]
+            _audOnStart.SetValue(staticbot, new SoundObject[]
             {
                 bcppAssets.Get<SoundObject>("ERRORBOT/AmbientStatic")
             });
-            AccessTools.DeclaredField(typeof(AudioManager), "loopOnStart").SetValue(staticbot, true);
+            _loopAudOnStart.SetValue(staticbot, true);
             staticbot.audioDevice.spatialBlend = 1;
             staticbot.audioDevice.rolloffMode = AudioRolloffMode.Custom;
             staticbot.audioDevice.maxDistance = 150;
@@ -865,14 +895,13 @@ namespace BCarnellChars
             motorAudMan.audioDevice.maxDistance = 150;
             motorAudMan.audioDevice.dopplerLevel = 0;
             motorAudMan.audioDevice.spread = 0;
-            AccessTools.DeclaredField(typeof(AudioManager), "soundOnStart").SetValue(motorAudMan, new SoundObject[]
+            _audOnStart.SetValue(motorAudMan, new SoundObject[]
             {
                 bcppAssets.Get<SoundObject>("SiegeCanonCart/Paddle")
             });
-            AccessTools.DeclaredField(typeof(AudioManager), "loopOnStart").SetValue(motorAudMan, true);
+            _loopAudOnStart.SetValue(motorAudMan, true);
             AnimatedSpriteRotator hell = siegecart.spriteBase.AddComponent<AnimatedSpriteRotator>();
             AccessTools.DeclaredField(typeof(AnimatedSpriteRotator), "renderer").SetValue(hell, siegecart.spriteRenderer[0]);
-            var _spriteSheet = AccessTools.DeclaredField(typeof(SpriteRotationMap), "spriteSheet");
             SpriteRotationMap idleRotationMap = new SpriteRotationMap()
             {
                 angleCount = 8
@@ -965,6 +994,7 @@ namespace BCarnellChars
             bcppAssets.Add<Entity>("SiegeCannonBall", ball.GetComponent<Entity>());
 
             yield return "Initializing Mr. Portal Man";
+            FieldInfo _layerMaskLooker = AccessTools.DeclaredField(typeof(Looker), "layerMask");
             var portalman = new NPCBuilder<MrPortalMan>(Info)
                 .SetName("Mr Portal Man")
                 .SetEnum("MrPortalMan")
@@ -980,9 +1010,9 @@ namespace BCarnellChars
                 .SetMetaTags(["BCPP"])
                 .Build(); //ObjectCreators.CreateNPC<MrPortalMan>("Mr Portal Man", EnumExtensions.ExtendEnum<Character>("MrPortalMan"), ObjectCreators.CreatePosterObject(bcppAssets.Get<Texture2D>("PRI/MrPortalMan"), []), usesHeatMap: true, spawnableRooms: [RoomCategory.Hall]);
             //AccessTools.DeclaredField(typeof(Looker), "hasFov").SetValue(portalman.looker, false);
-            LayerMask layer = (LayerMask)portalman.looker.ReflectionGetVariable("layerMask");
+            LayerMask layer = (LayerMask)_layerMaskLooker.GetValue(portalman.looker);
             layer |= 1 << LayerMask.NameToLayer("NPCs");
-            portalman.looker.ReflectionSetVariable("layerMask", layer);
+            _layerMaskLooker.SetValue(portalman.looker, layer);
             //AccessTools.DeclaredField(typeof(NPC), "ignorePlayerOnSpawn").SetValue(portalman, true);
             portalman.spriteRenderer[0].sprite = bcppAssets.Get<Sprite>("MrPortalMan/PortalMan");
             portalman.spriteRenderer[0].transform.position = new Vector3(0f, 0.5f, 0f);
@@ -1078,9 +1108,9 @@ namespace BCarnellChars
             //ObjectCreators.CreateNPC<MrRobber>("Mr Robber", EnumExtensions.ExtendEnum<Character>("MrRobber"), ObjectCreators.CreatePosterObject(Resources.FindObjectsOfTypeAll<Texture2D>().ToList().Find(x => x.name == "Transparent"), []), spawnableRooms: [RoomCategory.Hall, RoomCategory.Special], minAudioDistance: 1f, maxAudioDistance: 500);
             robber.Navigator.SetRoomAvoidance(false);
             // I FORGOT ABOUT THIS
-            layer = (LayerMask)robber.looker.ReflectionGetVariable("layerMask");
+            layer = (LayerMask)_layerMaskLooker.GetValue(robber.looker);
             layer |= 1 << LayerMask.NameToLayer("NPCs");
-            robber.looker.ReflectionSetVariable("layerMask", layer);
+            _layerMaskLooker.SetValue(robber.looker, layer);
             // Returning to normal I suppose...
             robber.sfxMan = robber.gameObject.AddComponent<AudioManager>();
             robber.sfxMan.audioDevice = robber.gameObject.AddComponent<AudioSource>();
@@ -1091,11 +1121,11 @@ namespace BCarnellChars
             robber.sfxMan.audioDevice.maxDistance = 150;
             robber.sfxMan.audioDevice.dopplerLevel = 0;
             robber.sfxMan.audioDevice.spread = 0;
-            AccessTools.DeclaredField(typeof(AudioManager), "soundOnStart").SetValue(robber.sfxMan, new SoundObject[]
+            _audOnStart.SetValue(robber.sfxMan, new SoundObject[]
             {
                 bcppAssets.Get<SoundObject>("MrRobber/EssenceBeat")
             });
-            AccessTools.DeclaredField(typeof(AudioManager), "loopOnStart").SetValue(robber.sfxMan, true);
+            _loopAudOnStart.SetValue(robber.sfxMan, true);
             robber.overlay = Instantiate(Resources.FindObjectsOfTypeAll<Gum>().ToList().First().transform.Find("GumOverlay").gameObject, robber.transform).GetComponent<Canvas>();
             robber.overlay.transform.Find("Image").GetComponent<Image>().sprite = null;
             robber.overlay.gameObject.SetActive(false);
@@ -1113,7 +1143,7 @@ namespace BCarnellChars
                 bcppAssets.Get<SoundObject>("MrRobber/WasNeverHere"),
                 bcppAssets.Get<SoundObject>("MrRobber/RegretAlone")
                 ];
-            robber.sfxBeat = BasePlugin.bcppAssets.Get<SoundObject>("MrRobber/AnnoyingBeat");
+            robber.sfxBeat = BCPPPlugin.bcppAssets.Get<SoundObject>("MrRobber/AnnoyingBeat");
             robber.sfxScreech = [
                 bcppAssets.Get<SoundObject>("MrRobber/ScreechIntro"),
                 bcppAssets.Get<SoundObject>("MrRobber/ScreechLoop")
@@ -2269,10 +2299,10 @@ namespace BCarnellChars
             realbcarnell.animator = realbcarnell.gameObject.AddComponent<CustomSpriteRendererAnimator>();
             realbcarnell.animator.renderer = realbcarnell.spriteRenderer[0];
             realbcarnell.animator.timeScale = TimeScaleType.Npc;
-            realbcarnell.animator.AddAnimation("Slap", new SpriteAnimation(12, bcppAssets.Get<Sprite[]>("BCarnellBoss/Walk")));
+            realbcarnell.animator.AddAnimation("Slap", new SpriteAnimation(bcppAssets.Get<Sprite[]>("BCarnellBoss/Walk"), 0.75f));
             realbcarnell.animator.AddAnimation("SlapIdle", new SpriteAnimation([bcppAssets.Get<Sprite[]>("BCarnellBoss/Walk").Last()], 1f));
             realbcarnell.animator.AddAnimation("Shoot", new SpriteAnimation(9 * 2, bcppAssets.Get<Sprite[]>("BCarnellBoss/SawShoot")));
-            realbcarnell.animator.AddAnimation("BoostPre", new SpriteAnimation(5, bcppAssets.Get<Sprite[]>("BCarnellBoss/BoostPre")));
+            realbcarnell.animator.AddAnimation("BoostPre", new SpriteAnimation(bcppAssets.Get<Sprite[]>("BCarnellBoss/BoostPre"), 0.5f));
             realbcarnell.animator.AddAnimation("Boosting", new SpriteAnimation([bcppAssets.Get<Sprite>("BCarnellBoss/Boosting")], 1f));
             realbcarnell.animator.AddAnimation("BoostOut", new SpriteAnimation(bcppAssets.Get<Sprite[]>("BCarnellBoss/Walk"), 0.5f));
             realbcarnell.dialIntro = [
@@ -2283,7 +2313,7 @@ namespace BCarnellChars
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_Intro5.wav"), "Vfx_BCarnell_Dial", SoundType.Voice, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_Intro6.wav"), "Vfx_BCarnell_Dial", SoundType.Voice, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
                 ];
-            GameObject sawblade = Instantiate(Resources.FindObjectsOfTypeAll<ITM_BSODA>().ToList().Find(x => x.name == "ITM_BSODA")).gameObject;
+            GameObject sawblade = Instantiate(Resources.FindObjectsOfTypeAll<ITM_BSODA>().ToList().Find(x => x.name == "ITM_BSODA"), MTM101BaldiDevAPI.prefabTransform).gameObject;
             sawblade.name = "Sawblade";
             Destroy(sawblade.GetComponent<ITM_BSODA>());
             sawblade.ConvertToPrefab(true);
@@ -2294,11 +2324,11 @@ namespace BCarnellChars
             Destroy(sawblade.transform.Find("RendereBase").Find("Particles")?.gameObject);
             AudioManager brrr = sawblade.gameObject.AddComponent<AudioManager>();
             brrr.audioDevice = sawblade.gameObject.AddComponent<AudioSource>();
-            AccessTools.DeclaredField(typeof(AudioManager), "soundOnStart").SetValue(brrr, new SoundObject[]
+            _audOnStart.SetValue(brrr, new SoundObject[]
             {
                 bcppAssets.Get<SoundObject>("BCarnellBoss/Sawblade")
             });
-            AccessTools.DeclaredField(typeof(AudioManager), "loopOnStart").SetValue(brrr, true);
+            _loopAudOnStart.SetValue(brrr, true);
             brrr.audioDevice.spatialBlend = 1;
             brrr.audioDevice.rolloffMode = AudioRolloffMode.Custom;
             brrr.audioDevice.maxDistance = 150;
@@ -3101,7 +3131,7 @@ namespace BCarnellChars
 
         internal static void ChangeRadarColor(this NPC me)
         {
-            if (BasePlugin.RadarModExists && me.ec != null)
+            if (BCPPPlugin.RadarModExists && me.ec != null)
             {
                 var color = 
                     me is RPSGuy ? RPSGuyColor.Value : 
@@ -3124,7 +3154,7 @@ namespace BCarnellChars
     [Serializable]
     public class BCPPSave // Redo...
     {
-        public static BCPPSave Instance => BasePlugin.Instance.SaveData;
+        public static BCPPSave Instance => BCPPPlugin.Instance.SaveData;
         [NonSerialized] public ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource("BCPPSave");
         [NonSerialized] public const string Version = "1.6.0";
         internal static Version typeVersion => new Version(Version);
@@ -3137,7 +3167,7 @@ namespace BCarnellChars
 
         internal bool Load()
         {
-            string path = Path.Combine(ModdedSaveSystem.GetCurrentSaveFolder(BasePlugin.Instance), "BCPP.dat");
+            string path = Path.Combine(ModdedSaveSystem.GetCurrentSaveFolder(BCPPPlugin.Instance), "BCPP.dat");
             if (!File.Exists(path))
             {
                 logger.LogWarning("Save data for B. Carnell Plus Pack does not exist, creating file now!");
@@ -3180,7 +3210,7 @@ namespace BCarnellChars
                 catch
                 {
                     logger.LogWarning("Save data for B. Carnell Plus Pack failed to load or is corrupted, setting to defaults!");
-                    File.Copy(path, Path.Combine(ModdedSaveSystem.GetCurrentSaveFolder(BasePlugin.Instance), "BCPP_CorruptDat_" + DateTime.Now.ToString("s").Replace(":", "-")));
+                    File.Copy(path, Path.Combine(ModdedSaveSystem.GetCurrentSaveFolder(BCPPPlugin.Instance), "BCPP_CorruptDat_" + DateTime.Now.ToString("s").Replace(":", "-")));
                     SetDefaults();
                     Save();
                     return false;
@@ -3192,7 +3222,7 @@ namespace BCarnellChars
         internal void Save()
         {
             version = Version;
-            string path = Path.Combine(ModdedSaveSystem.GetCurrentSaveFolder(BasePlugin.Instance), "BCPP.dat");
+            string path = Path.Combine(ModdedSaveSystem.GetCurrentSaveFolder(BCPPPlugin.Instance), "BCPP.dat");
             File.WriteAllText(path, RijndaelEncryption.Encrypt(JsonUtility.ToJson(this), "BCPP_" + PlayerFileManager.Instance.fileName));
         }
 

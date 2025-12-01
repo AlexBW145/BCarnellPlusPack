@@ -39,7 +39,7 @@ namespace BCarnellEditor
         {
             Harmony harmony = new Harmony("alexbw145.baldiplus.bcarnelleditor");
             harmony.PatchAllConditionals();
-            AddSpriteFolderToAssetMan("EditorUI/", 40f, AssetLoader.GetModPath(BasePlugin.Instance), "EditorUI");
+            AddSpriteFolderToAssetMan("EditorUI/", 40f, AssetLoader.GetModPath(BCPPPlugin.Instance), "EditorUI");
             LoadingEvents.RegisterOnAssetsLoaded(Info, () =>
             {
                 AssetLoader.LocalizationFromFunction((lang) => new Dictionary<string, string>()
@@ -76,7 +76,7 @@ namespace BCarnellEditor
             string[] files = Directory.GetFiles(Path.Combine(path));
             for (int i = 0; i < files.Length; i++)
             {
-                BasePlugin.bcppAssets.Add(prefix + Path.GetFileNameWithoutExtension(files[i]), AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromFile(files[i]), pixelsPerUnit));
+                BCPPPlugin.bcppAssets.Add(prefix + Path.GetFileNameWithoutExtension(files[i]), AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromFile(files[i]), pixelsPerUnit));
             }
         }
 
@@ -84,26 +84,26 @@ namespace BCarnellEditor
         private void PostLoad()
         {
             // Dunno why doors are first...
-            var infdoorlocked = AccessTools.Field(typeof(BasePlugin), "securedYellowSwingingDoor").GetValue(null) as Material;
+            var infdoorlocked = AccessTools.Field(typeof(BCPPPlugin), "securedYellowSwingingDoor").GetValue(null) as Material;
             EditorInterface.AddDoor<DoorDisplay>("inflocked", DoorIngameStatus.AlwaysObject, Resources.FindObjectsOfTypeAll<SwingDoor>().Last().mask.First(), [infdoorlocked, infdoorlocked]);
-            LevelLoaderPlugin.Instance.tileBasedObjectPrefabs.Add("inflocked", BasePlugin.bcppAssets.Get<SecuredSwingingDoor>("Obstacles/SecuredSwingingDoor").GetComponent<SwingDoor>());
+            LevelLoaderPlugin.Instance.tileBasedObjectPrefabs.Add("inflocked", BCPPPlugin.bcppAssets.Get<SecuredSwingingDoor>("Obstacles/SecuredSwingingDoor").GetComponent<SwingDoor>());
 
             NPC rpsguy = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("RPSGuy")).value;
             // RPS LOOKS LIKE BEANS, SO UHH... CHANGE SPRITE I GUESS??
-            rpsguy.transform.Find("SpriteBase").GetComponentInChildren<SpriteRenderer>().sprite = BCarnellChars.BasePlugin.bcppAssets.Get<Sprite>("RPSGuy/Alive");
+            rpsguy.transform.Find("SpriteBase").GetComponentInChildren<SpriteRenderer>().sprite = BCarnellChars.BCPPPlugin.bcppAssets.Get<Sprite>("RPSGuy/Alive");
             EditorInterface.AddNPCVisual("rpsguy", rpsguy);
             NPC errorbotBody = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("ERRORBOT")).value;
             // ERROR-BOT'S BODY IS BEANS, WTF??
-            errorbotBody.transform.Find("SpriteBase").GetComponentsInChildren<SpriteRenderer>()[0].sprite = BCarnellChars.BasePlugin.bcppAssets.Get<Sprite>("ERRORBOT/Body3");
+            errorbotBody.transform.Find("SpriteBase").GetComponentsInChildren<SpriteRenderer>()[0].sprite = BCarnellChars.BCPPPlugin.bcppAssets.Get<Sprite>("ERRORBOT/Body3");
             EditorInterface.AddNPCVisual("errorbot", errorbotBody);
             NPC siegecanoncart = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("SiegeCanonCart")).value;
             // EVEN SIEGE CANON CART IS A FUCKING BEANS, A LITERAL FUCKING BEANS!!
-            siegecanoncart.transform.Find("SpriteBase").GetComponentInChildren<SpriteRenderer>().sprite = BCarnellChars.BasePlugin.bcppAssets.Get<Sprite>("SiegeCanonCart/IdleFront");
+            siegecanoncart.transform.Find("SpriteBase").GetComponentInChildren<SpriteRenderer>().sprite = BCarnellChars.BCPPPlugin.bcppAssets.Get<Sprite>("SiegeCanonCart/IdleFront");
             EditorInterface.AddNPCVisual("siegecanoncart", siegecanoncart);
             var mrportalman = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("MrPortalMan")).value;
             EditorInterface.AddNPCVisual("mrportalman", mrportalman);
             NPC mrrobber = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("MrRobber")).value;
-            mrrobber.transform.Find("SpriteBase").GetComponentInChildren<SpriteRenderer>().sprite = BCarnellChars.BasePlugin.bcppAssets.Get<Sprite>("MrRobber/Targeting");
+            mrrobber.transform.Find("SpriteBase").GetComponentInChildren<SpriteRenderer>().sprite = BCarnellChars.BCPPPlugin.bcppAssets.Get<Sprite>("MrRobber/Targeting");
             EditorInterface.AddNPCVisual("mrrobber", mrrobber);
 
             LevelLoaderPlugin.Instance.npcAliases.Add("rpsguy", NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("RPSGuy")).value);
@@ -140,8 +140,8 @@ namespace BCarnellEditor
                 Resources.FindObjectsOfTypeAll<Sprite>().ToList().Find(s => s.name.ToLower().EndsWith("_" + name.ToLower())) ?? BaldiLevelEditorPlugin.Instance.assetMan.Get<Sprite>("UI/Object_bsodamachine")));
             }*/
 
-            EditorInterface.AddObjectVisual("bcpp_randomitemmachine", BasePlugin.bcppAssets.Get<GameObject>("Structures/RandomItemMachine"), true);
-            LevelLoaderPlugin.Instance.basicObjects.Add("bcpp_randomitemmachine", BasePlugin.bcppAssets.Get<GameObject>("Structures/RandomItemMachine"));
+            EditorInterface.AddObjectVisual("bcpp_randomitemmachine", BCPPPlugin.bcppAssets.Get<GameObject>("Structures/RandomItemMachine"), true);
+            LevelLoaderPlugin.Instance.basicObjects.Add("bcpp_randomitemmachine", BCPPPlugin.bcppAssets.Get<GameObject>("Structures/RandomItemMachine"));
 
             /*BaldiLevelEditorPlugin.itemObjects.Add("profitcard", BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard"));
             BaldiLevelEditorPlugin.itemObjects.Add("bhammer", BasePlugin.bcppAssets.Get<ItemObject>("Items/BHammer"));
@@ -149,12 +149,12 @@ namespace BCarnellEditor
             BaldiLevelEditorPlugin.itemObjects.Add("securedyellowlock", BasePlugin.bcppAssets.Get<ItemObject>("Items/SecuredLock"));
             BaldiLevelEditorPlugin.itemObjects.Add("anyportaloutput", BasePlugin.bcppAssets.Get<ItemObject>("Items/AnyportalOutput"));
             BaldiLevelEditorPlugin.itemObjects.Add("taserpulse", BasePlugin.bcppAssets.Get<ItemObject>("Items/TASERPulse"));*/
-            LevelLoaderPlugin.Instance.itemObjects.Add("profitcard", BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard"));
-            LevelLoaderPlugin.Instance.itemObjects.Add("bhammer", BasePlugin.bcppAssets.Get<ItemObject>("Items/BHammer"));
-            LevelLoaderPlugin.Instance.itemObjects.Add("unsecuredyellowkey", BasePlugin.bcppAssets.Get<ItemObject>("Items/UnsecuredKey"));
-            LevelLoaderPlugin.Instance.itemObjects.Add("securedyellowlock", BasePlugin.bcppAssets.Get<ItemObject>("Items/SecuredLock"));
-            LevelLoaderPlugin.Instance.itemObjects.Add("anyportaloutput", BasePlugin.bcppAssets.Get<ItemObject>("Items/AnyportalOutput"));
-            LevelLoaderPlugin.Instance.itemObjects.Add("taserpulse", BasePlugin.bcppAssets.Get<ItemObject>("Items/TASERPulse"));
+            LevelLoaderPlugin.Instance.itemObjects.Add("profitcard", BCPPPlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard"));
+            LevelLoaderPlugin.Instance.itemObjects.Add("bhammer", BCPPPlugin.bcppAssets.Get<ItemObject>("Items/BHammer"));
+            LevelLoaderPlugin.Instance.itemObjects.Add("unsecuredyellowkey", BCPPPlugin.bcppAssets.Get<ItemObject>("Items/UnsecuredKey"));
+            LevelLoaderPlugin.Instance.itemObjects.Add("securedyellowlock", BCPPPlugin.bcppAssets.Get<ItemObject>("Items/SecuredLock"));
+            LevelLoaderPlugin.Instance.itemObjects.Add("anyportaloutput", BCPPPlugin.bcppAssets.Get<ItemObject>("Items/AnyportalOutput"));
+            LevelLoaderPlugin.Instance.itemObjects.Add("taserpulse", BCPPPlugin.bcppAssets.Get<ItemObject>("Items/TASERPulse"));
 
 #if DEBUG
             BaldiLevelEditorPlugin.editorObjects.Add(EditorObjectType.CreateFromGameObject<EditorPrefab, PrefabLocation>("B2Platform_Sideways".ToLower(), BasePlugin.bcppAssets.Get<GameObject>("B2Platform/Sideways"), Vector3.zero, true));
@@ -172,7 +172,7 @@ namespace BCarnellEditor
         public ObjectToolProfitCard(string type, Sprite sprite, float offset, bool profitcard) : base(type, sprite, offset)
         {
             isProfitCard = profitcard;
-            if (sprite == null) this.sprite = BasePlugin.bcppAssets.Get<Sprite>("EditorUI/Object_" + type);
+            if (sprite == null) this.sprite = BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/Object_" + type);
         }
     }
 
@@ -183,7 +183,7 @@ namespace BCarnellEditor
         public ObjectToolNoRotationProfitCard(string type, Sprite sprite, float offset, bool profitcard) : base(type, sprite, offset)
         {
             isProfitCard = profitcard;
-            if (sprite == null) this.sprite = BasePlugin.bcppAssets.Get<Sprite>("EditorUI/Object_" + type);
+            if (sprite == null) this.sprite = BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/Object_" + type);
         }
     }
 
@@ -207,8 +207,8 @@ namespace BCarnellEditor
         static void Prefix(EditorController __instance)
         {
 
-            __instance.currentMode.availableTools["doors"].Add(new DoorTool("inflocked", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/inflocked_SwingDoorED")));
-            __instance.currentMode.availableTools["objects"].AddRange([..Plugin.sodaToolcats, new ObjectToolNoRotation("bcpp_randomitemmachine", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/Object_bcpp_randomitemmachine"))]);
+            __instance.currentMode.availableTools["doors"].Add(new DoorTool("inflocked", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/inflocked_SwingDoorED")));
+            __instance.currentMode.availableTools["objects"].AddRange([..Plugin.sodaToolcats, new ObjectToolNoRotation("bcpp_randomitemmachine", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/Object_bcpp_randomitemmachine"))]);
 #if DEBUG
             __instance.toolCats.Find(x => x.name == "objects").tools.AddRange([
                 new BCPP_RotateAndPlacePrefab("B2Platform_Sideways".ToLower()),
@@ -218,19 +218,19 @@ namespace BCarnellEditor
                 ]);
 #endif
             __instance.currentMode.availableTools["npcs"].AddRange([
-                new NPCToolBCPP("rpsguy", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_rpsguy"), "Ed_BCPP_RPSGuy_Title", "Ed_BCPP_RPSGuy_Desc"),
-                new NPCToolBCPP("errorbot", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_errorbot"), "Ed_BCPP_ERRORBOT_Title", "Ed_BCPP_ERRORBOT_Desc"),
-                new NPCToolBCPP("siegecanoncart", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_siegecanoncart"), "Ed_BCPP_SiegeCanonCart_Title", "Ed_BCPP_SiegeCanonCart_Desc"),
-                new NPCToolBCPP("mrportalman", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_mrportalman"), "Ed_BCPP_MrPortalMan_Title", "Ed_BCPP_MrPortalMan_Desc"),
-                new NPCToolBCPP("mrrobber", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_mrrobber"), "Ed_BCPP_MrRobber_Title", "Ed_BCPP_MrRobber_Desc"),
+                new NPCToolBCPP("rpsguy", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_rpsguy"), "Ed_BCPP_RPSGuy_Title", "Ed_BCPP_RPSGuy_Desc"),
+                new NPCToolBCPP("errorbot", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_errorbot"), "Ed_BCPP_ERRORBOT_Title", "Ed_BCPP_ERRORBOT_Desc"),
+                new NPCToolBCPP("siegecanoncart", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_siegecanoncart"), "Ed_BCPP_SiegeCanonCart_Title", "Ed_BCPP_SiegeCanonCart_Desc"),
+                new NPCToolBCPP("mrportalman", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_mrportalman"), "Ed_BCPP_MrPortalMan_Title", "Ed_BCPP_MrPortalMan_Desc"),
+                new NPCToolBCPP("mrrobber", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_mrrobber"), "Ed_BCPP_MrRobber_Title", "Ed_BCPP_MrRobber_Desc"),
                 ]);
             __instance.currentMode.availableTools["items"].AddRange([
-                new ItemTool("profitcard", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/ITM_profitcard")),
-                new ItemTool("bhammer", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/ITM_bhammer")),
-                new ItemTool("unsecuredyellowkey", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/ITM_unsecuredyellowkey")),
-                new ItemTool("securedyellowlock", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/ITM_securedyellowlock")),
-                new ItemTool("anyportaloutput", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/ITM_anyportaloutput")),
-                new ItemTool("taserpulse", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/ITM_taserpulse")),
+                new ItemTool("profitcard", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/ITM_profitcard")),
+                new ItemTool("bhammer", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/ITM_bhammer")),
+                new ItemTool("unsecuredyellowkey", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/ITM_unsecuredyellowkey")),
+                new ItemTool("securedyellowlock", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/ITM_securedyellowlock")),
+                new ItemTool("anyportaloutput", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/ITM_anyportaloutput")),
+                new ItemTool("taserpulse", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/ITM_taserpulse")),
                 ]);
         }
     }

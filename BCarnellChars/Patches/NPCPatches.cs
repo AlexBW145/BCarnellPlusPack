@@ -1,12 +1,7 @@
 ﻿using BCarnellChars.Characters;
-using BCarnellChars.Characters.States;
 using BCarnellChars.OtherStuff;
 using HarmonyLib;
-using MTM101BaldAPI;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace BCarnellChars.Patches

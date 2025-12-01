@@ -35,7 +35,7 @@ namespace BCarnellChars.Patches
 
                 WeightedItemObject[] setVal = list.ToArray();
                 RandomItemMachine[] gambler = GameObject.FindObjectsOfType<RandomItemMachine>(false);
-                var replenishSprite = BasePlugin.bcppAssets.Get<Sprite>("Structures/RandomMachine");
+                var replenishSprite = BCPPPlugin.bcppAssets.Get<Sprite>("Structures/RandomMachine");
                 foreach (RandomItemMachine instance in gambler)
                 {
                     instance.potentialItems = setVal;

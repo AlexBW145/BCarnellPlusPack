@@ -58,7 +58,7 @@ namespace BCarnellChars.ItemStuff
                         chain.positionCount++;
                         furthestPos = 0f;
                         flag++;
-                        cast[j].transform.gameObject.GetComponent<AudioManager>()?.PlaySingle(BasePlugin.bcppAssets.Get<SoundObject>("Items/TASERPulse/Effect"));
+                        cast[j].transform.gameObject.GetComponent<AudioManager>()?.PlaySingle(BCPPPlugin.bcppAssets.Get<SoundObject>("Items/TASERPulse/Effect"));
                         var npc = cast[j].transform.gameObject.GetComponent<NPC>();
                         npc.StartCoroutine(MoveModTime(npc));
                         pm.RuleBreak("Drinking", 9f);

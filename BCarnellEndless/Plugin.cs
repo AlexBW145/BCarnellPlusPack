@@ -30,18 +30,18 @@ namespace BCarnellEndless
                 EndlessForeverPlugin.AddGeneratorAction(Info, (data) =>
                 {
                     data.npcs.AddRange([
-                        new WeightedNPC { selection = BasePlugin.bcppAssets.Get<NPC>("NPCs/RPS Guy"), weight = 90 },
-                        new WeightedNPC { selection = BasePlugin.bcppAssets.Get<NPC>("NPCs/ERROR-BOT_ITEM-STEALER"), weight = 77 },
-                        new WeightedNPC { selection = BasePlugin.bcppAssets.Get<NPC>("NPCs/Siege Cannon Cart"), weight = 55 },
-                        new WeightedNPC { selection = BasePlugin.bcppAssets.Get<NPC>("NPCs/Mr Portal Man"), weight = 55 },
-                    new WeightedNPC { selection = BasePlugin.bcppAssets.Get<NPC>("NPCs/Mr Robber"), weight = 5 }]); // Guy with very harsh consequence must not spawn in first floors more often.
+                        new WeightedNPC { selection = BCPPPlugin.bcppAssets.Get<NPC>("NPCs/RPS Guy"), weight = 90 },
+                        new WeightedNPC { selection = BCPPPlugin.bcppAssets.Get<NPC>("NPCs/ERROR-BOT_ITEM-STEALER"), weight = 77 },
+                        new WeightedNPC { selection = BCPPPlugin.bcppAssets.Get<NPC>("NPCs/Siege Cannon Cart"), weight = 55 },
+                        new WeightedNPC { selection = BCPPPlugin.bcppAssets.Get<NPC>("NPCs/Mr Portal Man"), weight = 55 },
+                    new WeightedNPC { selection = BCPPPlugin.bcppAssets.Get<NPC>("NPCs/Mr Robber"), weight = 5 }]); // Guy with very harsh consequence must not spawn in first floors more often.
                     data.items.AddRange([
-                        new WeightedItemObject() { selection = BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard"), weight = 60 },
-                        new WeightedItemObject() { selection = BasePlugin.bcppAssets.Get<ItemObject>("Items/BHammer"), weight = 60 },
-                        new WeightedItemObject() { selection = BasePlugin.bcppAssets.Get<ItemObject>("Items/SecuredLock"), weight = 10 },
-                        new WeightedItemObject() { selection = BasePlugin.bcppAssets.Get<ItemObject>("Items/UnsecuredKey"), weight = 30 },
-                        new WeightedItemObject() { selection = BasePlugin.bcppAssets.Get<ItemObject>("Items/AnyportalOutput"), weight = 40 },
-                        new WeightedItemObject() { selection = BasePlugin.bcppAssets.Get<ItemObject>("Items/TASERPulse"), weight = 50 }]);
+                        new WeightedItemObject() { selection = BCPPPlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard"), weight = 60 },
+                        new WeightedItemObject() { selection = BCPPPlugin.bcppAssets.Get<ItemObject>("Items/BHammer"), weight = 60 },
+                        new WeightedItemObject() { selection = BCPPPlugin.bcppAssets.Get<ItemObject>("Items/SecuredLock"), weight = 10 },
+                        new WeightedItemObject() { selection = BCPPPlugin.bcppAssets.Get<ItemObject>("Items/UnsecuredKey"), weight = 30 },
+                        new WeightedItemObject() { selection = BCPPPlugin.bcppAssets.Get<ItemObject>("Items/AnyportalOutput"), weight = 40 },
+                        new WeightedItemObject() { selection = BCPPPlugin.bcppAssets.Get<ItemObject>("Items/TASERPulse"), weight = 50 }]);
                     data.potentialObjectBuilders.Add(new WeightedStructureWithParameters()
                     {
                         selection = new StructureWithParameters()

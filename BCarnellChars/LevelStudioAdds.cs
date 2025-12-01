@@ -21,13 +21,13 @@ internal static class LevelStudioAdds
         string[] files = Directory.GetFiles(Path.Combine(path));
         for (int i = 0; i < files.Length; i++)
         {
-            BasePlugin.bcppAssets.Add(prefix + Path.GetFileNameWithoutExtension(files[i]), AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromFile(files[i]), pixelsPerUnit));
+            BCPPPlugin.bcppAssets.Add(prefix + Path.GetFileNameWithoutExtension(files[i]), AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromFile(files[i]), pixelsPerUnit));
         }
     }
 
     internal static void EditorAdds()
     {
-        AddSpriteFolderToAssetMan("EditorUI/", 40f, AssetLoader.GetModPath(BasePlugin.Instance), "EditorUI");
+        AddSpriteFolderToAssetMan("EditorUI/", 40f, AssetLoader.GetModPath(BCPPPlugin.Instance), "EditorUI");
         AssetLoader.LocalizationFromFunction((lang) => new Dictionary<string, string>()
                 {
                     { "Ed_Tool_item_profitcard_Desc", "An alternative quarter that's only used for alternative quarter inputs." },
@@ -56,19 +56,19 @@ internal static class LevelStudioAdds
                     { "Ed_BCPP_MrRobber_Desc", "This thief is off onto collecting notebooks, but you shouldn't be alone by now..." },
                 });
 
-        NPC rpsguy = BasePlugin.bcppAssets.Get<NPC>("NPCs/RPS Guy");
-        NPC errorbot = BasePlugin.bcppAssets.Get<NPC>("NPCs/ERROR-BOT_ITEM-STEALER");
-        NPC siegecannoncart = BasePlugin.bcppAssets.Get<NPC>("NPCs/Siege Cannon Cart");
-        NPC mrportalman = BasePlugin.bcppAssets.Get<NPC>("NPCs/Mr Portal Man");
-        NPC mrrobber = BasePlugin.bcppAssets.Get<NPC>("NPCs/Mr Robber");
+        NPC rpsguy = BCPPPlugin.bcppAssets.Get<NPC>("NPCs/RPS Guy");
+        NPC errorbot = BCPPPlugin.bcppAssets.Get<NPC>("NPCs/ERROR-BOT_ITEM-STEALER");
+        NPC siegecannoncart = BCPPPlugin.bcppAssets.Get<NPC>("NPCs/Siege Cannon Cart");
+        NPC mrportalman = BCPPPlugin.bcppAssets.Get<NPC>("NPCs/Mr Portal Man");
+        NPC mrrobber = BCPPPlugin.bcppAssets.Get<NPC>("NPCs/Mr Robber");
         EditorInterface.AddNPCVisual("rpsguy", rpsguy);
         EditorInterface.AddNPCVisual("errorbot", errorbot);
         EditorInterface.AddNPCVisual("siegecanoncart", siegecannoncart);
         EditorInterface.AddNPCVisual("mrportalman", mrportalman);
         EditorInterface.AddNPCVisual("mrrobber", mrrobber);
 
-        EditorInterface.AddObjectVisual("bcpp_randomitemmachine", BasePlugin.bcppAssets.Get<GameObject>("Structures/RandomItemMachine"), true);
-        var infdoorlocked = BasePlugin.securedYellowSwingingDoor;
+        EditorInterface.AddObjectVisual("bcpp_randomitemmachine", BCPPPlugin.bcppAssets.Get<GameObject>("Structures/RandomItemMachine"), true);
+        var infdoorlocked = BCPPPlugin.securedYellowSwingingDoor;
         EditorInterface.AddDoor<DoorDisplay>("inflocked", DoorIngameStatus.AlwaysObject, Resources.FindObjectsOfTypeAll<SwingDoor>().Last().mask[0], [infdoorlocked, infdoorlocked]);
 
 #if DEBUG
@@ -100,17 +100,17 @@ internal static class LevelStudioAdds
                 ]);
         });
 #endif
-        LevelStudioPlugin.Instance.skyboxSprites.Add("pac75", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/pac75skybox"));
+        LevelStudioPlugin.Instance.skyboxSprites.Add("pac75", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/pac75skybox"));
         LevelStudioPlugin.Instance.selectableSkyboxes.Add("pac75");
 
         EditorInterfaceModes.AddModeCallback((mode, isComplaint) =>
         {
             EditorInterfaceModes.AddToolsToCategory(mode, "npcs", [
-                new NPCToolBCPP("rpsguy", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_rpsguy"), "Ed_BCPP_RPSGuy_Title", "Ed_BCPP_RPSGuy_Desc"),
-                new NPCToolBCPP("errorbot", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_errorbot"), "Ed_BCPP_ERRORBOT_Title", "Ed_BCPP_ERRORBOT_Desc"),
-                new NPCToolBCPP("siegecanoncart", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_siegecanoncart"), "Ed_BCPP_SiegeCanonCart_Title", "Ed_BCPP_SiegeCanonCart_Desc"),
-                new NPCToolBCPP("mrportalman", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_mrportalman"), "Ed_BCPP_MrPortalMan_Title", "Ed_BCPP_MrPortalMan_Desc"),
-                new NPCToolBCPP("mrrobber", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_mrrobber"), "Ed_BCPP_MrRobber_Title", "Ed_BCPP_MrRobber_Desc"),
+                new NPCToolBCPP("rpsguy", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_rpsguy"), "Ed_BCPP_RPSGuy_Title", "Ed_BCPP_RPSGuy_Desc"),
+                new NPCToolBCPP("errorbot", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_errorbot"), "Ed_BCPP_ERRORBOT_Title", "Ed_BCPP_ERRORBOT_Desc"),
+                new NPCToolBCPP("siegecanoncart", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_siegecanoncart"), "Ed_BCPP_SiegeCanonCart_Title", "Ed_BCPP_SiegeCanonCart_Desc"),
+                new NPCToolBCPP("mrportalman", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_mrportalman"), "Ed_BCPP_MrPortalMan_Title", "Ed_BCPP_MrPortalMan_Desc"),
+                new NPCToolBCPP("mrrobber", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_mrrobber"), "Ed_BCPP_MrRobber_Title", "Ed_BCPP_MrRobber_Desc"),
                 ]);
             EditorInterfaceModes.AddToolsToCategory(mode, "items", [
                 new ItemTool("profitcard"),
@@ -120,8 +120,8 @@ internal static class LevelStudioAdds
                 new ItemTool("anyportaloutput"),
                 new ItemTool("taserpulse"),
                 ]);
-            EditorInterfaceModes.AddToolToCategory(mode, "doors", new DoorTool("inflocked", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/inflocked_SwingDoorED")));
-            EditorInterfaceModes.AddToolToCategory(mode, "objects", new ObjectToolNoRotation("bcpp_randomitemmachine", BasePlugin.bcppAssets.Get<Sprite>("EditorUI/Object_bcpp_randomitemmachine")));
+            EditorInterfaceModes.AddToolToCategory(mode, "doors", new DoorTool("inflocked", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/inflocked_SwingDoorED")));
+            EditorInterfaceModes.AddToolToCategory(mode, "objects", new ObjectToolNoRotation("bcpp_randomitemmachine", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/Object_bcpp_randomitemmachine")));
         });
     }
 
@@ -180,7 +180,7 @@ class ProfitIcon
             yield return null;
         Image icon = GameObject.Instantiate(__instance.iconImage, __instance.iconImage.transform.parent, true);
         icon.gameObject.name = "ProfitCardIcon";
-        icon.sprite = BasePlugin.bcppAssets.Get<Sprite>("EditorUI/Icon_Profit");
+        icon.sprite = BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/Icon_Profit");
         icon.color = Color.white;
         icon.raycastTarget = false;
         icon.gameObject.SetActive(false);

@@ -96,7 +96,7 @@ namespace BCarnellTimes
     {
         static void Postfix(ref SoundObject[] ___soundsToEmit)
         {
-            ___soundsToEmit = ___soundsToEmit.AddRangeToArray(BCarnellChars.BasePlugin.bcppAssets.GetAll<SoundObject>().ToList().FindAll(c =>
+            ___soundsToEmit = ___soundsToEmit.AddRangeToArray(BCarnellChars.BCPPPlugin.bcppAssets.GetAll<SoundObject>().ToList().FindAll(c =>
 
                 c.soundKey.Contains("Vfx_RPS") ||
                 c.soundKey.Contains("Vfx_ERRORBOT") ||

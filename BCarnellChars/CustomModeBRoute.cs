@@ -10,7 +10,7 @@ namespace BCarnellChars
             {
                 var BRoutePage = ModeObject.CreateModeObjectOverExistingScreen(SelectionScreen.ChallengesScreen);
                 //BRoutePage.StandardButtonBuilder.CreateSeedInput(out var seedinput);
-                var B1Button = BRoutePage.StandardButtonBuilder.CreateModeButton(BasePlugin.Instance.sBasement, false, int.MaxValue, Mode.Main);
+                var B1Button = BRoutePage.StandardButtonBuilder.CreateModeButton(BCPPPlugin.Instance.sBasement, false, int.MaxValue, Mode.Main);
                 //B1Button.gameObject.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
                 if (BCPPSave.Instance.basementCompleted)
                 {
@@ -18,7 +18,7 @@ namespace BCarnellChars
                     text.fontSize = 24 - 2;
                     BRoutePage.StandardButtonBuilder.AddDescriptionText(B1Button, "Men_Basement01");
                     //B1Button.gameObject.GetComponent<RectTransform>().anchoredPosition = Vector2.left * 190f;
-                    var B2Button = BRoutePage.StandardButtonBuilder.CreateModeButton(BasePlugin.Instance.sBoss, false, int.MaxValue, Mode.Main);
+                    var B2Button = BRoutePage.StandardButtonBuilder.CreateModeButton(BCPPPlugin.Instance.sBoss, false, int.MaxValue, Mode.Main);
                     //B2Button.gameObject.GetComponent<RectTransform>().anchoredPosition = Vector2.right * 190f;
                     if (BCPPSave.Instance.death)
                     {

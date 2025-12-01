@@ -73,8 +73,8 @@ namespace BCarnellChars.OtherStuff
             base.ExitedSpawn();
             if (CoreGameManager.Instance.currentMode != Mode.Free)
             {
-                audMan.QueueAudio(BasePlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/AmbientIntro"), true);
-                audMan.QueueAudio(BasePlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/AmbientLoop"));
+                audMan.QueueAudio(BCPPPlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/AmbientIntro"), true);
+                audMan.QueueAudio(BCPPPlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/AmbientLoop"));
                 audMan.SetLoop(true);
             }
             BeginSpoopMode();
@@ -92,8 +92,8 @@ namespace BCarnellChars.OtherStuff
         public void ScaryMode()
         {
             audMan.FlushQueue(true);
-            audMan.QueueAudio(BasePlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/TimeOut"), true);
-            audMan.QueueAudio(BasePlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/TimeOutLoop"));
+            audMan.QueueAudio(BCPPPlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/TimeOut"), true);
+            audMan.QueueAudio(BCPPPlugin.bcppAssets.Get<SoundObject>("PrototypeBot-01/TimeOutLoop"));
             audMan.SetLoop(true);
             StartCoroutine(FadeOffFog());
         }

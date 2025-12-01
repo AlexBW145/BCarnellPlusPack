@@ -44,7 +44,7 @@ namespace BCarnellChars.OtherStuff
                     {
                         _requiredItem.SetValue(vending, Quarter);
                         MeshRenderer meshRender = gameObject.GetComponent<MeshRenderer>();
-                        MaterialModifier.ChangeMaterial(meshRender, [.. meshRender.GetSharedMaterialArray(), BasePlugin.freeInsert]);
+                        MaterialModifier.ChangeMaterial(meshRender, [.. meshRender.GetSharedMaterialArray(), BCPPPlugin.freeInsert]);
                         if (Chainloader.PluginInfos.ContainsKey("pixelguy.pixelmodding.baldiplus.pixelinternalapi"))
                             if (gameObject.GetComponent(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
                                 .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent")) != null)
@@ -57,22 +57,22 @@ namespace BCarnellChars.OtherStuff
                     // Now onto this ez fix!
                     if (profitCardRng.NextDouble() < (double)profitCardChance)
                     {
-                        _requiredItem.SetValue(vending, BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard"));
+                        _requiredItem.SetValue(vending, BCPPPlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard"));
                         MeshRenderer meshRender = gameObject.GetComponent<MeshRenderer>();
-                        MaterialModifier.ChangeMaterial(meshRender, [..meshRender.GetSharedMaterialArray(), BasePlugin.profitCardInsert]);
+                        MaterialModifier.ChangeMaterial(meshRender, [..meshRender.GetSharedMaterialArray(), BCPPPlugin.profitCardInsert]);
                         if (Chainloader.PluginInfos.ContainsKey("pixelguy.pixelmodding.baldiplus.pixelinternalapi")) // Geez, thanks doc...
                             if (gameObject.GetComponent(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
                                 .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent")) != null)
                                 AccessTools.Field(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
                                 .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent"), "requiredItems")
                                 .SetValue(gameObject.GetComponent(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
-                                .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent")), new List<Items> { BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard").itemType });
+                                .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent")), new List<Items> { BCPPPlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard").itemType });
                     }
                     else if (freeRng.NextDouble() < (double)freeChance) // Chances are super low, I hope you don't waste your time finding one...
                     {
                         _requiredItem.SetValue(vending, ItemMetaStorage.Instance.FindByEnum(Items.None).value);
                         MeshRenderer meshRender = gameObject.GetComponent<MeshRenderer>();
-                        MaterialModifier.ChangeMaterial(meshRender, [..meshRender.GetSharedMaterialArray(), BasePlugin.freeInsert]);
+                        MaterialModifier.ChangeMaterial(meshRender, [..meshRender.GetSharedMaterialArray(), BCPPPlugin.freeInsert]);
                         if (Chainloader.PluginInfos.ContainsKey("pixelguy.pixelmodding.baldiplus.pixelinternalapi")) // All because of THIS very easy thing??
                             if (gameObject.GetComponent(Chainloader.PluginInfos["pixelguy.pixelmodding.baldiplus.pixelinternalapi"].Instance.GetType().Assembly
                                 .GetType("PixelInternalAPI.Components.SodaMachineCustomComponent")) != null)
@@ -93,7 +93,7 @@ namespace BCarnellChars.OtherStuff
                 if (itemObject.itemType == Items.None && (int)_usesLeft.GetValue(vending) > 0)
                 {
                     CoreGameManager.Instance.audMan
-                        .PlaySingle((SoundObject)_audUse.GetValue(BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard").item.GetComponent<ITM_Acceptable>()));
+                        .PlaySingle((SoundObject)_audUse.GetValue(BCPPPlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard").item.GetComponent<ITM_Acceptable>()));
                     _InsertItem.Invoke(vending, [CoreGameManager.Instance.GetPlayer(player), ec]);
                 }
             }

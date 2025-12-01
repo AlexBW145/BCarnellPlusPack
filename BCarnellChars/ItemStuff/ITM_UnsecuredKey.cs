@@ -7,7 +7,9 @@ namespace BCarnellChars.ItemStuff;
 public class ITM_UnsecuredKey : ITM_Acceptable
 {
     private bool usedUpSticker = false;
-    private static FieldInfo _audUse = AccessTools.DeclaredField(typeof(ITM_Acceptable), "audUse");
+    private static readonly FieldInfo 
+        _audUse = AccessTools.DeclaredField(typeof(ITM_Acceptable), "audUse"),
+        _disabled = AccessTools.DeclaredField(typeof(ItemManager), "disabled");
     public override bool Use(PlayerManager pm)
     {
         if (StickerManager.Instance.HasSticker(StickerPatches.securedPacket))
@@ -23,7 +25,7 @@ public class ITM_UnsecuredKey : ITM_Acceptable
             usedUpSticker = true;
             return true;
         }
-        return base.Use(pm);
+        return !(bool)_disabled.GetValue(pm.itm) && base.Use(pm);
     }
 
     public override void PostUse(PlayerManager pm)

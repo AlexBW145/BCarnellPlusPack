@@ -120,7 +120,7 @@ namespace BCarnellChars.Characters.States
         public override void Enter()
         {
             base.Enter();
-            ghost.AudMan.QueueAudio(BasePlugin.bcppAssets.Get<SoundObject>("PAC75Ghost/Wandering"), true);
+            ghost.AudMan.QueueAudio(BCPPPlugin.bcppAssets.Get<SoundObject>("PAC75Ghost/Wandering"), true);
             ghost.AudMan.SetLoop(true);
             foreach (SpriteRenderer spriterend in ghost.spriteRenderer)
                 spriterend.color = Color.red;
@@ -150,7 +150,7 @@ namespace BCarnellChars.Characters.States
         public override void Enter()
         {
             base.Enter();
-            ghost.AudMan.QueueAudio(BasePlugin.bcppAssets.Get<SoundObject>("PAC75Ghost/Wandering"), true);
+            ghost.AudMan.QueueAudio(BCPPPlugin.bcppAssets.Get<SoundObject>("PAC75Ghost/Wandering"), true);
             ghost.AudMan.SetLoop(true);
             foreach (SpriteRenderer spriterend in ghost.spriteRenderer)
                 spriterend.color = Color.cyan;
@@ -179,7 +179,7 @@ namespace BCarnellChars.Characters.States
         public override void Enter()
         {
             base.Enter();
-            ghost.AudMan.QueueAudio(BasePlugin.bcppAssets.Get<SoundObject>("PAC75Ghost/Wandering"), true);
+            ghost.AudMan.QueueAudio(BCPPPlugin.bcppAssets.Get<SoundObject>("PAC75Ghost/Wandering"), true);
             ghost.AudMan.SetLoop(true);
             foreach (SpriteRenderer spriterend in ghost.spriteRenderer)
                 spriterend.color = new Color(1f, 0.5f, 0f);
@@ -199,7 +199,7 @@ namespace BCarnellChars.Characters.States
         public override void Enter()
         {
             base.Enter();
-            ghost.AudMan.QueueAudio(BasePlugin.bcppAssets.Get<SoundObject>("PAC75Ghost/Wandering"), true);
+            ghost.AudMan.QueueAudio(BCPPPlugin.bcppAssets.Get<SoundObject>("PAC75Ghost/Wandering"), true);
             ghost.AudMan.SetLoop(true);
             foreach (SpriteRenderer spriterend in ghost.spriteRenderer)
                 spriterend.color = new Color(1f, 0.5f, 1f);
@@ -239,7 +239,7 @@ namespace BCarnellChars.Characters.States
         {
             base.Enter();
             ghost.AudMan.FlushQueue(true);
-            ghost.AudMan.QueueAudio(BasePlugin.bcppAssets.Get<SoundObject>("PAC75Ghost/Weakened"), true);
+            ghost.AudMan.QueueAudio(BCPPPlugin.bcppAssets.Get<SoundObject>("PAC75Ghost/Weakened"), true);
             ghost.AudMan.SetLoop(true);
             foreach (SpriteRenderer spriterend in ghost.spriteRenderer)
                 spriterend.color = Color.blue;
@@ -272,7 +272,7 @@ namespace BCarnellChars.Characters.States
             if (!targetSighted || !isValid)
                 return;
 
-            CoreGameManager.Instance.audMan.PlaySingle(BasePlugin.bcppAssets.Get<SoundObject>("PAC75/WakaGhost"));
+            CoreGameManager.Instance.audMan.PlaySingle(BCPPPlugin.bcppAssets.Get<SoundObject>("PAC75/WakaGhost"));
             ghost.behaviorStateMachine.ChangeState(new PAC75Ghost_Fleeing(ghost, previousState));
         }
     }
@@ -296,7 +296,7 @@ namespace BCarnellChars.Characters.States
             ChangeNavigationState(new NavigationState_TargetPosition(ghost, 32, ghost.home));
             ghost.Navigator.SetSpeed(ghost.Speed + 99f);
             ghost.AudMan.FlushQueue(true);
-            ghost.AudMan.QueueAudio(BasePlugin.bcppAssets.Get<SoundObject>("PAC75Ghost/Fleeing"), true);
+            ghost.AudMan.QueueAudio(BCPPPlugin.bcppAssets.Get<SoundObject>("PAC75Ghost/Fleeing"), true);
             ghost.AudMan.SetLoop(true);
             foreach (SpriteRenderer spriterend in ghost.spriteRenderer)
                 spriterend.color = Color.clear;

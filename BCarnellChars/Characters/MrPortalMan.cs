@@ -32,8 +32,8 @@ namespace BCarnellChars.Characters
 
         public override void Initialize()
         {
-            BasePlugin.bcppAssets.Get<RenderTexture>("MrPortalMan/ManCamRender").Release();
-            BasePlugin.bcppAssets.Get<RenderTexture>("MrPortalMan/OutputCamRender").Release();
+            BCPPPlugin.bcppAssets.Get<RenderTexture>("MrPortalMan/ManCamRender").Release();
+            BCPPPlugin.bcppAssets.Get<RenderTexture>("MrPortalMan/OutputCamRender").Release();
             this.ChangeRadarColor();
             base.Initialize();
             if (!gameObject.GetComponent<CullAffector>())
@@ -246,8 +246,8 @@ namespace BCarnellChars.Characters
                 Destroy(spriteRenderer[1].sprite.texture);
                 Destroy(spriteRenderer[1].sprite);
             }
-            BasePlugin.bcppAssets.Get<RenderTexture>("MrPortalMan/ManCamRender").Release();
-            BasePlugin.bcppAssets.Get<RenderTexture>("MrPortalMan/OutputCamRender").Release();
+            BCPPPlugin.bcppAssets.Get<RenderTexture>("MrPortalMan/ManCamRender").Release();
+            BCPPPlugin.bcppAssets.Get<RenderTexture>("MrPortalMan/OutputCamRender").Release();
         }
 
         private void SwitchOutput()

@@ -20,8 +20,8 @@ namespace BCarnellChars.Patches
         [HarmonyPatch(typeof(FloodEvent), "Initialize"), HarmonyPrefix]
         static void BasementDirtyWaterFill(ref float ___height, ref float ___volume, ref float ___riseSpeed)
         {
-            if (BaseGameManager.Instance.levelObject?.name == BasePlugin.Instance.lBasement.name
-                || BaseGameManager.Instance.levelObject?.name == BasePlugin.Instance.lBoss.name)
+            if (BaseGameManager.Instance.levelObject?.name == BCPPPlugin.Instance.lBasement.name
+                || BaseGameManager.Instance.levelObject?.name == BCPPPlugin.Instance.lBoss.name)
             {
                 ___height = 10.1f;
                 ___volume = 3f;
@@ -90,7 +90,7 @@ namespace BCarnellChars.Patches
                 }
 
                 SubtitleManager.Instance.DestroyAll();
-                _LoadSceneObject.Invoke(__instance, [BasePlugin.Instance.sBasement]);
+                _LoadSceneObject.Invoke(__instance, [BCPPPlugin.Instance.sBasement]);
                 return false;
             }
             return true;
@@ -207,40 +207,6 @@ paint.NET, Anim8or, Audacity, Firealpaca, GIMP, Photopea, TTSMP3 (prior to v1.1.
         }
     }
 
-    public static class BCPPStickerStuff
-    {
-        public static void GiveBCPPRandomStickers(this StickerManager __instance, List<WeightedSticker> _potentialStickersToAdd, WeightedSticker[] potentialStickers, int amount, bool openNow, bool sticky)
-        {
-            _potentialStickersToAdd.Clear();
-            var potentialBCPPStickers = new List<WeightedSticker>();
-            foreach (WeightedSticker weightedSticker in potentialStickers)
-            {
-                if (weightedSticker.selection == StickerPatches.rpsSticker
-                    || weightedSticker.selection == StickerPatches.stealerSticker
-                    || weightedSticker.selection == StickerPatches.anyportalSticker
-                    || weightedSticker.selection == StickerPatches.switcherooSticker)
-                    continue;
-                else
-                    _potentialStickersToAdd.Add(new WeightedSticker(weightedSticker.selection, Mathf.RoundToInt((float)weightedSticker.weight * __instance.GetStickerOddsMultiplier(weightedSticker.selection))));
-            }
-            potentialBCPPStickers.AddRange([
-                new WeightedSticker(StickerPatches.rpsSticker, Mathf.RoundToInt(100f * __instance.GetStickerOddsMultiplier(StickerPatches.rpsSticker))),
-                new WeightedSticker(StickerPatches.stealerSticker, Mathf.RoundToInt(100f * __instance.GetStickerOddsMultiplier(StickerPatches.stealerSticker))),
-                new WeightedSticker(StickerPatches.anyportalSticker, Mathf.RoundToInt(100f * __instance.GetStickerOddsMultiplier(StickerPatches.anyportalSticker))),
-                new WeightedSticker(StickerPatches.switcherooSticker, Mathf.RoundToInt(100f * __instance.GetStickerOddsMultiplier(StickerPatches.switcherooSticker))),
-                ]);
-
-            __instance.AddSticker(potentialBCPPStickers.RandomSelection(), openNow, sticky, openNow);
-            for (int j = 0; j < amount; j++)
-                __instance.AddSticker(_potentialStickersToAdd.RandomSelection(), openNow, sticky, openNow);
-        }
-
-        public static void GiveSecuredPacket(this StickerManager __instance)
-        {
-            __instance.AddSticker(StickerPatches.securedPacket, true, false, false);
-        }
-    }
-
     [ConditionalPatchNoMod("pixelguy.pixelmodding.baldiplus.moddedmodesapi"), HarmonyPatch(typeof(MainMenu), "Start")]
     class DoneForDay
     {
@@ -273,7 +239,7 @@ paint.NET, Anim8or, Audacity, Firealpaca, GIMP, Photopea, TTSMP3 (prior to v1.1.
                     ElevatorScreen evl = SceneManager.GetActiveScene().GetRootGameObjects().Where(x => x.name == "ElevatorScreen").First().GetComponent<ElevatorScreen>();
                     gl.AssignElevatorScreen(evl);
                     evl.gameObject.SetActive(true);
-                    gl.LoadLevel(BasePlugin.Instance.sBasement);
+                    gl.LoadLevel(BCPPPlugin.Instance.sBasement);
                     evl.Initialize();
                     gl.SetSave(false);
                 });
@@ -301,7 +267,7 @@ paint.NET, Anim8or, Audacity, Firealpaca, GIMP, Photopea, TTSMP3 (prior to v1.1.
         [HarmonyPatch(typeof(Elevator), nameof(Elevator.Initialize)), HarmonyPostfix]
         static void NoExits(EnvironmentController ec, IntVector2 position, Elevator __instance, ref AudioManager ___audMan)
         {
-            if (CoreGameManager.Instance.sceneObject != BasePlugin.Instance.sPac) return;
+            if (CoreGameManager.Instance.sceneObject != BCPPPlugin.Instance.sPac) return;
             __instance.Close();
             ___audMan.FlushQueue(true);
             foreach (var gatewall in __instance.transform.Find("Gate").GetComponentsInChildren<MeshRenderer>())

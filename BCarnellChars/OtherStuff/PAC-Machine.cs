@@ -62,7 +62,7 @@ namespace BCarnellChars.OtherStuff
                 prevMIDIpos = MusicManager.Instance.MidiPlayer.MPTK_Position;
                 MusicManager.Instance.StopMidi();
             }
-            CoreGameManager.Instance.sceneObject = BasePlugin.Instance.sPac;
+            CoreGameManager.Instance.sceneObject = BCPPPlugin.Instance.sPac;
             playerPrevPos = new Vector3[CoreGameManager.Instance.setPlayers];
             playerPrevRotat = new Quaternion[CoreGameManager.Instance.setPlayers];
             for (int i = 0; i < CoreGameManager.Instance.setPlayers; i++)
@@ -134,7 +134,7 @@ namespace BCarnellChars.OtherStuff
             CoreGameManager.Instance.ResetShaders();
             foreach (Cell cell in ec.AllCells())
                 ec.UpdateLightingAtCell(cell);
-            gameObject.GetComponent<MeshRenderer>().SetMaterial(BasePlugin.bcppAssets.Get<Material>("PAC75/MachineInactive"));
+            gameObject.GetComponent<MeshRenderer>().SetMaterial(BCPPPlugin.bcppAssets.Get<Material>("PAC75/MachineInactive"));
             if (win)
             {
                 Cell cell = ec.CellFromPosition(transform.position);
@@ -162,7 +162,7 @@ namespace BCarnellChars.OtherStuff
     public class Pellet : MonoBehaviour
     {
         public bool Powered => gameObject.name.StartsWith("PacSuperPellet");
-        private SoundObject waka => Powered ? BasePlugin.bcppAssets.Get<SoundObject>("PAC75/WakaSuper") : BasePlugin.bcppAssets.Get<SoundObject>("PAC75/Waka");
+        private SoundObject waka => Powered ? BCPPPlugin.bcppAssets.Get<SoundObject>("PAC75/WakaSuper") : BCPPPlugin.bcppAssets.Get<SoundObject>("PAC75/Waka");
         public MapIcon icon;
         void OnTriggerEnter(Collider other)
         {

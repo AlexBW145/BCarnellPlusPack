@@ -95,19 +95,19 @@ namespace BCarnellChars.OtherStuff
                 if (ec.TrapCheck(cell) || cell.room.type != RoomType.Hall) continue;
                 if (!(powerRNG.NextDouble() >= (double)powerChance) && (cell.WallCount <= 0 || (cell.AllOpenNavDirections.Count >= 3 && cell.WallCount <= 1)))
                 {
-                    var powerpellet = Instantiate(BasePlugin.bcppAssets.Get<Pellet>("PAC75/SuperPellet").gameObject, cell.CenterWorldPosition, default);
+                    var powerpellet = Instantiate(BCPPPlugin.bcppAssets.Get<Pellet>("PAC75/SuperPellet").gameObject, cell.CenterWorldPosition, default);
                     powerpellet.GetComponent<Pellet>().icon = ec.map.AddIcon(mapicon, powerpellet.transform, Color.white);
-                    powerpellet.GetComponent<Pellet>().icon.spriteRenderer.sprite = BasePlugin.bcppAssets.Get<Sprite>("PAC75/UIPowerPellett");
+                    powerpellet.GetComponent<Pellet>().icon.spriteRenderer.sprite = BCPPPlugin.bcppAssets.Get<Sprite>("PAC75/UIPowerPellett");
                     continue;
                 }
-                var pellet = Instantiate(BasePlugin.bcppAssets.Get<Pellet>("PAC75/Pellet").gameObject, cell.CenterWorldPosition, default);
+                var pellet = Instantiate(BCPPPlugin.bcppAssets.Get<Pellet>("PAC75/Pellet").gameObject, cell.CenterWorldPosition, default);
                 pellet.GetComponent<Pellet>().icon = ec.map.AddIcon(mapicon, pellet.transform, Color.white);
-                pellet.GetComponent<Pellet>().icon.spriteRenderer.sprite = BasePlugin.bcppAssets.Get<Sprite>("PAC75/UIPellett");
+                pellet.GetComponent<Pellet>().icon.spriteRenderer.sprite = BCPPPlugin.bcppAssets.Get<Sprite>("PAC75/UIPellett");
                 ec.notebookTotal++;
             }
             base.Initialize();
             GlobalCam.Instance.Transition(UiTransition.Dither, 0.01666667f);
-            CoreGameManager.Instance.musicMan.QueueAudio(BasePlugin.bcppAssets.Get<SoundObject>("mus_PAC75"), true);
+            CoreGameManager.Instance.musicMan.QueueAudio(BCPPPlugin.bcppAssets.Get<SoundObject>("mus_PAC75"), true);
             CoreGameManager.Instance.musicMan.SetLoop(true);
             Destroy(FindObjectsOfType<Canvas>().ToList().Find(x => x.name.StartsWith("FieldTripLoad")).gameObject);
             AudioListener.pause = false;
@@ -208,7 +208,7 @@ namespace BCarnellChars.OtherStuff
                 LoadSceneObject(previousScene, false);
                 yield break;
             }
-            CoreGameManager.Instance.audMan.PlaySingle(BasePlugin.bcppAssets.Get<SoundObject>("PAC75/Victory"));
+            CoreGameManager.Instance.audMan.PlaySingle(BCPPPlugin.bcppAssets.Get<SoundObject>("PAC75/Victory"));
             StartCoroutine(WaitUntilEnd());
         }
 

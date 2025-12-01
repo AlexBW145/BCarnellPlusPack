@@ -61,7 +61,7 @@ namespace BCarnellChars.Characters
         public override void CaughtPlayer(PlayerManager player)
         {
             base.CaughtPlayer(player);
-            CoreGameManager.Instance.audMan.PlaySingle(BasePlugin.bcppAssets.Get<SoundObject>("BCarnellBoss/LOSE/caughtlayer"));
+            CoreGameManager.Instance.audMan.PlaySingle(BCPPPlugin.bcppAssets.Get<SoundObject>("BCarnellBoss/LOSE/caughtlayer"));
         }
 
         internal void InitPhase(B2Boss phase)
@@ -86,7 +86,7 @@ namespace BCarnellChars.Characters
                 audMan.QueueAudio(dialIntro[4], true);
             else if (Chainloader.PluginInfos.ContainsKey("alexbw145.baldiplus.playablecharacters") && ProtagonistStuff.IsMainProtagonist(pm))
                 audMan.QueueAudio(dialIntro[5], true);
-            else if (PlayerFileManager.Instance.clearedLevels[1] == false && !BasePlugin.Instance.SaveData.death)
+            else if (PlayerFileManager.Instance.clearedLevels[1] == false && !BCPPPlugin.Instance.SaveData.death)
                 audMan.QueueAudio(dialIntro[1], true);
             else if (CoreGameManager.Instance.Lives <= 0)
                 audMan.QueueAudio(dialIntro[3], true);
@@ -231,6 +231,7 @@ namespace BCarnellChars.Characters
         private IEnumerator ChargeGo(float actualTimeWillWaste = 1.6f, float cooldown = 10f, bool targetPlayer = true)
         {
             var players = ec.Players;
+            float initial = actualTimeWillWaste;
             audMan.pitchModifier = 1f + (1.6f - actualTimeWillWaste);
             audMan.QueueAudio(boostCharge, true);
             animator.Play("BoostPre", 1f, true);
@@ -239,7 +240,7 @@ namespace BCarnellChars.Characters
             {
                 behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 127));
                 actualTimeWillWaste -= TimeScale * Time.deltaTime;
-                speed = 1f + (1.6f - actualTimeWillWaste);
+                speed = 1f + (-actualTimeWillWaste + initial);
                 animator.ChangeSpeed(speed);
                 yield return null;
             }

@@ -30,7 +30,7 @@ namespace BCarnellChars.OtherStuff
                 for (int i = 0; i < swingDoor.overlayLocked.Length; i++)
                 {
                     originalOverlays[i] = swingDoor.overlayLocked[i];
-                    swingDoor.overlayLocked[i] = BasePlugin.securedYellowSwingingDoor;
+                    swingDoor.overlayLocked[i] = BCPPPlugin.securedYellowSwingingDoor;
                 }
             }
 

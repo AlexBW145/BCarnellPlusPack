@@ -12,52 +12,52 @@ internal static class AdvancedEditionAdds
 {
     internal static void AdvancedAdds()
     {
-        var profitCard = BasePlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard");
+        var profitCard = BCPPPlugin.bcppAssets.Get<ItemObject>("Items/ProfitCard");
         var quarter = ToProfitCardCost.Quarter;
-        var profitCardRecipe = new FoodRecipeData(BasePlugin.Instance.Info)
+        var profitCardRecipe = new FoodRecipeData(BCPPPlugin.Instance.Info)
             .SetRawFood(quarter, quarter)
             .SetCookedFood(profitCard)
             .OverrideCookingTime(4)
             .OverrideCoolingTime(7)
             .RegisterRecipe();
-        var quarterRecipe = new FoodRecipeData(BasePlugin.Instance.Info)
+        var quarterRecipe = new FoodRecipeData(BCPPPlugin.Instance.Info)
             .SetRawFood(profitCard)
             .SetCookedFood(quarter, quarter)
             .OverrideCookingTime(2)
             .OverrideCoolingTime(7)
             .RegisterRecipe();
-        var infKey = BasePlugin.bcppAssets.Get<ItemObject>("Items/UnsecuredKey");
+        var infKey = BCPPPlugin.bcppAssets.Get<ItemObject>("Items/UnsecuredKey");
         var regularKey = ItemMetaStorage.Instance.FindByEnum(Items.DetentionKey).value;
-        var infKeyRecipe = new FoodRecipeData(BasePlugin.Instance.Info)
+        var infKeyRecipe = new FoodRecipeData(BCPPPlugin.Instance.Info)
             .SetRawFood(regularKey, regularKey, regularKey, regularKey)
             .SetCookedFood(infKey)
             .OverrideCookingTime(11)
             .OverrideCoolingTime(11)
             .RegisterRecipe();
-        var regularKeyRecipe = new FoodRecipeData(BasePlugin.Instance.Info)
+        var regularKeyRecipe = new FoodRecipeData(BCPPPlugin.Instance.Info)
             .SetRawFood(infKey)
             .SetCookedFood(regularKey, regularKey, regularKey, regularKey)
             .OverrideCookingTime(7)
             .OverrideCoolingTime(4)
             .RegisterRecipe();
-        var infLock = BasePlugin.bcppAssets.Get<ItemObject>("Items/SecuredLock");
+        var infLock = BCPPPlugin.bcppAssets.Get<ItemObject>("Items/SecuredLock");
         var regularLock = ItemMetaStorage.Instance.FindByEnum(Items.DoorLock).value;
-        var infLockRecipe = new FoodRecipeData(BasePlugin.Instance.Info)
+        var infLockRecipe = new FoodRecipeData(BCPPPlugin.Instance.Info)
             .SetRawFood(regularLock, regularLock, regularLock, regularLock)
             .SetCookedFood(infLock)
             .OverrideCookingTime(11)
             .OverrideCoolingTime(11)
             .RegisterRecipe();
-        var regularLockRecipe = new FoodRecipeData(BasePlugin.Instance.Info)
+        var regularLockRecipe = new FoodRecipeData(BCPPPlugin.Instance.Info)
             .SetRawFood(infLock)
             .SetCookedFood(regularLock, regularLock, regularLock, regularLock)
             .OverrideCookingTime(7)
             .OverrideCoolingTime(4)
             .RegisterRecipe();
-        var taserPulse = BasePlugin.bcppAssets.Get<ItemObject>("Items/TASERPulse");
+        var taserPulse = BCPPPlugin.bcppAssets.Get<ItemObject>("Items/TASERPulse");
         var bsoda = ItemMetaStorage.Instance.FindByEnum(Items.Bsoda).value;
         var windBlower = ItemMetaStorage.Instance.FindByEnum(EnumExtensions.GetFromExtendedName<Items>("WindBlower")).value;
-        var taserPulseRecipe = new FoodRecipeData(BasePlugin.Instance.Info)
+        var taserPulseRecipe = new FoodRecipeData(BCPPPlugin.Instance.Info)
             .SetRawFood(bsoda, windBlower)
             .SetCookedFood(taserPulse)
             .RegisterRecipe();
@@ -86,9 +86,9 @@ internal static class AdvancedEditionAdds
             { "Adv_Elv_Tip_BCPP_B2", "Are you forgetting something?" },
         };
         AssetLoader.LocalizationFromFunction((lang) => localization);
-        ApiManager.AddNewTips(BasePlugin.Instance.Info, localization.Keys.ToArray());
+        ApiManager.AddNewTips(BCPPPlugin.Instance.Info, localization.Keys.ToArray());
 
-        ApiManager.AddNewSymbolMachineWords(BasePlugin.Instance.Info,
+        ApiManager.AddNewSymbolMachineWords(BCPPPlugin.Instance.Info,
             "BCMAC",
             "BCPP",
             "RPS",

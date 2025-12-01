@@ -77,7 +77,7 @@ public class Plugin : BaseUnityPlugin
                         new() { selection = Resources.FindObjectsOfTypeAll<ItemObject>().First(x => x.item.GetComponent<ITM_SugarFlavoredZestyBar>()), weight = 55 },
                         new() { selection = Resources.FindObjectsOfTypeAll<ItemObject>().First(x => x.item.GetComponent<ITM_SoapBubbles>()), weight = 40 }
                     ];
-                    if (!BCarnellChars.BasePlugin.RadarModExists)
+                    if (!BCarnellChars.BCPPPlugin.RadarModExists)
                     {
                         ld.levelObject.potentialItems = ld.levelObject.potentialItems.AddToArray(
                             new() { selection = Resources.FindObjectsOfTypeAll<ItemObject>().First(x => x.item.GetComponent<ITM_GPS>()), weight = 40 });

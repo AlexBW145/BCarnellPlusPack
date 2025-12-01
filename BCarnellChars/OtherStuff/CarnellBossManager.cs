@@ -3,6 +3,7 @@ using BepInEx.Bootstrap;
 using HarmonyLib;
 using MTM101BaldAPI;
 using MTM101BaldAPI.Components;
+using MTM101BaldAPI.ErrorHandler;
 using MTM101BaldAPI.PlusExtensions;
 using System;
 using System.Collections;
@@ -23,7 +24,7 @@ namespace BCarnellChars.OtherStuff
         private static System.Random lightonRNG;
         public static CarnellBossManager BossInstance => singleton;
         private List<SubInitializer> subinit = new List<SubInitializer>();
-        private SubInitializer subinitPre => BasePlugin.bcppAssets.Get<GameInitializer>("SubInitializer") as SubInitializer;
+        private SubInitializer subinitPre => BCPPPlugin.bcppAssets.Get<GameInitializer>("SubInitializer") as SubInitializer;
 
         [SerializeField]
         protected List<EnvironmentController> Environments;
@@ -48,7 +49,7 @@ namespace BCarnellChars.OtherStuff
             for (int i = 0; i < 4; i++)
             {
                 var subin = Instantiate(subinitPre, null, false);
-                subin.subLevelObject = BasePlugin.Instance.lsubBoss[i];
+                subin.subLevelObject = BCPPPlugin.Instance.lsubBoss[i];
                 subin.baseGameManager = this;
                 subin.onReady = (lb, gm) =>
                 {
@@ -161,7 +162,7 @@ namespace BCarnellChars.OtherStuff
         public override void Initialize()
         {
             if (CoreGameManager.Instance.currentMode == Mode.Free || CoreGameManager.Instance.lifeMode == LifeMode.Explorer || !BCPPSave.Instance.basementCompleted
-                || Chainloader.PluginInfos.ContainsKey("com.exmagikguy.baldi.loguscheats"))
+                || Chainloader.PluginInfos.ContainsKey("com.exmagikguy.baldi.loguscheats") /*|| Chainloader.PluginInfos.ContainsKey("com.sinai.unityexplorer") || Chainloader.PluginInfos.ContainsKey("alexbw145.baldiplus.pinedebug")*/)
             {
                 DogcheckBCPP.SendToDogcheckScreen();
                 Destroy(gameObject);
@@ -211,6 +212,7 @@ namespace BCarnellChars.OtherStuff
             base.BeginPlay();
             LastEnvironments = Environments;
             LastLevelObjects = levelObjects;
+            ErrorDisplayer.allErrorDisplayers.Do(x => x.ShowError("<color=white>Just as you know...\nThis level is not yet finished and is not beatable yet.", 10f)); // Never do spam `Debug.Error` but this seems to be a public method...
         }
 
         public override void BeginSpoopMode()
@@ -273,7 +275,7 @@ namespace BCarnellChars.OtherStuff
             {
                 ec.Npcs.DoIf(x => x.Character.ToStringExtended().ToLower() == "BCarnellBoss".ToLower(), x => x.GetComponent<BCarnellBoss>().TheDialogue(ec.Players[0]));
                 ec.AddTimeScale(new TimeScaleModifier(0f, 1f, 1f));
-                MusicManager.Instance.PlayMidi(BasePlugin.bcppAssets.Get<string>("mus_BCarnellBossIntro"), false);
+                MusicManager.Instance.PlayMidi(BCPPPlugin.bcppAssets.Get<string>("mus_BCarnellBossIntro"), false);
                 yield return null;
                 while (MusicManager.Instance.MidiPlaying)
                     yield return null;
@@ -283,7 +285,7 @@ namespace BCarnellChars.OtherStuff
                 LastLevelObjects = [.. levelObjects.Where(ld => ld != levelObject)];
                 yield return null;
                 SwapEnvironment(Mathf.RoundToInt(UnityEngine.Random.Range(0f, LastEnvironments.Count - 1)), true);
-                MusicManager.Instance.PlayMidi(BasePlugin.bcppAssets.Get<string>("mus_BCarnellBoss01"), true);
+                MusicManager.Instance.PlayMidi(BCPPPlugin.bcppAssets.Get<string>("mus_BCarnellBoss01"), true);
                 yield return null;
                 Teleporttt();
                 var speedMod = new ValueModifier(2f, 0f);
@@ -301,7 +303,7 @@ namespace BCarnellChars.OtherStuff
 
         internal void THEBUTTONISPRESSED()
         {
-            if (MusicManager.Instance.MidiPlaying && MusicManager.Instance.MidiPlayer.MPTK_MidiName == BasePlugin.bcppAssets.Get<string>("mus_BCarnellBossIntro")
+            if (MusicManager.Instance.MidiPlaying && MusicManager.Instance.MidiPlayer.MPTK_MidiName == BCPPPlugin.bcppAssets.Get<string>("mus_BCarnellBossIntro")
                 && MusicManager.Instance.MidiPlayer.MPTK_TickCurrent < 6912)
                 MusicManager.Instance.MidiPlayer.MPTK_TickCurrent = 6912;
             ec.Npcs.DoIf(x => x.Character.ToStringExtended().ToLower() == "BCarnellBoss".ToLower(), x => x.GetComponent<BCarnellBoss>().ButtonPressed(ec.Players[0]));
