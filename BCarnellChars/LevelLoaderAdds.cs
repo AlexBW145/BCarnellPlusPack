@@ -1,4 +1,5 @@
 ﻿using BCarnellChars.OtherStuff;
+using BCarnellChars.Patches;
 using BepInEx.Bootstrap;
 using HarmonyLib;
 using MonoMod.Utils;
@@ -30,11 +31,19 @@ internal static class LevelLoaderAdds
             { "unsecuredyellowkey", BCPPPlugin.bcppAssets.Get<ItemObject>("Items/UnsecuredKey") },
             { "securedyellowlock", BCPPPlugin.bcppAssets.Get<ItemObject>("Items/SecuredLock") },
             { "anyportaloutput", BCPPPlugin.bcppAssets.Get<ItemObject>("Items/AnyportalOutput") },
-            { "taserpulse", BCPPPlugin.bcppAssets.Get<ItemObject>("Items/TASERPulse") }
+            { "taserpulse", BCPPPlugin.bcppAssets.Get<ItemObject>("Items/TASERPulse") },
+            { "stickerpack_securedlocked", MiscPatches._securedPacket }
         });
         LevelLoaderPlugin.Instance.tileBasedObjectPrefabs.Add("inflocked", BCPPPlugin.bcppAssets.Get<SecuredSwingingDoor>("Obstacles/SecuredSwingingDoor").GetComponent<SwingDoor>());
         LevelLoaderPlugin.Instance.basicObjects.Add("bcpp_randomitemmachine", BCPPPlugin.bcppAssets.Get<GameObject>("Structures/RandomItemMachine"));
         LevelLoaderPlugin.Instance.skyboxAliases.Add("pac75", BCPPPlugin.bcppAssets.Get<Cubemap>("PacSkybox"));
+        LevelLoaderPlugin.Instance.stickerAliases.AddRange(new()
+        {
+            { "switcherquartprofit", StickerPatches.switcherooSticker },
+            { "rock_paper_scissors", StickerPatches.rpsSticker },
+            { "errorbot", StickerPatches.stealerSticker },
+            { "anyportalman", StickerPatches.anyportalSticker }
+        });
     }
 
     private static FieldInfo requiredItem = AccessTools.DeclaredField(typeof(SodaMachine), "requiredItem");

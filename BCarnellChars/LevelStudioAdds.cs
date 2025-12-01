@@ -1,10 +1,12 @@
-﻿using HarmonyLib;
+﻿using BCarnellChars.Patches;
+using HarmonyLib;
+using MonoMod.Utils;
 using MTM101BaldAPI.AssetTools;
-using PlusStudioLevelLoader;
 using PlusLevelStudio;
 using PlusLevelStudio.Editor;
 using PlusLevelStudio.Editor.Tools;
 using PlusLevelStudio.UI;
+using PlusStudioLevelLoader;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -36,6 +38,8 @@ internal static class LevelStudioAdds
                     { "Ed_Tool_item_securedyellowlock_Desc", "Don't place it!" },
                     { "Ed_Tool_item_anyportaloutput_Desc", "Can only be placed if Mr. Portal Man is present, but its usable for planned escape routes!" },
                     { "Ed_Tool_item_taserpulse_Desc", "ZAP! This bad boy chains through three bad criminals! But can lethally get you into trouble!" },
+                    { "Ed_Tool_item_stickerpack_securedlocked_Title", "Secured Locked Sticker Packet" },
+                    { "Ed_Tool_item_stickerpack_securedlocked_Desc", "Contains 1 BCPP-related sticker and 2 randomly selected stickers. This packet is not yet opened, you must search for a Unsecured Key in order to open!" },
 
                     { "Ed_Tool_door_inflocked_Title", "Secured Locked Swinging Door" },
                     { "Ed_Tool_door_inflocked_Desc", "It's forever to be locked..." },
@@ -102,6 +106,20 @@ internal static class LevelStudioAdds
 #endif
         LevelStudioPlugin.Instance.skyboxSprites.Add("pac75", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/pac75skybox"));
         LevelStudioPlugin.Instance.selectableSkyboxes.Add("pac75");
+        LevelStudioPlugin.Instance.selectableStickers.AddRange(new List<string>()
+        {
+            "switcherquartprofit",
+            "rock_paper_scissors",
+            "errorbot",
+            "anyportalman",
+        });
+        LevelStudioPlugin.Instance.stickerSprites.AddRange(new()
+        {
+            { "switcherquartprofit", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/Sticker_switcherooprofit") },
+            { "rock_paper_scissors", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/Sticker_rps") },
+            { "errorbot", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/Sticker_errorbot") },
+            { "anyportalman", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/Sticker_anyportalman") }
+        });
 
         EditorInterfaceModes.AddModeCallback((mode, isComplaint) =>
         {
@@ -119,6 +137,7 @@ internal static class LevelStudioAdds
                 new ItemTool("securedyellowlock"),
                 new ItemTool("anyportaloutput"),
                 new ItemTool("taserpulse"),
+                new ItemTool("stickerpack_securedlocked", false)
                 ]);
             EditorInterfaceModes.AddToolToCategory(mode, "doors", new DoorTool("inflocked", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/inflocked_SwingDoorED")));
             EditorInterfaceModes.AddToolToCategory(mode, "objects", new ObjectToolNoRotation("bcpp_randomitemmachine", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/Object_bcpp_randomitemmachine")));
