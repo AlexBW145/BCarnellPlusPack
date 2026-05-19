@@ -46,7 +46,7 @@ namespace BCarnellChars
     {
         public static BCPPPlugin Instance { get; private set; }
         public BCPPSave SaveData { get; private set; } = new BCPPSave();
-        public static AssetManager bcppAssets = new AssetManager();
+        public static readonly AssetManager bcppAssets = new AssetManager();
         // Makin' sure that it'll become colorful!
         internal static bool RadarModExists { get; private set; } = false;
         private const string radarID = "org.aestheticalz.baldi.characterradar";
@@ -982,7 +982,7 @@ namespace BCarnellChars
             siegecart.motorAudMan = motorAudMan;
             // The balls
             GameObject ball = Instantiate(Resources.FindObjectsOfTypeAll<ITM_BSODA>().Last(x => x.name == "ITM_BSODA"), MTM101BaldiDevAPI.prefabTransform).gameObject;
-            ball.name = "CanonBall";
+            ball.name = "CannonBall";
             Destroy(ball.GetComponent<ITM_BSODA>());
             siegecart.ballPre = ball.AddComponent<SiegeCartBalls>();
             ball.ConvertToPrefab(true);
@@ -3168,7 +3168,7 @@ namespace BCarnellChars
     {
         public static BCPPSave Instance => BCPPPlugin.Instance.SaveData;
         [NonSerialized] public ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource("BCPPSave");
-        [NonSerialized] public const string Version = "1.6.0", Build = "earlybird"; // BepinEx 5 does not support semantic versioning, which they have lied in their tutorial documentation until BepInEx 6 comes out.
+        [NonSerialized] public const string Version = "1.6.0", Build = "earlybird.1"; // BepinEx 5 does not support semantic versioning, which they have lied in their tutorial documentation until BepInEx 6 comes out.
         internal static Version typeVersion => new Version(Version);
 
         internal string version = Version, build = Build;

@@ -192,6 +192,7 @@ public class PAC75Ghost_Fleeing(PAC75Ghost ghost, PAC75Ghost_StateBase previousS
         base.Enter();
         ChangeNavigationState(new NavigationState_TargetPosition(ghost, 32, ghost.home));
         ghost.Navigator.SetSpeed(ghost.Speed + 99f);
+        ghost.Navigator.maxSpeed = ghost.Speed + 99f;
         ghost.AudMan.FlushQueue(true);
         ghost.AudMan.QueueAudio(BCPPPlugin.bcppAssets.Get<SoundObject>("PAC75Ghost/Fleeing"), true);
         ghost.AudMan.SetLoop(true);
@@ -202,6 +203,7 @@ public class PAC75Ghost_Fleeing(PAC75Ghost ghost, PAC75Ghost_StateBase previousS
     public override void Exit()
     {
         ghost.Navigator.SetSpeed(ghost.NewSpeed);
+        ghost.Navigator.maxSpeed = ghost.NewSpeed;
     }
 
     public override void Update() { }

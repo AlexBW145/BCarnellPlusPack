@@ -35,7 +35,7 @@ public class SiegeCartBalls : MonoBehaviour, IEntityTrigger
     {
         if (moveMod == null || !isValid) return;
         // The original concept was every collision would result the entity being squished, but due to physics, that is very out of context.
-        if ((other.CompareTag("Player") || (other.CompareTag("NPC") && other.GetComponent<NPC>().Character.ToStringExtended() != "SiegeCanonCart")) && entity != null)
+        if ((other.CompareTag("Player") || (other.CompareTag("NPC") && !other.GetComponent<SiegeCannonCart>())) && entity != null)
         {
             entity.ExternalActivity.moveMods.Add(moveMod);
             activityMods.Add(entity.ExternalActivity);
@@ -45,7 +45,7 @@ public class SiegeCartBalls : MonoBehaviour, IEntityTrigger
     public void EntityTriggerStay(Entity entity, Collider other, bool isValid)
     {
         if (moveMod == null || !entity.Squished) return;
-        if ((other.CompareTag("Player") || (other.CompareTag("NPC") && other.GetComponent<NPC>().Character.ToStringExtended() != "SiegeCanonCart")) && entity != null)
+        if ((other.CompareTag("Player") || (other.CompareTag("NPC") && !other.GetComponent<SiegeCannonCart>())) && entity != null)
         {
             entity.ExternalActivity.moveMods.Remove(moveMod);
             activityMods.Remove(entity.ExternalActivity);
@@ -55,7 +55,7 @@ public class SiegeCartBalls : MonoBehaviour, IEntityTrigger
     public void EntityTriggerExit(Entity entity, Collider other, bool isValid)
     {
         if (moveMod == null || !isValid) return;
-        if ((other.CompareTag("Player") || (other.CompareTag("NPC") && other.GetComponent<NPC>().Character.ToStringExtended() != "SiegeCanonCart")) && entity != null)
+        if ((other.CompareTag("Player") || (other.CompareTag("NPC") && !other.GetComponent<SiegeCannonCart>())) && entity != null)
         {
             entity.ExternalActivity.moveMods.Remove(moveMod);
             activityMods.Remove(entity.ExternalActivity);

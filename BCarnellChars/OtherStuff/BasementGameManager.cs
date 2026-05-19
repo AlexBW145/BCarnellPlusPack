@@ -57,6 +57,7 @@ public class BasementGameManager : BaseGameManager
     public override void BeginPlay()
     {
         base.BeginPlay();
+        MusicManager.Instance.StopMidi();
         ambience.Initialize(ec);
         foreach (Activity activity in ec.activities)
             if (activity.Corrupted)

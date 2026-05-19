@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using MTM101BaldAPI;
-using MTM101BaldAPI.Registers;
 using System.Linq;
-using MTM101BaldAPI.Reflection;
 using HarmonyLib;
-using System.Collections;
-using System.Drawing;
+using System.Reflection;
 
 namespace BCarnellChars.OtherStuff
 {
@@ -20,9 +14,20 @@ namespace BCarnellChars.OtherStuff
         [SerializeField] internal WeightedItemObject[] selection;
         private Vector3[] playerPrevPos;
         private Quaternion[] playerPrevRotat;
+        private bool[] playerPrevFlipped;
         private string prevMIDI;
         private double prevMIDIpos;
         private DijkstraMap prevDijkstra;
+
+        private static readonly FieldInfo
+            _timeScaleModifiers = AccessTools.DeclaredField(typeof(EnvironmentController), "timeScaleModifiers"),
+            _instance = AccessTools.DeclaredField(typeof(Singleton<BaseGameManager>), "m_Instance"),
+            _ecPre = AccessTools.DeclaredField(typeof(GameInitializer), "ecPre"),
+            _generatorPre = AccessTools.DeclaredField(typeof(GameInitializer), "generatorPre"),
+            _loaderPre = AccessTools.DeclaredField(typeof(GameInitializer), "loaderPre"),
+            _dijiEC = AccessTools.DeclaredField(typeof(DijkstraMap), "environment");
+        private static readonly MethodInfo
+            happyInvoke = AccessTools.DeclaredMethod(typeof(HappyBaldi), "Activate");
 
         public bool ClickableHidden()
         {
@@ -54,7 +59,7 @@ namespace BCarnellChars.OtherStuff
             PropagatedAudioManager.paused = true;
             ec.PauseEnvironment(true);
             ec.PauseEvents(true);
-            List<TimeScaleModifier> timescale = ec.ReflectionGetVariable("timeScaleModifiers") as List<TimeScaleModifier>;
+            List<TimeScaleModifier> timescale = _timeScaleModifiers.GetValue(ec) as List<TimeScaleModifier>;
             timescale.DoIf(t => t.playerTimeScale != 1, t => ec.RemoveTimeScale(t));
             if (MusicManager.Instance.MidiPlaying)
             {
@@ -65,23 +70,27 @@ namespace BCarnellChars.OtherStuff
             CoreGameManager.Instance.sceneObject = BCPPPlugin.Instance.sPac;
             playerPrevPos = new Vector3[CoreGameManager.Instance.setPlayers];
             playerPrevRotat = new Quaternion[CoreGameManager.Instance.setPlayers];
+            playerPrevFlipped = new bool[CoreGameManager.Instance.setPlayers];
             for (int i = 0; i < CoreGameManager.Instance.setPlayers; i++)
             {
-                playerPrevPos[i] = CoreGameManager.Instance.GetPlayer(i).transform.position;
-                playerPrevRotat[i] = CoreGameManager.Instance.GetPlayer(i).transform.localRotation;
-                CoreGameManager.Instance.GetPlayer(i).plm.Entity.ExternalActivity.moveMods.RemoveAll(m => m != null);
+                var pp = CoreGameManager.Instance.GetPlayer(i);
+                playerPrevFlipped[i] = pp.plm.Entity.Flipped;
+                if (pp.plm.Entity.Flipped)
+                    pp.plm.Entity.Flip();
+                playerPrevPos[i] = pp.transform.position;
+                playerPrevRotat[i] = pp.transform.localRotation;
+                pp.plm.Entity.ExternalActivity.moveMods.RemoveAll(m => m != null);
             }
-            foreach (Entity mob in FindObjectsOfType<Entity>(false).Where(m => m.gameObject.scene.name == "Game"))
-                mob.SetActive(false);
-            var canvas = Instantiate(Resources.FindObjectsOfTypeAll<Canvas>().ToList().Find(x => x.name == "FieldTripLoad").gameObject);
+            ec.Active = false;
+            foreach (var obj in FindObjectsOfType<GameObject>(true).Where(m => m.gameObject.scene.Equals(ec.gameObject.scene) && m.transform.parent == null))
+                obj.SetActive(false);
+            var canvas = Instantiate(Resources.FindObjectsOfTypeAll<Canvas>().Last(x => x.name == "FieldTripLoad").gameObject);
             GlobalCam.Instance.FadeIn(UiTransition.Dither, 0.01666667f);
             // I'm doing something wrong...
             Scene pacScene = SceneManager.CreateScene("PacGame");
             SceneManager.SetActiveScene(pacScene);
-            RenderSettings.skybox = Resources.FindObjectsOfTypeAll<Material>().ToList().Last(s => s.name == "Skybox" && s.shader == Shader.Find("Shader Graphs/Skybox"));
-            ec.Active = false;
-            ec.gameObject.SetActive(false);
-            FindObjectOfType<MainGameManager>().gameObject.SetActive(false);
+            //FindObjectOfType<MainGameManager>().gameObject.SetActive(false);
+            RenderSettings.skybox = Resources.FindObjectsOfTypeAll<Material>().Last(s => s.name == "Skybox" && s.shader == Shader.Find("Shader Graphs/Skybox"));
             AccessTools.DeclaredField(typeof(Singleton<BaseGameManager>), "m_Instance").SetValue(null, null);
             GameObject prea = new GameObject("GameInitializer");
             prea.gameObject.SetActive(false);
@@ -89,9 +98,9 @@ namespace BCarnellChars.OtherStuff
                 GameInitializer initaliz = prea.AddComponent<GameInitializer>();
                 //initaliz.ReflectionSetVariable("sceneObject", BasePlugin.Instance.sPac);
                 // Never find the first prefab, worst mistake of my life.
-                initaliz.ReflectionSetVariable("ecPre", Resources.FindObjectsOfTypeAll<EnvironmentController>().ToList().Find(x => x.name == "Environment Controller"));
-                initaliz.ReflectionSetVariable("generatorPre", Resources.FindObjectsOfTypeAll<LevelGenerator>().ToList().Find(x => x.name == "LevelGenerator"));
-                initaliz.ReflectionSetVariable("loaderPre", Resources.FindObjectsOfTypeAll<LevelLoader>().ToList().Find(x => x.name == "LevelLoader"));
+                _ecPre.SetValue(initaliz, Resources.FindObjectsOfTypeAll<EnvironmentController>().Last(x => x.name == "Environment Controller" && x.GetInstanceID() >= 0));
+                _generatorPre.SetValue(initaliz, Resources.FindObjectsOfTypeAll<LevelGenerator>().Last(x => x.name == "LevelGenerator" && x.GetInstanceID() >= 0));
+                _loaderPre.SetValue(initaliz, Resources.FindObjectsOfTypeAll<LevelLoader>().Last(x => x.name == "LevelLoader" && x.GetInstanceID() >= 0));
             }
             SceneManager.MoveGameObjectToScene(canvas.gameObject, pacScene);
             SceneManager.MoveGameObjectToScene(prea, pacScene);
@@ -101,35 +110,37 @@ namespace BCarnellChars.OtherStuff
 
         public void Returned(bool win)
         {
-            AccessTools.DeclaredField(typeof(Singleton<BaseGameManager>), "m_Instance").SetValue(null, FindObjectsOfType<MainGameManager>(true).ToList().Find(m => m.gameObject.scene.name == "Game"));
-            ec.gameObject.SetActive(true);
-            FindObjectsOfType<MainGameManager>(true).ToList().Find(m => m.gameObject.scene.name == "Game").gameObject.SetActive(true);
+            _instance.SetValue(null, FindObjectsOfType<MainGameManager>(true).First(m => m.gameObject.scene.Equals(ec.gameObject.scene)));
+            foreach (var obj in FindObjectsOfType<GameObject>(true).Where(m => m.gameObject.scene.Equals(ec.gameObject.scene) && m.transform.parent == null))
+                obj.SetActive(true);
+            //FindObjectsOfType<MainGameManager>(true).ToList().Find(m => m.gameObject.scene.name == "Game").gameObject.SetActive(true);
             CoreGameManager.Instance.disablePause = false;
+            if (prevDijkstra.EnvironmentController != ec)
+                _dijiEC.SetValue(prevDijkstra, ec);
+            if (prevDijkstra.UpdateIsNeeded())
+                prevDijkstra.QueueUpdate();
             GameCamera.dijkstraMap = prevDijkstra;
-            if (GameCamera.dijkstraMap.EnvironmentController != ec)
-                GameCamera.dijkstraMap.ReflectionSetVariable("environment", ec);
-            if (GameCamera.dijkstraMap.UpdateIsNeeded())
-                GameCamera.dijkstraMap.QueueUpdate();
             //Destroy(FindObjectsOfType<Canvas>().ToList().Find(x => x.name.StartsWith("FieldTripLoad")).gameObject);
             ec.Active = true;
             ec.PauseEnvironment(false);
             ec.PauseEvents(false);
             for (int i = 0; i < CoreGameManager.Instance.setPlayers; i++)
             {
-                CoreGameManager.Instance.GetPlayer(i).transform.position = playerPrevPos[i];
-                CoreGameManager.Instance.GetPlayer(i).transform.localRotation = playerPrevRotat[i];
-                CoreGameManager.Instance.GetPlayer(i).ec = ec;
-                CoreGameManager.Instance.GetPlayer(i).plm.Entity.Initialize(ec, CoreGameManager.Instance.GetPlayer(i).transform.position);
-                CoreGameManager.Instance.GetPlayer(i).itm.Disable(false);
+                var player = CoreGameManager.Instance.GetPlayer(i);
+                player.transform.position = playerPrevPos[i];
+                player.transform.localRotation = playerPrevRotat[i];
+                player.ec = ec;
+                player.plm.Entity.Initialize(ec, playerPrevPos[i]);
+                player.itm.Disable(false);
                 CoreGameManager.Instance.GetCamera(i).SetControllable(true);
                 CoreGameManager.Instance.GetCamera(i).matchTargetRotation = true;
                 CoreGameManager.Instance.GetCamera(i).mapCam = ec.map.cams[0];
                 CoreGameManager.Instance.GetHud(i).UpdateNotebookText(0, BaseGameManager.Instance.FoundNotebooks + "/" + Mathf.Max(ec.notebookTotal, BaseGameManager.Instance.FoundNotebooks), false);
-                CoreGameManager.Instance.GetHud(i).UpdateInventorySize(CoreGameManager.Instance.GetPlayer(i).itm.maxItem + 1);
-                CoreGameManager.Instance.GetPlayer(i).itm.UpdateItems();
+                CoreGameManager.Instance.GetHud(i).UpdateInventorySize(player.itm.maxItem + 1);
+                player.itm.UpdateItems();
+                if (playerPrevFlipped[i] == true)
+                    player.plm.Entity.Flip();
             }
-            foreach (Entity mob in FindObjectsOfType<Entity>(true).Where(m => m.gameObject.scene.name == "Game"))
-                mob.SetActive(true);
             CoreGameManager.Instance.ResetCameras();
             CoreGameManager.Instance.ResetShaders();
             foreach (Cell cell in ec.AllCells())
@@ -150,12 +161,19 @@ namespace BCarnellChars.OtherStuff
             }
             if (ec.gameObject.GetComponentInChildren<HappyBaldi>(true) != null)
             {
-                ec.gameObject.GetComponentInChildren<HappyBaldi>(true).GetComponent<AudioManager>().FlushQueue(true);
-                ec.gameObject.GetComponentInChildren<HappyBaldi>(true).ReflectionInvoke("Activate", []);
+                var happy = ec.gameObject.GetComponentInChildren<HappyBaldi>(true);
+                happy.GetComponent<AudioManager>().FlushQueue(true);
+                happyInvoke.Invoke(happy, []);
             }
             AudioListener.pause = false;
             PropagatedAudioManager.paused = false;
-            ec.ElevatorManager.SetAllElevators(ElevatorState.Closed);
+            foreach (var door in ec.ElevatorManager.Elevators)
+            {
+                var amopen = door.Door.IsOpen;
+                door.Door.Open(false, false);
+                if (!amopen)
+                    door.Door.Shut();
+            }
         }
     }
 

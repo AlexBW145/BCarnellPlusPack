@@ -1,8 +1,8 @@
 ﻿using BCarnellChars.Characters.States;
-using BCarnellChars.OtherStuff;
+using HarmonyLib;
 using MTM101BaldAPI;
-using MTM101BaldAPI.Reflection;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace BCarnellChars.Characters;
@@ -15,6 +15,7 @@ public class PAC75Ghost : Baldi
     [SerializeField] internal AudioManager audman;
     public new AudioManager AudMan => audman;
     public Vector3 home { get; internal set; }
+    private static readonly FieldInfo _subtitleColor = AccessTools.DeclaredField(typeof(AudioManager), "subtitleColor");
 
     public override float DistanceCheck(float val) => val;
 
@@ -29,7 +30,7 @@ public class PAC75Ghost : Baldi
     void Start()
     {
         if (ec != null && audman != null)
-            BaseGameManager.Instance.Ec.map.AddArrow(navigator.Entity, (Color)audman.ReflectionGetVariable("subtitleColor"));
+            BaseGameManager.Instance.Ec.map.AddArrow(navigator.Entity, (Color)_subtitleColor.GetValue(audman));
     }
 
     public override void Slap() { }
@@ -64,8 +65,9 @@ public class PAC75Ghost : Baldi
     public override void SetAnger(float value)
     {
         increaseSpeed = value;
-        navigator.maxSpeed = Speed + increaseSpeed;
+        if (behaviorStateMachine.CurrentState is PAC75Ghost_Fleeing) return;
         navigator.SetSpeed(Speed + increaseSpeed);
+        navigator.maxSpeed = Speed + increaseSpeed;
     }
 
     public override void GetAngry(float value)
@@ -73,7 +75,8 @@ public class PAC75Ghost : Baldi
         increaseSpeed += value;
         if (increaseSpeed <= 0.1f)
             increaseSpeed = 0.1f;
-        navigator.maxSpeed = Speed + increaseSpeed;
+        if (behaviorStateMachine.CurrentState is PAC75Ghost_Fleeing) return;
         navigator.SetSpeed(Speed + increaseSpeed);
+        navigator.maxSpeed = Speed + increaseSpeed;
     }
 }

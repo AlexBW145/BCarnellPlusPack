@@ -37,6 +37,7 @@ namespace BCarnellChars.OtherStuff
         protected override void LoadSceneObject(SceneObject sceneObject, bool restarting)
         {
             ec.Active = false;
+            GameCamera.dijkstraMap = null;
             Time.timeScale = 0f;
             CoreGameManager.Instance.disablePause = true;
             AudioListener.pause = true;
