@@ -1,5 +1,4 @@
 ﻿using BCarnellChars.Characters;
-using BCarnellChars.GeneratorStuff;
 using BCarnellChars.ItemStuff;
 using BCarnellChars.OtherStuff;
 using BCarnellChars.Patches;
@@ -17,7 +16,6 @@ using MTM101BaldAPI.Reflection;
 using MTM101BaldAPI.Registers;
 using MTM101BaldAPI.Registers.Buttons;
 using MTM101BaldAPI.SaveSystem;
-using MTM101BaldAPI.UI;
 using PlusStudioLevelFormat;
 using PlusStudioLevelLoader;
 using System;
@@ -30,18 +28,18 @@ using System.Text;
 using TMPro;
 using UnityCipher;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace BCarnellChars
 {
-    [BepInPlugin("alexbw145.baldiplus.bcarnellchars", "B. Carnell Chars", BCPPSave.Version)]
-    [BepInDependency("mtm101.rulerp.bbplus.baldidevapi", "10.0.0.0")]
+    [BepInPlugin("alexbw145.baldiplus.bcarnellchars", "B. Carnell's Plus Pack", BCPPSave.Version)]
+    [BepInDependency("mtm101.rulerp.bbplus.baldidevapi", "11.0.0.0")]
     [BepInDependency("mrsasha5.baldi.basics.plus.advanced", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("io.github.uncertainluei.baldiplus.customposters", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("pixelguy.pixelmodding.baldiplus.moddedmodesapi", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("mtm101.rulerp.baldiplus.levelstudioloader", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("mtm101.rulerp.baldiplus.levelstudio", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("mtm101.rulerp.baldiplus.baldiarcade", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInIncompatibility("alexbw145.bbplus.rpsguy")] // This is a bad idea...
     [BepInProcess("BALDI.exe")]
     public class BCPPPlugin : BaseUnityPlugin
@@ -53,15 +51,11 @@ namespace BCarnellChars
         internal static bool RadarModExists { get; private set; } = false;
         private const string radarID = "org.aestheticalz.baldi.characterradar";
 
-        internal LevelObject lBasement;
-        internal SceneObject sBasement;
-
-        internal LevelObject lBoss;
+        internal SceneObject sBasement, sBoss, sPac;
+        internal LevelObject lBasement, lBoss, lPac;
+#if !RELEASE
         internal LevelObject[] lsubBoss = new LevelObject[5];
-        internal SceneObject sBoss;
-
-        internal LevelObject lPac;
-        internal SceneObject sPac;
+#endif
 
         internal static Material profitCardInsert, freeInsert, securedYellowSwingingDoor;
 
@@ -89,15 +83,16 @@ namespace BCarnellChars
                     LevelStudioAdds.ProfitIsEditorTime();
             }, LoadingEventOrder.Final);
             ModdedSaveGame.AddSaveHandler(Info); // I hate it when the same ol' mistakes happen!
-            MTM101BaldiDevAPI.AddWarningScreen(@"<color=red>B. Carnell's</color> <color=yellow>Plus Pack</color> v1.6.0 is currently work in progress right now, anything in this new version are not yet finished!
-Current Build: LONG WAIT DX EDITION", false);
+            if (!BCPPSave.Build.IsNullOrWhiteSpace())
+                MTM101BaldiDevAPI.AddWarningScreen(@$"<color=red>B. Carnell's</color> <color=yellow>Plus Pack</color> v1.6.0 is currently work in progress right now, anything in this new version are not yet finished!
+    Current Build: {BCPPSave.Build}", false);
         }
 
         private IEnumerator StartLoad()
         {
             yield return 2;
             yield return "Loading...";
-            string APIMinimumVer = "10.0.0.0";
+            string APIMinimumVer = "11.0.0.0";
             if (MTM101BaldiDevAPI.Version < new Version(APIMinimumVer))
             {
                 MTM101BaldiDevAPI.CauseCrash(Info, new Exception("BCPP crashed the mod loading screen because the API version is wrong.\n<color=white>Current API Version: " + MTM101BaldiDevAPI.Version.ToString() + "</color>\n<color=yellow>Required API Version: " + APIMinimumVer + " or later</color>"));
@@ -133,16 +128,16 @@ Current Build: LONG WAIT DX EDITION", false);
 
                 AssetLoader.TextureFromMod(this, "Texture2D", "ProfitCardMachine.png"),
                 AssetLoader.TextureFromMod(this, "Texture2D", "FreeItemMachine.png"),
-                AssetLoader.TextureFromMod(this, "Texture2D", "SwingDoor_SecuredLocked.png"),
+                AssetLoader.TextureFromMod(this, "Texture2D", "SwingDoor_SecuredLocked_Transparent.png"),
                 AssetLoader.TextureFromMod(this, "Texture2D", "AnyportalOutput.png"),
                 AssetLoader.TextureFromMod(this, "Texture2D", "AnyportalOutput_Mask.png"),
                 AssetLoader.TextureFromMod(this, "Texture2D", "TASERAttack.png"),
-
+#if !RELEASE
                 AssetLoader.TextureFromMod(this, "Texture2D", "SchoolTextures", "BlueBrickWallC.png"),
                 AssetLoader.TextureFromMod(this, "Texture2D", "SchoolTextures", "CarnellCarpet.png"),
                 AssetLoader.TextureFromMod(this, "Texture2D", "SchoolTextures", "WoodPlanksC.png"),
                 AssetLoader.TextureFromMod(this, "Texture2D", "SchoolTextures", "PlasticWallC.png"),
-
+#endif
                 AssetLoader.TextureFromMod(this, "Texture2D", "SchoolTextures", "PacWall.png"),
                 AssetLoader.TextureFromMod(this, "Texture2D", "PAC75Machine.png"),
                 AssetLoader.TextureFromMod(this, "Texture2D", "PAC75MachineInactive.png"),
@@ -165,12 +160,12 @@ Current Build: LONG WAIT DX EDITION", false);
                     "AnyportalOutput",
                     "AnyportalOutputMask",
                     "TaserLineMat",
-
+#if !RELEASE
                     "Boss/BlueBrickWall",
                     "Boss/Carpet",
                     "Boss/WoodPlanks",
                     "Boss/PlasticWall",
-
+#endif
                     "PAC75/Wall",
                     "PAC75/Machine",
                     "PAC75/MachineInactive"
@@ -392,14 +387,14 @@ Current Build: LONG WAIT DX EDITION", false);
                 "PAC75/UIPowerPellett",
                 ]);
             bcppAssets.Add<Cubemap>("PacSkybox", AssetLoader.CubemapFromMod(this, "Texture2D", "PACVirtual.png"));
-
+#if !RELEASE
             // This seems better to use...
             float bcarnellSize = 80f;
             bcppAssets.Add("BCarnellBoss/Walk", AssetLoader.SpritesFromSpritesheet(12, 1, bcarnellSize, Vector2.one / 2f, AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "Real B. Carnell", "RealBWalk.png")));
             bcppAssets.Add("BCarnellBoss/SawShoot", AssetLoader.SpritesFromSpritesheet(7, 1, bcarnellSize, Vector2.one / 2f, AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "Real B. Carnell", "RealBShoot.png")));
             bcppAssets.Add("BCarnellBoss/BoostPre", AssetLoader.SpritesFromSpritesheet(5, 1, bcarnellSize, Vector2.one / 2f, AssetLoader.TextureFromMod(this, "Texture2D", "NPCs", "Real B. Carnell", "RealBBoostPre.png")));
             bcppAssets.Add("BCarnellBoss/Boosting", AssetLoader.SpriteFromMod(this, Vector2.one / 2f, bcarnellSize, "Texture2D", "NPCs", "Real B. Carnell", "RealBBoosting.png"));
-
+#endif
             // SoundObjects
             bcppAssets.AddRange<SoundObject>([
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "Hit 15.wav"), "Nothing", SoundType.Effect, Color.white, 0f),
@@ -452,7 +447,7 @@ Current Build: LONG WAIT DX EDITION", false);
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "PrototypeBot-01", "PB01_Waiting.wav"), "Sfx_Lose_Buzz", SoundType.Effect, Color.white),
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "PrototypeBot-01", "PB01_AntiHearStun.wav"), "Sfx_ShrinkMachine_Door", SoundType.Effect, Color.white),
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "PrototypeBot-01", "PB01_Ceiling.wav"), "Sfx_Lose_Buzz", SoundType.Effect, Color.white),
-
+#if !RELEASE
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBOSS_boostCharge.wav"), "Sfx_BCBoss_BoostCharge", SoundType.Effect, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBOSS_boostGo.wav"), "Sfx_BCBoss_BoostGo", SoundType.Effect, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBOSS_sawblade.wav"), "Sfx_ShrinkMachine_Door", SoundType.Effect, Color.white),
@@ -463,7 +458,7 @@ Current Build: LONG WAIT DX EDITION", false);
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "LOSEBC_standard.wav"), "Sfx_Lose_Buzz", SoundType.Effect, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "LOSEBC_yello.wav"), "Sfx_Lose_Buzz", SoundType.Effect, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_caughtlayer.wav"), "Sfx_Lose_Buzz", SoundType.Effect, new Color(0.01960784f, 0.3607843f, 0.7568628f), 0f),
-
+#endif
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "door_break.wav"), "Vfx_Prize_Bang", SoundType.Effect, Color.white),
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "ITM_UnsafeHammerBreak.wav"), "Sfx_Bang", SoundType.Effect, Color.white),
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "ITM_AnyportalOutputSpawning.wav"), "Sfx_Slap", SoundType.Effect, new Color(0.07058824f, 0.6431373f, 1f)),
@@ -522,7 +517,7 @@ Current Build: LONG WAIT DX EDITION", false);
                     "PrototypeBot-01/Waiting",
                     "PrototypeBot-01/Stunned",
                     "PrototypeBot-01/Ceiling",
-
+#if !RELEASE
                     "BCarnellBoss/BoostCharge",
                     "BCarnellBoss/BoostGo",
                     "BCarnellBoss/Sawblade",
@@ -533,7 +528,7 @@ Current Build: LONG WAIT DX EDITION", false);
                     "BCarnellBoss/LOSE/Standard",
                     "BCarnellBoss/LOSE/Yello",
                     "BCarnellBoss/LOSE/caughtlayer",
-
+#endif
                     "Items/UnsafeHammer/DestroyDoor",
                     "Items/UnsafeHammer/DurationBreak",
                     "Items/AnyportalOutput/Spawning",
@@ -550,7 +545,7 @@ Current Build: LONG WAIT DX EDITION", false);
 
             bcppAssets.Get<SoundObject>("Items/AnyportalOutput/Spawning").additionalKeys = [new SubtitleTimedKey() { key = "Sfx_AnyportalOutput_Spawning", time = 0.5120181f },
             new SubtitleTimedKey() { key = "Sfx_BellGeneric", time = 6.21f }];
-
+#if !RELEASE
             Texture2D LoadTextureFromResources(string name)
             {
                 using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("BCarnellChars.bcarnellpluspack.hiddenassets." + name);
@@ -597,7 +592,7 @@ Current Build: LONG WAIT DX EDITION", false);
             b2model = AssetLoader.ModelFromMod(this, "Mesh", "B2Platform.obj");
             bcppAssets.Add<Mesh>("B2Platform/Open", b2model.GetComponentInChildren<MeshFilter>().mesh);
             Destroy(b2model);
-
+#endif
             // PAC MAN
             bcppAssets.Add("PAC75/MachineModel", AssetLoader.ModelFromMod(this, "PAC75Machine.obj"));
             bcppAssets.Add<SoundObject>("mus_PAC75", ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "mus_PAC75.wav"), "Nothing", SoundType.Music, Color.clear, 0));
@@ -617,8 +612,8 @@ Current Build: LONG WAIT DX EDITION", false);
                 "PAC75Ghost/Wandering",
                 "PAC75Ghost/Weakened",
                 "PAC75Ghost/Fleeing"]);
-
-            GameObject notfinalnotif = Instantiate(Resources.FindObjectsOfTypeAll<Jumprope>().ToList().Last(s => s.name == "Jumprope").gameObject, MTM101BaldiDevAPI.prefabTransform);
+#if false
+            GameObject notfinalnotif = Instantiate(Resources.FindObjectsOfTypeAll<Jumprope>().Last(s => s.name == "Jumprope").gameObject, MTM101BaldiDevAPI.prefabTransform);
             notfinalnotif.name = "BCPP_NotFinalNotif";
             DestroyImmediate(notfinalnotif.GetComponent<Jumprope>());
             DestroyImmediate(notfinalnotif.transform.Find("RopeCanvas").gameObject);
@@ -643,6 +638,7 @@ Current Build: LONG WAIT DX EDITION", false);
                     notfinalnotif.SetActive(false);
                 notfinalnotif.transform.SetAsLastSibling();
             };
+#endif
         }
 
         private IEnumerator PreLoad()
@@ -652,7 +648,7 @@ Current Build: LONG WAIT DX EDITION", false);
             RadarModExists = Chainloader.PluginInfos.ContainsKey(radarID);
             if (RadarModExists)
             {
-                ConfigFile radarConfig = Chainloader.PluginInfos.ToList().Find(p => p.Key == radarID).Value.Instance.Config;
+                ConfigFile radarConfig = Chainloader.PluginInfos.Last(p => p.Key == radarID).Value.Instance.Config;
                 RadarSupport.RPSGuyColor = radarConfig.Bind("CharacterColors", "RPSGuyColor", new Color(0.7176471f, 0.6941177f, 0.6235294f), "The color of RPS Guy's arrow.");
                 RadarSupport.ERRORBOTColor = radarConfig.Bind("CharacterColors", "ERRORBOTColor", new Color(0.8f, 0.1647059f, 0.2f), "The color of ERROR-BOT_ITEM-STEALER's arrow.");
                 RadarSupport.SiegeCartColor = radarConfig.Bind("CharacterColors", "SiegeCartColor", new Color(0.4196078f, 0.2901961f, 0.2117647f), "The color of Siege Canon Cart's arrow.");
@@ -667,7 +663,7 @@ Current Build: LONG WAIT DX EDITION", false);
                 if (RadarSupport.MrPortalManColor.Value == Color.clear)
                     Debug.LogError("MrPortalManColor is (0, 0, 0, 0). The map arrow will be fully clear.");
             }
-
+#if !RELEASE
             // B2 Ending
             /*bcppAssets.AddRange<SoundObject>([
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "dial_underscore.wav"), "_Talk", SoundType.Voice, Color.white, 0f),
@@ -681,6 +677,7 @@ Current Build: LONG WAIT DX EDITION", false);
             loop.clips = [AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "01.wav")];
             loop.mixer = Resources.FindObjectsOfTypeAll<AudioMixerGroup>().Last(x => x.name.ToLower() == "Music".ToLower());
             bcppAssets.Add<LoopingSoundObject>("_", loop);*/
+#endif
             BinaryReader reader;
             var PacModel = bcppAssets.Get<GameObject>("PAC75/MachineModel");
             bcppAssets.Remove<GameObject>("PAC75/MachineModel");
@@ -718,20 +715,24 @@ Current Build: LONG WAIT DX EDITION", false);
             annoying.audioDevice.dopplerLevel = 0;
             annoying.audioDevice.spread = 0;
             yield return "Initializing RPSUI";
-            GameObject rockpaperscissors = Instantiate(Resources.FindObjectsOfTypeAll<Jumprope>().ToList().Last(s => s.name == "Jumprope").gameObject, MTM101BaldiDevAPI.prefabTransform);
+            GameObject rockpaperscissors = Instantiate(Resources.FindObjectsOfTypeAll<Jumprope>().Last(s => s.name == "Jumprope").gameObject, MTM101BaldiDevAPI.prefabTransform);
             rockpaperscissors.name = "Rock Paper Scissors";
             Destroy(rockpaperscissors.GetComponent<Jumprope>());
             Destroy(rockpaperscissors.transform.Find("RopeCanvas").gameObject);
             Destroy(rockpaperscissors.transform.Find("TextCanvas").transform.Find("Count").gameObject);
             RawImage raw = rockpaperscissors.transform.Find("TextCanvas").gameObject.AddComponent<RawImage>();
             raw.color = new Color(0f, 0f, 0f, 0.50f); // Initial Color
-            Image uhf = new GameObject("Border", typeof(Image)).GetComponent<Image>();
+            Image uhf = new GameObject("Border", typeof(RectTransform), typeof(Image)).GetComponent<Image>();
             uhf.gameObject.layer = LayerMask.NameToLayer("UI");
-            uhf.transform.SetParent(rockpaperscissors.transform.Find("TextCanvas").transform);
-            uhf.transform.localPosition = Vector3.zero;
+            uhf.transform.SetParent(rockpaperscissors.transform.Find("TextCanvas").transform, false);
+            uhf.transform.localScale = Vector3.one;
             uhf.sprite = bcppAssets.Get<Sprite>("RPSUI/Border");
+            uhf.rectTransform.anchorMin = new Vector2(0f, 0.5f);
+            uhf.rectTransform.anchorMax = new Vector2(1f, 0.5f);
+            uhf.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            uhf.rectTransform.anchoredPosition = Vector2.zero;
             uhf.transform.SetAsFirstSibling(); // IT COVERS, SHIT IT INTO THE FIRST SIBLING!!
-            uhf.rectTransform.sizeDelta = new Vector2(rockpaperscissors.transform.Find("TextCanvas").GetComponent<RectTransform>().sizeDelta.x, uhf.rectTransform.sizeDelta.y + 40);
+            uhf.rectTransform.sizeDelta += Vector2.up * 40f;
             GameObject me = new GameObject("Player", typeof(RawImage));
             me.layer = LayerMask.NameToLayer("UI");
             me.transform.SetParent(rockpaperscissors.transform.Find("TextCanvas").transform);
@@ -758,7 +759,7 @@ Current Build: LONG WAIT DX EDITION", false);
             iChose.GetComponent<RectTransform>().pivot = new Vector2(0f, 0.5f);
             iChose.transform.localScale = Vector3.one * 0.8f;
             iChose.GetComponent<RectTransform>().anchoredPosition = new Vector3(110, 0, 0); // Pro tip: anchoredPosition helps.
-            iChose.GetComponent<Image>().sprite = Resources.FindObjectsOfTypeAll<Sprite>().ToList().Find(x => x.name == "Transparent");
+            iChose.GetComponent<Image>().sprite = Resources.FindObjectsOfTypeAll<Sprite>().Last(x => x.name == "Transparent");
             GameObject theyChoose = new GameObject("Opponent_Chose", typeof(Image));
             theyChoose.layer = LayerMask.NameToLayer("UI");
             theyChoose.transform.SetParent(rockpaperscissors.transform.Find("TextCanvas").transform);
@@ -767,7 +768,7 @@ Current Build: LONG WAIT DX EDITION", false);
             theyChoose.GetComponent<RectTransform>().pivot = new Vector2(1f, 0.5f);
             theyChoose.transform.localScale = Vector3.one * 0.8f;
             theyChoose.GetComponent<RectTransform>().anchoredPosition = new Vector3(-110, 0, 0); // Pro tip: anchoredPosition helps.
-            theyChoose.GetComponent<Image>().sprite = Resources.FindObjectsOfTypeAll<Sprite>().ToList().Find(x => x.name == "Transparent");
+            theyChoose.GetComponent<Image>().sprite = Resources.FindObjectsOfTypeAll<Sprite>().Last(x => x.name == "Transparent");
             rockpaperscissors.transform.Find("TextCanvas").gameObject.GetComponentInChildren<TMP_Text>().alignment = TextAlignmentOptions.Center;
             yield return "Finalizing RPS Guy";
             rpsguy.rpsPre = rockpaperscissors.AddComponent<RockPaperScissors>();
@@ -838,7 +839,7 @@ Current Build: LONG WAIT DX EDITION", false);
             errorbot.spriteRenderer[1].transform.SetParent(errorbot.spriteBase.transform);
             errorbot.spriteRenderer[1].gameObject.layer = errorbot.spriteRenderer[0].gameObject.layer;
             errorbot.spriteRenderer[1].transform.position = new Vector3(0f, 0.27f, 0f);
-            errorbot.spriteRenderer[1].material = Resources.FindObjectsOfTypeAll<Material>().ToList().Find(m => m.name == "SpriteStandard_Billboard");
+            errorbot.spriteRenderer[1].material = Resources.FindObjectsOfTypeAll<Material>().Last(m => m.name == "SpriteStandard_Billboard");
             errorbot.spriteRenderer[1].sprite = bcppAssets.Get<Sprite>("ERRORBOT/Head");
             PropagatedAudioManager staticbot = errorbot.gameObject.AddComponent<PropagatedAudioManager>();
             staticbot.audioDevice = errorbot.gameObject.AddComponent<AudioSource>();
@@ -866,9 +867,9 @@ Current Build: LONG WAIT DX EDITION", false);
 
             yield return "Initializing Siege Cannon Cart";
             // This part is the reason why I almost gave up
-            var siegecart = new NPCBuilder<SiegeCanonCart>(Info)
+            var siegecart = new NPCBuilder<SiegeCannonCart>(Info)
                 .SetName("Siege Cannon Cart")
-                .SetEnum("SiegeCanonCart")
+                .SetEnum("SiegeCannonCart")
                 .AddLooker()
                 .AddTrigger()
                 //.IgnoreBelts()
@@ -971,18 +972,16 @@ Current Build: LONG WAIT DX EDITION", false);
             animator.renderer = hell;
             animator.timeScale = TimeScaleType.Npc; 
             siegecart.animator = animator;
-            animator.AddAnimation("Idle", new SpriteAnimation([idleStaticFrames[0]], 1f));
-            animator.AddAnimation("Moving", new SpriteAnimation(2, [movingFrames[0], movingFrames[8], movingFrames[8*2], movingFrames[8*3],
-            movingFrames[8*4],movingFrames[8*5],movingFrames[8*6]]));
-            animator.AddAnimation("Shoot", new SpriteAnimation(6, [shootingFrames[0], shootingFrames[8], shootingFrames[8*2], shootingFrames[8*3],
-            shootingFrames[8*4],shootingFrames[8*5],shootingFrames[8*6],shootingFrames[8*7]]));
+            animator.AddAngledAnimation("Idle", 8, idleStaticFrames.ToList(), 1f);
+            animator.AddAngledAnimation("Moving", 8, movingFrames.ToList(), 2);
+            animator.AddAngledAnimation("Shoot", 8, shootingFrames.ToList(), 6);
 
             siegecart.audMan = siegecart.gameObject.GetComponents<AudioManager>()[0];
-            siegecart.bang = Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(b => b.name == "Bang");
+            siegecart.bang = Resources.FindObjectsOfTypeAll<SoundObject>().Last(b => b.name == "Bang");
 
             siegecart.motorAudMan = motorAudMan;
             // The balls
-            GameObject ball = Instantiate(Resources.FindObjectsOfTypeAll<ITM_BSODA>().ToList().Find(x => x.name == "ITM_BSODA"), MTM101BaldiDevAPI.prefabTransform).gameObject;
+            GameObject ball = Instantiate(Resources.FindObjectsOfTypeAll<ITM_BSODA>().Last(x => x.name == "ITM_BSODA"), MTM101BaldiDevAPI.prefabTransform).gameObject;
             ball.name = "CanonBall";
             Destroy(ball.GetComponent<ITM_BSODA>());
             siegecart.ballPre = ball.AddComponent<SiegeCartBalls>();
@@ -1028,7 +1027,7 @@ Current Build: LONG WAIT DX EDITION", false);
             trigger.height = 12;
             yield return "Initializing Mr. Portal Man (RenderTextures)";
             // Welp, I was never here!
-            RenderTexture baseRendererTexture = Resources.FindObjectsOfTypeAll<RenderTexture>().ToList().Find(x => x.name == "AuthenticGameTexture");
+            RenderTexture baseRendererTexture = Resources.FindObjectsOfTypeAll<RenderTexture>().Last(x => x.name == "AuthenticGameTexture");
             Camera mainCam = Resources.FindObjectsOfTypeAll<GameCamera>().First().transform.Find("MainCamera").GetComponent<Camera>();
             RenderTexture portalmanCamText = Instantiate(baseRendererTexture);
             portalmanCamText.name = "MrPortalManRenderCam";
@@ -1070,16 +1069,16 @@ Current Build: LONG WAIT DX EDITION", false);
             portalman.audHungry = bcppAssets.Get<SoundObject>("MrPortalMan/Hungry");
             portalman.audWhere = bcppAssets.Get<SoundObject>("MrPortalMan/WhereIs");
             portalman.audFulfilled = bcppAssets.Get<SoundObject>("MrPortalMan/Fullfilled");
-            portalman.teleport = Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(b => b.name == "Teleport");
+            portalman.teleport = Resources.FindObjectsOfTypeAll<SoundObject>().Last(b => b.name == "Teleport");
             yield return "Initializing Mr. Portal Man (Portal Outputs)";
             // This is a room poster
-            Material cryingportalMat = Instantiate(Resources.FindObjectsOfTypeAll<Material>().ToList().Find(x => x.name == "BlankChalk"));
+            Material cryingportalMat = Instantiate(Resources.FindObjectsOfTypeAll<Material>().Last(x => x.name == "BlankChalk"));
             cryingportalMat.name = "CryingPortalMat";
             cryingportalMat.SetMainTexture(bcppAssets.Get<Texture2D>("MrPortalMan/OutputPortal"));
-            Material cryingportalMask = Instantiate(Resources.FindObjectsOfTypeAll<Material>().ToList().Find(x => x.name == "PortalMask"));
+            Material cryingportalMask = Instantiate(Resources.FindObjectsOfTypeAll<Material>().Last(x => x.name == "PortalMask"));
             cryingportalMask.name = "CryingPortalMask";
             cryingportalMask.SetMaskTexture(bcppAssets.Get<Texture2D>("MrPortalMan/OutputPortalMask"));
-            GameObject cryingPortal = Instantiate(Resources.FindObjectsOfTypeAll<Chalkboard>().ToList().First()).gameObject;
+            GameObject cryingPortal = Instantiate(Resources.FindObjectsOfTypeAll<Chalkboard>().Last(), MTM101BaldiDevAPI.prefabTransform).gameObject;
             cryingPortal.name = "CryingPortalOutput";
             cryingPortal.transform.Find("Chalkbaord").Find("Quad").GetComponent<MeshRenderer>().materials = [cryingportalMask, cryingportalMat];
             cryingPortal.transform.Find("Chalkbaord").Find("Quad").GetComponent<MeshCollider>().enabled = false;
@@ -1100,12 +1099,12 @@ Current Build: LONG WAIT DX EDITION", false);
                 //.SetFOV(100f)
                 .SetAudioTimescaleType(TimeScaleType.Npc)
                 .AddSpawnableRoomCategories(RoomCategory.Hall, RoomCategory.Special)
-                .SetPoster(ObjectCreators.CreatePosterObject(Resources.FindObjectsOfTypeAll<Texture2D>().ToList().Find(x => x.name == "Transparent" && x.isReadable), []))
+                .SetPoster(ObjectCreators.CreatePosterObject(Resources.FindObjectsOfTypeAll<Texture2D>().Last(x => x.name == "Transparent" && x.isReadable), []))
                 .SetMinMaxAudioDistance(1f, 500f)
                 .SetMetaTags(["BCPP"])
                 .Build();
 
-            //ObjectCreators.CreateNPC<MrRobber>("Mr Robber", EnumExtensions.ExtendEnum<Character>("MrRobber"), ObjectCreators.CreatePosterObject(Resources.FindObjectsOfTypeAll<Texture2D>().ToList().Find(x => x.name == "Transparent"), []), spawnableRooms: [RoomCategory.Hall, RoomCategory.Special], minAudioDistance: 1f, maxAudioDistance: 500);
+            //ObjectCreators.CreateNPC<MrRobber>("Mr Robber", EnumExtensions.ExtendEnum<Character>("MrRobber"), ObjectCreators.CreatePosterObject(Resources.FindObjectsOfTypeAll<Texture2D>().Last(x => x.name == "Transparent"), []), spawnableRooms: [RoomCategory.Hall, RoomCategory.Special], minAudioDistance: 1f, maxAudioDistance: 500);
             robber.Navigator.SetRoomAvoidance(false);
             // I FORGOT ABOUT THIS
             layer = (LayerMask)_layerMaskLooker.GetValue(robber.looker);
@@ -1126,7 +1125,7 @@ Current Build: LONG WAIT DX EDITION", false);
                 bcppAssets.Get<SoundObject>("MrRobber/EssenceBeat")
             });
             _loopAudOnStart.SetValue(robber.sfxMan, true);
-            robber.overlay = Instantiate(Resources.FindObjectsOfTypeAll<Gum>().ToList().First().transform.Find("GumOverlay").gameObject, robber.transform).GetComponent<Canvas>();
+            robber.overlay = Instantiate(Resources.FindObjectsOfTypeAll<Gum>().Last().transform.Find("GumOverlay").gameObject, robber.transform).GetComponent<Canvas>();
             robber.overlay.transform.Find("Image").GetComponent<Image>().sprite = null;
             robber.overlay.gameObject.SetActive(false);
 
@@ -1228,9 +1227,9 @@ Current Build: LONG WAIT DX EDITION", false);
                 .SetMeta(ItemFlags.None, ["BCPP", "currency"])
                 .Build(); //ObjectCreators.CreateItemObject("Itm_ProfitCard", "Desc_ProfitCard", bcppAssets.Get<Sprite>("Items/ProfitCard_Small"), bcppAssets.Get<Sprite>("Items/ProfitCard_Large"), EnumExtensions.ExtendEnum<Items>("ProfitCard"), 85, 25);
             profitCard.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("item", EnumExtensions.GetFromExtendedName<Items>("ProfitCard"));
-            profitCard.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("audUse", Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(x => x.name == "CoinDrop"));
+            profitCard.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("audUse", Resources.FindObjectsOfTypeAll<SoundObject>().Last(x => x.name == "CoinDrop"));
             profitCard.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("layerMask", playerclicklayer);
-            profitCardInsert = Instantiate(Resources.FindObjectsOfTypeAll<Material>().ToList().Find(x => x.name == "BSODAMachine"));
+            profitCardInsert = Instantiate(Resources.FindObjectsOfTypeAll<Material>().Last(x => x.name == "BSODAMachine"));
             profitCardInsert.name = "ProfitCardMachine";
             profitCardInsert.SetMainTexture(bcppAssets.Get<Texture2D>("ProfitCardMachine"));
             profitCardInsert.renderQueue += 10;
@@ -1245,13 +1244,13 @@ Current Build: LONG WAIT DX EDITION", false);
                 .SetNameAndDescription("Itm_UnsecuredKey", "Desc_UnsecuredKey")
                 .SetSprites(bcppAssets.Get<Sprite>("Items/UnsecuredKey_Small"), bcppAssets.Get<Sprite>("Items/UnsecuredKey_Large"))
                 .SetEnum("UnsecuredYellowKey")
-                .SetShopPrice(1110)
+                .SetShopPrice(1000)
                 .SetGeneratorCost(50)
                 .SetAsNotOverridable()
                 .SetMeta(ItemFlags.MultipleUse, ["BCPP", "technology"])
                 .Build(); //ObjectCreators.CreateItemObject("Itm_UnsecuredKey", "Desc_UnsecuredKey", bcppAssets.Get<Sprite>("Items/UnsecuredKey_Small"), bcppAssets.Get<Sprite>("Items/UnsecuredKey_Large"), EnumExtensions.ExtendEnum<Items>("UnsecuredYellowKey"), 110, 50);
             swingingdoorInfKey.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("item", EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey"));
-            swingingdoorInfKey.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("audUse", Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(x => x.name == "Doors_StandardUnlock"));
+            swingingdoorInfKey.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("audUse", Resources.FindObjectsOfTypeAll<SoundObject>().Last(x => x.name == "Doors_StandardUnlock"));
             swingingdoorInfKey.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("layerMask", playerclicklayer);
             yield return "Initializing Secured Lock and Secured Locked Door builder";
             ItemObject swingingdoorInfLock = new ItemBuilder(Info)
@@ -1264,23 +1263,25 @@ Current Build: LONG WAIT DX EDITION", false);
                 .SetMeta(ItemFlags.None, ["BCPP", "technology", "crmp_contraband"]) // Reason of contraband: they last too long.
                 .Build(); //ObjectCreators.CreateItemObject("Itm_SecuredLock", "Desc_SecuredLock", bcppAssets.Get<Sprite>("Items/SecuredLock_Small"), bcppAssets.Get<Sprite>("Items/SecuredLock_Large"), EnumExtensions.ExtendEnum<Items>("SecuredYellowLock"), 95, 75);
             swingingdoorInfLock.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("item", EnumExtensions.GetFromExtendedName<Items>("SecuredYellowLock"));
-            swingingdoorInfLock.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("audUse", Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(x => x.name == "Slap"));
+            swingingdoorInfLock.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("audUse", Resources.FindObjectsOfTypeAll<SoundObject>().Last(x => x.name == "Slap"));
             swingingdoorInfLock.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("layerMask", playerclicklayer);
-            GameObject inflockedSwingDoor = Instantiate(Resources.FindObjectsOfTypeAll<SwingDoor>().ToList().Find(p => p.name == "Door_Swinging"), MTM101BaldiDevAPI.prefabTransform).gameObject;
+            GameObject inflockedSwingDoor = Instantiate(Resources.FindObjectsOfTypeAll<SwingDoor>().Last(p => p.name == "Door_Swinging"), MTM101BaldiDevAPI.prefabTransform).gameObject;
             inflockedSwingDoor.name = "Door_SwingingSecuredLock";
-            inflockedSwingDoor.AddComponent<SecuredSwingingDoor>();
-            securedYellowSwingingDoor = Instantiate(Resources.FindObjectsOfTypeAll<Material>().ToList().Find(x => x.name == "CoinDoor"));
+            var inflockeddoor = inflockedSwingDoor.SwapComponent<SwingDoor, SwingDoor_Secured>();
+            inflockeddoor.securedDoor = inflockedSwingDoor.AddComponent<SecuredSwingingDoor>();
+            inflockeddoor.securedDoor.swingDoor = inflockeddoor;
+            securedYellowSwingingDoor = Instantiate(Resources.FindObjectsOfTypeAll<Material>().Last(x => x.name == "CoinDoor"));
             securedYellowSwingingDoor.name = "SecuredLockDoor";
             securedYellowSwingingDoor.SetMainTexture(bcppAssets.Get<Texture2D>("Obstacles/InfLockedSwingingDoor"));
             //inflockedSwingDoor.GetComponent<SecuredSwingingDoor>().doorOverlay = securedYellowSwingingDoor;
             //inflockedSwingDoor.SetActive(false);
             inflockedSwingDoor.GetComponent<AudioManager>().enabled = false;
-            inflockedSwingDoor.ConvertToPrefab(true);
-            CoinDoorBuilder builder = Instantiate(Resources.FindObjectsOfTypeAll<CoinDoorBuilder>().ToList().Find(x => x.name == "CoinDoorBuilder"), MTM101BaldiDevAPI.prefabTransform);
+            //inflockedSwingDoor.ConvertToPrefab(true);
+            CoinDoorBuilder builder = Instantiate(Resources.FindObjectsOfTypeAll<CoinDoorBuilder>().Last(x => x.name == "CoinDoorBuilder"), MTM101BaldiDevAPI.prefabTransform);
             builder.gameObject.name = "Inf Secured Swinging Door Builder";
             builder.ReflectionSetVariable("doorPre", inflockedSwingDoor.GetComponent<SwingDoor>());
             builder.obstacle = EnumExtensions.ExtendEnum<Obstacle>("InfLockedDoor");
-            builder.gameObject.ConvertToPrefab(true);
+            //builder.gameObject.ConvertToPrefab(true);
             //ObjectBuilderMetaStorage.Instance.Add(EnumExtensions.GetFromExtendedName<Obstacle>("InfLockedDoor"), new ObjectBuilderMeta(Info, builder));
             bcppAssets.Add<SecuredSwingingDoor>("Obstacles/SecuredSwingingDoor", inflockedSwingDoor.GetComponent<SecuredSwingingDoor>());
             bcppAssets.Add<ObjectBuilder>("ObjectBuilder/SecuredSwingingDoor", builder);
@@ -1290,11 +1291,11 @@ Current Build: LONG WAIT DX EDITION", false);
                 .SetNameAndDescription("Itm_Anyportal", "Desc_Anyportal")
                 .SetSprites(bcppAssets.Get<Sprite>("Items/Anyportal_Small"), bcppAssets.Get<Sprite>("Items/Anyportal_Large"))
                 .SetEnum("AnyportalOutput")
-                .SetShopPrice(980)
+                .SetShopPrice(500)
                 .SetGeneratorCost(105)
                 .SetMeta(ItemFlags.Persists, ["BCPP", "technology"])
                 .Build();
-            anyportal.item.gameObject.GetComponent<ITM_AnyportalOutput>().wrongPlacement = Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(x => x.name == "ErrorMaybe");
+            anyportal.item.gameObject.GetComponent<ITM_AnyportalOutput>().wrongPlacement = Resources.FindObjectsOfTypeAll<SoundObject>().Last(x => x.name == "ErrorMaybe");
             anyportal.item.gameObject.GetComponent<ITM_AnyportalOutput>().outputGeneration = bcppAssets.Get<SoundObject>("Items/AnyportalOutput/Spawning");
             anyportal.item.gameObject.GetComponent<ITM_AnyportalOutput>().destroySnd = bcppAssets.Get<SoundObject>("Items/AnyportalOutput/Destroyed");
 
@@ -1345,7 +1346,7 @@ Current Build: LONG WAIT DX EDITION", false);
 
             var render = anyportal.item.transform.Find("Quad").gameObject.GetComponent<ParticleSystemRenderer>();
             render.renderMode = ParticleSystemRenderMode.Billboard;
-            render.material = Resources.FindObjectsOfTypeAll<Material>().ToList().Find(x => x.name == "UI_AsSprite");
+            render.material = Resources.FindObjectsOfTypeAll<Material>().Last(x => x.name == "UI_AsSprite");
             render.sortMode = ParticleSystemSortMode.OldestInFront;
             render.minParticleSize = 0.01f;
             render.maxParticleSize = 0.01f;
@@ -1355,12 +1356,12 @@ Current Build: LONG WAIT DX EDITION", false);
                 .SetNameAndDescription("Itm_TASERPulse", "Desc_TASERPulse")
                 .SetSprites(bcppAssets.Get<Sprite>("Items/TASERPulse_Small"), bcppAssets.Get<Sprite>("Items/TASERPulse_Large"))
                 .SetEnum("TASERPulse")
-                .SetShopPrice(1000)
+                .SetShopPrice(455)
                 .SetGeneratorCost(140)
                 .SetMeta(ItemFlags.Persists, ["BCPP", "technology", "firearm", "crmp_contraband"]) // Reason of contraband: illegal use inside of the schoolhouse.
                 .Build();
             taserpulse.item.GetComponent<ITM_TaserPulse>().mask = LayerMask.GetMask("Default", "Ignore Raycast", "Ignore Raycast B", "NPCs", "Windows");
-            var tasermat = Instantiate(Resources.FindObjectsOfTypeAll<Material>().ToList().Find(x => x.name == "Bookshelf"));
+            var tasermat = Instantiate(Resources.FindObjectsOfTypeAll<Material>().Last(x => x.name == "Bookshelf"));
             tasermat.SetMainTexture(bcppAssets.Get<Texture2D>("TaserLineMat"));
             taserpulse.item.GetComponent<ITM_TaserPulse>().mat = tasermat;
             taserpulse.item.GetComponent<ITM_TaserPulse>().use = bcppAssets.Get<SoundObject>("Items/TASERPulse/Use");
@@ -1392,7 +1393,7 @@ Current Build: LONG WAIT DX EDITION", false);
                 ]);
 
             yield return "Initializing structures";
-            GameObject randommachine = Instantiate(Resources.FindObjectsOfTypeAll<TapePlayer>().ToList().Find(x => x.name == "PayPhone"), MTM101BaldiDevAPI.prefabTransform).gameObject;
+            GameObject randommachine = Instantiate(Resources.FindObjectsOfTypeAll<TapePlayer>().Last(x => x.name == "PayPhone" && x.GetInstanceID() >= 0), MTM101BaldiDevAPI.prefabTransform).gameObject;
             DestroyImmediate(randommachine.GetComponent<AudioManager>());
             DestroyImmediate(randommachine.GetComponent<AudioSource>());
             randommachine.name = "Random Machine";
@@ -1403,6 +1404,7 @@ Current Build: LONG WAIT DX EDITION", false);
             gambling.tileShapeMask = randommachine.GetComponent<TapePlayer>().tileShapeMask;
             DestroyImmediate(randommachine.GetComponent<TapePlayer>());
             gambling.requiredItem = profitCard;
+            var itemmeta = ItemMetaStorage.Instance;
             gambling.potentialItems = [
                 new WeightedItemObject()
                 {
@@ -1427,35 +1429,36 @@ Current Build: LONG WAIT DX EDITION", false);
 
                 new WeightedItemObject()
                 {
-                    selection = Resources.FindObjectsOfTypeAll<ItemObject>().ToList().Find(x => x.itemType == Items.NanaPeel), // Ain't no way that ItemMetaStorage.Instance.Get() is useless nowadays...
+                    selection = itemmeta.FindByEnum(Items.NanaPeel).value,
                     weight = 90
                 },
                 new WeightedItemObject()
                 {
-                    selection = Resources.FindObjectsOfTypeAll<ItemObject>().ToList().Find(x => x.itemType == Items.Apple),
+                    selection = itemmeta.FindByEnum(Items.Apple).value,
                     weight = 55
                 },
                 new WeightedItemObject()
                 {
-                    selection = Resources.FindObjectsOfTypeAll<ItemObject>().ToList().Find(x => x.itemType == Items.PrincipalWhistle),
+                    selection = itemmeta.FindByEnum(Items.PrincipalWhistle).value,
                     weight = 90
                 },
                 new WeightedItemObject()
                 {
-                    selection = Resources.FindObjectsOfTypeAll<ItemObject>().ToList().Find(x => x.itemType == Items.PortalPoster),
+                    selection = itemmeta.FindByEnum(Items.PortalPoster).value,
                     weight = 55
                 },
                 new WeightedItemObject()
                 {
-                    selection = Resources.FindObjectsOfTypeAll<ItemObject>().ToList().Find(x => x.itemType == Items.Boots),
+                    selection = itemmeta.FindByEnum(Items.Boots).value,
                     weight = 80
                 }
             ];
-            gambling.GetComponentInChildren<SpriteRenderer>().sprite = bcppAssets.Get<Sprite>("Structures/RandomMachine");
-            gambling.GetComponentInChildren<SpriteRenderer>().transform.position = new Vector3(gambling.GetComponentInChildren<SpriteRenderer>().transform.position.x, 4.2f, gambling.GetComponentInChildren<SpriteRenderer>().transform.position.z);
+            gambling.render = gambling.GetComponentInChildren<SpriteRenderer>(true);
+            gambling.render.sprite = bcppAssets.Get<Sprite>("Structures/RandomMachine");
+            gambling.render.transform.position = new Vector3(gambling.render.transform.position.x, 4.2f, gambling.render.transform.position.z);
             gambling.outOf = bcppAssets.Get<Sprite>("Structures/RandomMachine_OutOfGoods");
 
-            GenericHallBuilder gambleBuilder = Instantiate(Resources.FindObjectsOfTypeAll<GenericHallBuilder>().ToList().Find(x => x.name == "PayphoneBuilder"), MTM101BaldiDevAPI.prefabTransform);
+            GenericHallBuilder gambleBuilder = Instantiate(Resources.FindObjectsOfTypeAll<GenericHallBuilder>().Last(x => x.name == "PayphoneBuilder" && x.GetInstanceID() >= 0), MTM101BaldiDevAPI.prefabTransform);
             gambleBuilder.gameObject.name = "Random Machine Builder";
             gambleBuilder.gameObject.ConvertToPrefab(true);
             ObjectPlacer yesIhateThat = gambleBuilder.ReflectionGetVariable("objectPlacer") as ObjectPlacer;
@@ -1476,10 +1479,11 @@ Current Build: LONG WAIT DX EDITION", false);
                 .SetSprite(bcppAssets.Get<Sprite>("Stickers/Switcherquartprofit"))
                 .SetEnum("Switcherquartprofit")
                 .SetDuplicateOddsMultiplier(0.5f)
+                .SetValueCap(1)
                 .Build().sticker;
             StickerPatches.profitCard = profitCard.itemType;
-            StickerPatches.rpsSticker = new StickerBuilder<RPSGuySticker>(Info)
-                .SetSprite(bcppAssets.Get<Sprite>("Stickers/RockPaperScissorsSticker"))
+            StickerPatches.rpsSticker = new StickerBuilder<ExtendedStickerData>(Info)
+                .SetSprite(bcppAssets.Get<Sprite>("Stickers/RockPaperScissorsSticker")) // I have invented one of the most useless stickers that only can benefit gambling on an NPC.
                 .SetEnum("RockPaperScissors")
                 .SetAsAffectingGenerator()
                 .Build().sticker;
@@ -1538,13 +1542,13 @@ Current Build: LONG WAIT DX EDITION", false);
                 .SetWanderEnterRooms()
                 .IgnorePlayerOnSpawn()
                 .AddSpawnableRoomCategories(RoomCategory.Hall, RoomCategory.Office)
-                .SetPoster(ObjectCreators.CreatePosterObject(Resources.FindObjectsOfTypeAll<Texture2D>().ToList().Find(x => x.name == "Transparent" && x.isReadable), []))
+                .SetPoster(ObjectCreators.CreatePosterObject(Resources.FindObjectsOfTypeAll<Texture2D>().Last(x => x.name == "Transparent" && x.isReadable), []))
                 .SetMinMaxAudioDistance(50f, 300f)
                 .SetAudioTimescaleType(TimeScaleType.Npc)
                 .IgnorePlayerVisibility()
                 .SetForcedSubtitleColor(new Color(0.3089626f, 0.1634033f, 0.6792453f, 1f))
                 .SetMetaTags(["BCPP", "adv_exclusion_hammer_immunity"]) // Why do you not check the LevelObject from the SceneObject from the CoreGameManager??
-                .Build(); //ObjectCreators.CreateNPC<PrototypeBot>("PrototypeBot-01", EnumExtensions.ExtendEnum<Character>("PrototypeBot"), ObjectCreators.CreatePosterObject(Resources.FindObjectsOfTypeAll<Texture2D>().ToList().Find(x => x.name == "Transparent"), []), spawnableRooms: [RoomCategory.Hall, RoomCategory.Office], maxAudioDistance: 400f);
+                .Build(); //ObjectCreators.CreateNPC<PrototypeBot>("PrototypeBot-01", EnumExtensions.ExtendEnum<Character>("PrototypeBot"), ObjectCreators.CreatePosterObject(Resources.FindObjectsOfTypeAll<Texture2D>().Last(x => x.name == "Transparent"), []), spawnableRooms: [RoomCategory.Hall, RoomCategory.Office], maxAudioDistance: 400f);
             prototypeBot.audMan = prototypeBot.gameObject.GetComponent<AudioManager>();
             prototypeBot.spriteRenderer[0].sprite = bcppAssets.Get<Sprite>("PrototypeBot-01/Idle");
             prototypeBot.spriteRenderer[0].transform.localPosition = new Vector3(0f, 0f, 0f);
@@ -1605,8 +1609,8 @@ Current Build: LONG WAIT DX EDITION", false);
                 .SetGradeValue(2f)
                 .Build();
             Ambience ambObj = Instantiate(managRef.GetComponentInChildren<Ambience>(), basementManager.transform);
-            basementManager.ReflectionSetVariable("ambience", ambObj);
-            basementManager.overlay = Instantiate(Resources.FindObjectsOfTypeAll<Gum>().ToList().First().transform.Find("GumOverlay").gameObject, basementManager.transform).GetComponent<Canvas>();
+            basementManager.ambience = ambObj;
+            basementManager.overlay = Instantiate(Resources.FindObjectsOfTypeAll<Gum>().Last().transform.Find("GumOverlay").gameObject, basementManager.transform).GetComponent<Canvas>();
             basementManager.overlayAnimator = basementManager.overlay.gameObject.AddComponent<CustomImageAnimator>();
             basementManager.overlayAnimator.image = basementManager.overlay.transform.Find("Image").GetComponent<Image>();
             basementManager.overlayAnimator.useScaledTime = false;
@@ -1619,6 +1623,10 @@ Current Build: LONG WAIT DX EDITION", false);
                 jump2.Add(bcppAssets.Get<Sprite>("PrototypeBot-01/Jumpscare02_" + frame));
             basementManager.overlayAnimator.AddAnimation("Jump1", new SpriteAnimation(18, jump1.ToArray()));
             basementManager.overlayAnimator.AddAnimation("Jump2", new SpriteAnimation(18, jump2.ToArray()));
+            basementManager.audMan = Instantiate(Resources.FindObjectsOfTypeAll<CoreGameManager>().Last(x => x.GetInstanceID() >= 0).musicMan, basementManager.transform, false);
+            basementManager.audMan.useUnscaledPitch = true;
+            //_disableSubtitles.SetValue(audMan, true);
+            //audMan.audioSourceManager.dopplerLevel = 0f;
 
             // Also the time out event...
             B1TimeOut timeoutBasement = new RandomEventBuilder<B1TimeOut>(Info)
@@ -1632,7 +1640,7 @@ Current Build: LONG WAIT DX EDITION", false);
             lBasement = ScriptableObject.CreateInstance<CustomLevelObject>();
             // Make sure to not modify the ones you're unsure about!
             lBasement.name = "Basement1";
-            //lBasement.previousLevels = [Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main1")];
+            //lBasement.previousLevels = [Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Main1")];
 
             lBasement.minSize = new IntVector2(40, 45);
             lBasement.maxSize = new IntVector2(50, 55);
@@ -1653,10 +1661,10 @@ Current Build: LONG WAIT DX EDITION", false);
             lBasement.deadEndBuffer = 6;
             lBasement.includeBuffers = true;
 
-            lBasement.hallWallTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").hallWallTexs.Clone() as WeightedTexture2D[];
-            lBasement.hallFloorTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").hallFloorTexs.Clone() as WeightedTexture2D[];
-            lBasement.hallCeilingTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").hallCeilingTexs.Clone() as WeightedTexture2D[];
-            lBasement.hallLights = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").hallLights.Clone() as WeightedTransform[];
+            lBasement.hallWallTexs = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").hallWallTexs.Clone() as WeightedTexture2D[];
+            lBasement.hallFloorTexs = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").hallFloorTexs.Clone() as WeightedTexture2D[];
+            lBasement.hallCeilingTexs = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").hallCeilingTexs.Clone() as WeightedTexture2D[];
+            lBasement.hallLights = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").hallLights.Clone() as WeightedTransform[];
             lBasement.maxLightDistance = 9;
 
             lBasement.minPrePlotSpecialHalls = 1;
@@ -1665,15 +1673,15 @@ Current Build: LONG WAIT DX EDITION", false);
             lBasement.maxPostPlotSpecialHalls = 2;
             lBasement.prePlotSpecialHallChance = 0.5f;
             lBasement.postPlotSpecialHallChance = 0.25f;
-            lBasement.potentialPrePlotSpecialHalls = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").potentialPrePlotSpecialHalls;
-            lBasement.potentialPostPlotSpecialHalls = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").potentialPostPlotSpecialHalls;
-            lBasement.standardHallBuilders = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").standardHallBuilders;
+            lBasement.potentialPrePlotSpecialHalls = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").potentialPrePlotSpecialHalls;
+            lBasement.potentialPostPlotSpecialHalls = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").potentialPostPlotSpecialHalls;
+            lBasement.standardHallBuilders = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").standardHallBuilders;
 
             lBasement.minSpecialBuilders = 2;
             lBasement.maxSpecialBuilders = 3;
-            lBasement.forcedStructures = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").forcedStructures.Clone() as StructureWithParameters[];
+            lBasement.forcedStructures = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").forcedStructures.Clone() as StructureWithParameters[];
             lBasement.forcedStructures = lBasement.forcedStructures.Where(x => x.prefab is not Structure_StudentSpawner).ToArray();
-            lBasement.potentialStructures = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").potentialStructures.Clone() as WeightedStructureWithParameters[];
+            lBasement.potentialStructures = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").potentialStructures.Clone() as WeightedStructureWithParameters[];
             var vent = lBasement.potentialStructures[lBasement.potentialStructures.ToList().FindIndex(x => x.selection.prefab is Structure_Vent)];
             vent.selection = new StructureWithParameters()
             {
@@ -1693,8 +1701,8 @@ Current Build: LONG WAIT DX EDITION", false);
                 selection = inflockedSwingDoor.gameObject,
                 weight = 10
             });*/
-            //lBasement.forcedSpecialHallBuilders = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").forcedSpecialHallBuilders;
-            var roomg = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").roomGroup.Where(x => x.name == "Class" || x.name == "Faculty" || x.name == "LockedRoom" || x.name == "Office").ToArray();
+            //lBasement.forcedSpecialHallBuilders = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Main3").forcedSpecialHallBuilders;
+            var roomg = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").roomGroup.Where(x => x.name == "Class" || x.name == "Faculty" || x.name == "LockedRoom" || x.name == "Office").ToArray();
             lBasement.roomGroup = new RoomGroup[roomg.Length];
             for (int i = 0; i < roomg.Length; i++)
             {
@@ -1727,11 +1735,11 @@ Current Build: LONG WAIT DX EDITION", false);
             /*lBasement.minClassRooms = 7;
             lBasement.maxClassRooms = 7;
             lBasement.classStickToHallChance = 1;
-            lBasement.potentialClassRooms = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").potentialClassRooms;
+            lBasement.potentialClassRooms = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Main3").potentialClassRooms;
             lBasement.minFacultyRooms = 10;
             lBasement.maxFacultyRooms = 14;
             lBasement.facultyStickToHallChance = 0.75f;
-            lBasement.potentialFacultyRooms = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").potentialFacultyRooms;
+            lBasement.potentialFacultyRooms = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Main3").potentialFacultyRooms;
             lBasement.minExtraRooms = 0;
             lBasement.maxExtraRooms = 0;
             lBasement.extraStickToHallChance = 0.75f;
@@ -1739,7 +1747,7 @@ Current Build: LONG WAIT DX EDITION", false);
             lBasement.minOffices = 2;
             lBasement.maxOffices = 6;
             lBasement.officeStickToHallChance = 1;
-            lBasement.potentialOffices = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").potentialOffices;*/
+            lBasement.potentialOffices = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Main3").potentialOffices;*/
             lBasement.minRoomSize = new IntVector2(3, 5);
 
             lBasement.centerWeightMultiplier = 25;
@@ -1750,56 +1758,33 @@ Current Build: LONG WAIT DX EDITION", false);
             lBasement.additionalHallDoorRequirementMultiplier = 4;
             lBasement.hallPriorityDampening = 3;
 
-            /*lBasement.classWallTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").classWallTexs;
-            lBasement.classFloorTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").classFloorTexs;
-            lBasement.classCeilingTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").classCeilingTexs;
-            lBasement.facultyWallTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").facultyWallTexs;
-            lBasement.facultyFloorTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").facultyFloorTexs;
-            lBasement.facultyCeilingTexs = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").facultyCeilingTexs;
-            lBasement.classLights = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").classLights;
-            lBasement.facultyLights = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").facultyLights;
-            lBasement.officeLights = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").officeLights;*/
+            /*lBasement.classWallTexs = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Main3").classWallTexs;
+            lBasement.classFloorTexs = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Main3").classFloorTexs;
+            lBasement.classCeilingTexs = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Main3").classCeilingTexs;
+            lBasement.facultyWallTexs = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Main3").facultyWallTexs;
+            lBasement.facultyFloorTexs = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Main3").facultyFloorTexs;
+            lBasement.facultyCeilingTexs = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Main3").facultyCeilingTexs;
+            lBasement.classLights = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Main3").classLights;
+            lBasement.facultyLights = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Main3").facultyLights;
+            lBasement.officeLights = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Main3").officeLights;*/
 
-            lBasement.standardDoorMat = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").standardDoorMat;
+            lBasement.standardDoorMat = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").standardDoorMat;
             lBasement.minSpecialRooms = 2;
             lBasement.maxSpecialRooms = 2;
             lBasement.specialRoomsStickToEdge = true;
-            lBasement.potentialSpecialRooms = ((WeightedRoomAsset[])Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").potentialSpecialRooms.Clone()).Where(x => x.selection.name.ToLower().Contains("cafet")).ToArray();
+            lBasement.potentialSpecialRooms = ((WeightedRoomAsset[])Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").potentialSpecialRooms.Clone()).Where(x => x.selection.name.ToLower().Contains("cafet")).ToArray();
             //lBasement.windowChance = 0.5f;
 
             lBasement.lightMode = LightMode.Greatest;
             lBasement.standardLightStrength = 5;
-            lBasement.standardLightColor = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").standardLightColor;
-            lBasement.standardDarkLevel = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").standardDarkLevel;
-            lBasement.potentialBaldis = [new WeightedNPC() { selection = prototypeBot, weight = int.MaxValue }];
-            lBasement.additionalNPCs = 0;
-            lBasement.potentialNPCs = [
-                /*new WeightedNPC()
-                {
-                    selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("ERRORBOT")).value,
-                    weight = 100
-                },
-                new WeightedNPC()
-                {
-                    selection = NPCMetaStorage.Instance.Get(Character.Sweep).value,
-                    weight = 170
-                },
-                new WeightedNPC()
-                {
-                    selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("MrPortalMan")).value,
-                    weight = 100
-                },
-                new WeightedNPC()
-                {
-                    selection = NPCMetaStorage.Instance.Get(EnumExtensions.GetFromExtendedName<Character>("SiegeCanonCart")).value,
-                    weight = 150
-                }*/];
+            lBasement.standardLightColor = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").standardLightColor;
+            lBasement.standardDarkLevel = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").standardDarkLevel;
             lBasement.forcedNpcs = [
             //NPCMetaStorage.Instance.Get(Character.LookAt).value,
                 ];
             lBasement.posterChance = 2;
-            lBasement.posters = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").posters;
-            lBasement.potentialItems = [..Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").potentialItems,
+            lBasement.posters = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").posters;
+            lBasement.potentialItems = [..Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").potentialItems,
                             new WeightedItemObject()
                             {
                                 selection = hammer,
@@ -1816,8 +1801,8 @@ Current Build: LONG WAIT DX EDITION", false);
                                 weight = 75
                             }
                         ];
-            lBasement.forcedItems = [..Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").forcedItems, profitCard,
-                Resources.FindObjectsOfTypeAll<ItemObject>().ToList().Find(x => x.itemType == Items.Tape)];
+            lBasement.forcedItems = [..Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").forcedItems, profitCard,
+                Resources.FindObjectsOfTypeAll<ItemObject>().Last(x => x.itemType == Items.Tape)];
             lBasement.maxItemValue *= 2;
             lBasement.singleEntranceItemVal = 10;
             lBasement.noHallItemVal = 15;
@@ -1829,45 +1814,45 @@ Current Build: LONG WAIT DX EDITION", false);
             lBasement.randomEvents = [
                     /*new WeightedRandomEvent()
                     {
-                        selection = Resources.FindObjectsOfTypeAll<RandomEvent>().ToList().Find(x => x.name == "Event_Flood"),
+                        selection = Resources.FindObjectsOfTypeAll<RandomEvent>().Last(x => x.name == "Event_Flood"),
                         weight = 150
                     },
                     new WeightedRandomEvent()
                     {
-                        selection = Resources.FindObjectsOfTypeAll<RandomEvent>().ToList().Find(x => x.name == "Event_TestProcedure"),
+                        selection = Resources.FindObjectsOfTypeAll<RandomEvent>().Last(x => x.name == "Event_TestProcedure"),
                         weight = 100
                     },
                     new WeightedRandomEvent()
                     {
-                        selection = Resources.FindObjectsOfTypeAll<RandomEvent>().ToList().Find(x => x.name == "Event_Fog"),
+                        selection = Resources.FindObjectsOfTypeAll<RandomEvent>().Last(x => x.name == "Event_Fog"),
                         weight = 75
                     },
                     new WeightedRandomEvent()
                     {
-                        selection = Resources.FindObjectsOfTypeAll<RandomEvent>().ToList().Find(x => x.name == "Event_BrokenRuler"),
+                        selection = Resources.FindObjectsOfTypeAll<RandomEvent>().Last(x => x.name == "Event_BrokenRuler"),
                         weight = 100
                     },
                     new WeightedRandomEvent()
                     {
-                        selection = Resources.FindObjectsOfTypeAll<RandomEvent>().ToList().Find(x => x.name == "Event_Party"),
+                        selection = Resources.FindObjectsOfTypeAll<RandomEvent>().Last(x => x.name == "Event_Party"),
                         weight = 75
                     }*/
             ];
 
             /*lBasement.fieldTrip = false;
             lBasement.fieldTrips = [];
-            lBasement.tripEntrancePre = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").tripEntrancePre;
-            lBasement.tripEntranceRoom = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Main3").tripEntranceRoom;
+            lBasement.tripEntrancePre = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Main3").tripEntrancePre;
+            lBasement.tripEntranceRoom = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Main3").tripEntranceRoom;
             lBasement.fieldTripItems = [];*/
 
             lBasement.exitCount = 4;
-            lBasement.elevatorPre = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").elevatorPre;
-            lBasement.elevatorRoom = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").elevatorRoom;
+            lBasement.elevatorPre = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").elevatorPre;
+            lBasement.elevatorRoom = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").elevatorRoom;
             lBasement.hallBuffer = 4;
             lBasement.edgeBuffer = 3;
 
             lBasement.mapPrice = 1000;
-            lBasement.shopItems = [..Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl2").shopItems,
+            lBasement.shopItems = [..Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl2").shopItems,
                             new WeightedItemObject()
                             {
                                 selection = profitCard,
@@ -1891,9 +1876,9 @@ Current Build: LONG WAIT DX EDITION", false);
             lBasement.timeOutEvent = timeoutBasement;
             sBasement = ScriptableObject.CreateInstance<SceneObject>();
             sBasement.name = "BasementLevel_1";
-            sBasement.manager = basementManager; //Resources.FindObjectsOfTypeAll<MainGameManager>().ToList().Find(x => x.name.Contains("Lvl3"));
+            sBasement.manager = basementManager; //Resources.FindObjectsOfTypeAll<MainGameManager>().Last(x => x.name.Contains("Lvl3"));
             sBasement.levelObject = lBasement;
-            sBasement.skybox = Resources.FindObjectsOfTypeAll<Cubemap>().ToList().Find(x => x.name.Contains("DayStandard"));
+            sBasement.skybox = Resources.FindObjectsOfTypeAll<Cubemap>().Last(x => x.name.Contains("DayStandard"));
             sBasement.skyboxColor = Color.black;
             sBasement.levelTitle = "B1";
             sBasement.levelNo = -1;
@@ -1904,7 +1889,7 @@ Current Build: LONG WAIT DX EDITION", false);
             sBasement.totalShopItems = 8;
             sBasement.nameKey = "Level_BasementBCPP";
             sBasement.potentialNPCs = new();
-            sBasement.forcedNpcs = [];
+            sBasement.forcedNpcs = [prototypeBot];
             lBasement.type = LevelType.Schoolhouse;
             sBasement.potentialStickers = SceneObjectMetaStorage.Instance.Find(x => x.title == "F3" && x.number == 2).value.potentialStickers.Clone() as WeightedSticker[];
             GeneratorManagement.EnqueueGeneratorChanges(sBasement);
@@ -1924,15 +1909,15 @@ Current Build: LONG WAIT DX EDITION", false);
 
             yield return "Initializing v1.5 stuff...";
             // Aw shit it's pac man!
-            GameObject bsodaClone = Instantiate(Resources.FindObjectsOfTypeAll<SodaMachine>().ToList().Find(x => x.name == "SodaMachine")).gameObject;
-            Destroy(bsodaClone.GetComponent<SodaMachine>());
+            GameObject bsodaClone = Instantiate(Resources.FindObjectsOfTypeAll<SodaMachine>().Last(x => x.name == "SodaMachine"), MTM101BaldiDevAPI.prefabTransform).gameObject;
+            DestroyImmediate(bsodaClone.GetComponent<SodaMachine>());
             bsodaClone.name = "PAC-Machine";
             PAC_Machine pacmanGameMachine = bsodaClone.AddComponent<PAC_Machine>();
             pacmanGameMachine.gameObject.ConvertToPrefab(true);
             bsodaClone.GetComponent<MeshFilter>().mesh = PacModel.GetComponentInChildren<MeshFilter>().mesh;
             Destroy(PacModel);
-            pacmanGameMachine.ReflectionSetVariable("selection", Resources.FindObjectsOfTypeAll<MysteryRoom>().ToList().Last().ReflectionGetVariable("items"));
-            var PacMat = Instantiate(Resources.FindObjectsOfTypeAll<Material>().ToList().Find(x => x.name == "Bookshelf"));
+            pacmanGameMachine.selection = (WeightedItemObject[])Resources.FindObjectsOfTypeAll<MysteryRoom>().Last().ReflectionGetVariable("items");
+            var PacMat = Instantiate(Resources.FindObjectsOfTypeAll<Material>().Last(x => x.name == "Bookshelf"));
             PacMat.SetMainTexture(bcppAssets.Get<Texture2D>("PAC75/Machine"));
             bcppAssets.Add<Material>("PAC75/Machine", PacMat);
             PacMat = Instantiate(bcppAssets.Get<Material>("PAC75/Machine"));
@@ -1968,14 +1953,14 @@ Current Build: LONG WAIT DX EDITION", false);
             SpriteRenderer spriterenPel = new GameObject("Sprite", typeof(SpriteRenderer), typeof(PickupBob)).GetComponent<SpriteRenderer>();
             spriterenPel.transform.SetParent(pellet.transform, false);
             spriterenPel.material = ObjectCreators.SpriteMaterial;
-            spriterenPel.sprite = Resources.FindObjectsOfTypeAll<Sprite>().ToList().Find(x => x.name == "NotebookSheet_6");
+            spriterenPel.sprite = Resources.FindObjectsOfTypeAll<Sprite>().Last(x => x.name == "NotebookSheet_6");
             spriterenPel.gameObject.layer = LayerMask.NameToLayer("Billboard");
             pellet.gameObject.ConvertToPrefab(true);
             bcppAssets.Add("PAC75/Pellet", pellet);
             var superpellet = Instantiate(pellet);
             superpellet.gameObject.name = "PacSuperPellet";
             superpellet.gameObject.ConvertToPrefab(true);
-            superpellet.GetComponentInChildren<SpriteRenderer>(true).sprite = Resources.FindObjectsOfTypeAll<Sprite>().ToList().Find(x => x.name == "AppleIcon_Large");
+            superpellet.GetComponentInChildren<SpriteRenderer>(true).sprite = Resources.FindObjectsOfTypeAll<Sprite>().Last(x => x.name == "AppleIcon_Large");
             superpellet.GetComponentInChildren<SpriteRenderer>(true).color = Color.yellow;
             bcppAssets.Add("PAC75/SuperPellet", superpellet);
             // Pac Manager
@@ -1989,7 +1974,7 @@ Current Build: LONG WAIT DX EDITION", false);
             PacMan.beginPlayImmediately = true;
             //PacMan.CompleteMapOnReady();
             ambObj = Instantiate(managRef.GetComponentInChildren<Ambience>(), PacMan.transform);
-            PacMan.ReflectionSetVariable("ambience", ambObj);
+            PacMan.ambience = ambObj;
 
             Texture2D darkestFloor = new Texture2D(1, 1);
             darkestFloor.SetPixel(1, 1, Color.black);
@@ -2016,7 +2001,7 @@ Current Build: LONG WAIT DX EDITION", false);
             ghostroom.minItemValue = 0;
             ghostroom.maxItemValue = 0;
             ghostroom.wallTex = bcppAssets.Get<Texture2D>("PAC75/Wall");
-            ghostroom.ceilTex = Resources.FindObjectsOfTypeAll<Texture2D>().ToList().Find(x => x.name == "Transparent" && x.isReadable);
+            ghostroom.ceilTex = Resources.FindObjectsOfTypeAll<Texture2D>().Last(x => x.name == "Transparent" && x.isReadable);
             ghostroom.florTex = darkestFloor;
             ghostroom.doorMats = Resources.FindObjectsOfTypeAll<StandardDoorMats>().ToList().Last(d => d.name == "ClassDoorSet");
             ghostroom.roomFunctionContainer = ghostcontainer.GetComponent<RoomFunctionContainer>();
@@ -2095,7 +2080,7 @@ Current Build: LONG WAIT DX EDITION", false);
             emptyRoom.name = "Elevator_Null";*/
 
             // Todo: attempt to make it as a maze.
-            lPac = Instantiate(Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3"));
+            lPac = Instantiate(Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3"));
             lPac.name = "PacManLevel";
             lPac.exitCount = 1;
             lPac.type = EnumExtensions.ExtendEnum<LevelType>("Pac75");
@@ -2105,9 +2090,7 @@ Current Build: LONG WAIT DX EDITION", false);
             lPac.roomGroup = [];
             lPac.previousLevels = [];
             lPac.finalLevel = false;
-            lPac.potentialNPCs = [];
             lPac.forcedNpcs = [];
-            lPac.potentialBaldis = [];
             lPac.potentialSpecialRooms = [];
             lPac.minSpecialRooms = 0;
             lPac.maxSpecialRooms = 0;
@@ -2150,7 +2133,7 @@ Current Build: LONG WAIT DX EDITION", false);
             lPac.hallBuffer = 5;
             lPac.includeBuffers = true;
             lPac.specialRoomsStickToEdge = false;
-            lPac.hallCeilingTexs = [new() { selection = Resources.FindObjectsOfTypeAll<Texture2D>().ToList().Find(x => x.name == "Transparent" && x.isReadable), weight = int.MaxValue }];
+            lPac.hallCeilingTexs = [new() { selection = Resources.FindObjectsOfTypeAll<Texture2D>().Last(x => x.name == "Transparent" && x.isReadable), weight = int.MaxValue }];
             lPac.hallWallTexs = [new() { selection = bcppAssets.Get<Texture2D>("PAC75/Wall"), weight = int.MaxValue }];
             lPac.hallFloorTexs = [new() { selection = darkestFloor, weight = int.MaxValue }];
             lPac.standardLightColor = new Color(0f, 0.2862745f, 0.9098039f);
@@ -2177,8 +2160,35 @@ Current Build: LONG WAIT DX EDITION", false);
             sPac.potentialNPCs = [];
             sPac.forcedNpcs = [Red, Cyan, Orange, Pink];
             sPac.shopItems = [];
-            sPac.AddMeta(this);
-
+            sPac.baldiPrefab = null;
+            sPac.AddMeta(this, ["secondary", "PAC75"]);
+#if RELEASE
+            yield return "Initializing Early Release Stuff...";
+            sBoss = ScriptableObject.CreateInstance<SceneObject>();
+            sBoss.name = "PlaceholderB";
+            sBoss.skippable = false;
+            sBoss.levelNo = -2;
+            sBoss.usesMap = false;
+            sBoss.levelTitle = "B2";
+            sBoss.nameKey = "Level_BasementBCPP";
+            sBoss.additionalNPCs = 0;
+            sBoss.potentialNPCs = [];
+            sBoss.shopItems = [];
+            var placeholderending = Resources.FindObjectsOfTypeAll<SceneObject>().Last(x => x.name.Contains("Placeholder") && x.GetInstanceID() >= 0);
+            sBoss.levelAsset = placeholderending.levelAsset;
+            sBoss.extraAsset = placeholderending.extraAsset;
+            sBoss.levelContainer = placeholderending.levelContainer;
+            var placeholderman = new BaseGameManagerBuilder<BRouteEarlyEndingManager>()
+                .SetObjectName("PlaceholderB")
+                .SetNameKey(placeholderending.nameKey)
+                .SetLevelNumber(2)
+                .SetGradeValue(0f)
+                .SetNPCSpawnMode(GameManagerNPCAutomaticSpawn.Never)
+                .Build();
+            sBoss.manager = placeholderman;
+            sBasement.nextLevel = sBoss;
+            sBoss.AddMeta(this, ["ending"]);
+#else
             yield return "Initializing v1.6 stuff...";
             var platform = new GameObject("B2PlatformSideways", typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider));
             platform.GetComponent<MeshFilter>().mesh = bcppAssets.Get<Mesh>("B2Platform/Sideways");
@@ -2289,7 +2299,7 @@ Current Build: LONG WAIT DX EDITION", false);
                 .IgnorePlayerOnSpawn()
                 .DisableNavigationPrecision()
                 .AddSpawnableRoomCategories(RoomCategory.Null)
-                .SetPoster(ObjectCreators.CreatePosterObject(Resources.FindObjectsOfTypeAll<Texture2D>().ToList().Find(x => x.name == "Transparent" && x.isReadable), []))
+                .SetPoster(ObjectCreators.CreatePosterObject(Resources.FindObjectsOfTypeAll<Texture2D>().Last(x => x.name == "Transparent" && x.isReadable), []))
                 .SetMinMaxAudioDistance(10f, 300f)
                 .SetWanderEnterRooms()
                 .SetAudioTimescaleType(TimeScaleType.Npc)
@@ -2313,7 +2323,7 @@ Current Build: LONG WAIT DX EDITION", false);
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_Intro5.wav"), "Vfx_BCarnell_Dial", SoundType.Voice, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
                 ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_Intro6.wav"), "Vfx_BCarnell_Dial", SoundType.Voice, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
                 ];
-            GameObject sawblade = Instantiate(Resources.FindObjectsOfTypeAll<ITM_BSODA>().ToList().Find(x => x.name == "ITM_BSODA"), MTM101BaldiDevAPI.prefabTransform).gameObject;
+            GameObject sawblade = Instantiate(Resources.FindObjectsOfTypeAll<ITM_BSODA>().Last(x => x.name == "ITM_BSODA"), MTM101BaldiDevAPI.prefabTransform).gameObject;
             sawblade.name = "Sawblade";
             Destroy(sawblade.GetComponent<ITM_BSODA>());
             sawblade.ConvertToPrefab(true);
@@ -2348,16 +2358,15 @@ Current Build: LONG WAIT DX EDITION", false);
             realbcarnell.audMan = realbcarnell.gameObject.GetComponent<AudioManager>();
 
             SubInitializer subinit = new GameObject("SubGame Initializer", typeof(SubInitializer)).GetComponent<SubInitializer>();
-            subinit.ecPre = Resources.FindObjectsOfTypeAll<EnvironmentController>().ToList().Find(x => x.name == "Environment Controller");
-            subinit.generatorPre = Resources.FindObjectsOfTypeAll<LevelGenerator>().ToList().Find(x => x.name == "LevelGenerator");
-            subinit.loaderPre = Resources.FindObjectsOfTypeAll<LevelLoader>().ToList().Find(x => x.name == "LevelLoader");
+            subinit.ecPre = Resources.FindObjectsOfTypeAll<EnvironmentController>().Last(x => x.name == "Environment Controller");
+            subinit.generatorPre = Resources.FindObjectsOfTypeAll<LevelGenerator>().Last(x => x.name == "LevelGenerator");
+            subinit.loaderPre = Resources.FindObjectsOfTypeAll<LevelLoader>().Last(x => x.name == "LevelLoader");
             subinit.gameObject.ConvertToPrefab(false);
             bcppAssets.Add<GameInitializer>("SubInitializer", subinit);
 
             lBoss = Instantiate(lBasement);
             lBoss.name = "BasementBoss";
             lBoss.type = bossleveltype;
-            lBoss.potentialBaldis = [new WeightedNPC() { selection = realbcarnell, weight = int.MaxValue }];
             lBoss.potentialItems = lBoss.potentialItems.AddToArray(new()
             {
                 selection = taserpulse,
@@ -2475,9 +2484,9 @@ Current Build: LONG WAIT DX EDITION", false);
             sBoss.name = "BasementLevel_Boss";
             sBoss.manager = bossManager;
             sBoss.levelObject = lBoss;
-            sBoss.skybox = Resources.FindObjectsOfTypeAll<Cubemap>().ToList().Find(x => x.name.Contains("DayStandard"));
+            sBoss.skybox = Resources.FindObjectsOfTypeAll<Cubemap>().Last(x => x.name.Contains("DayStandard"));
             sBoss.skyboxColor = Color.black;
-            sBoss.nextLevel = Resources.FindObjectsOfTypeAll<SceneObject>().ToList().Find(x => x.name.Contains("Placeholder"));
+            sBoss.nextLevel = Resources.FindObjectsOfTypeAll<SceneObject>().Last(x => x.name.Contains("Placeholder"));
             sBoss.levelTitle = "B2";
             sBoss.levelNo = -2;
             sBoss.mapPrice = 2000;
@@ -2489,6 +2498,7 @@ Current Build: LONG WAIT DX EDITION", false);
             sBoss.nameKey = "Level_BossBCPP";
             sBoss.potentialNPCs = [];
             sBoss.potentialStickers = sBasement.potentialStickers;
+            sBoss.baldiPrefab = realbcarnell;
             sBoss.AddMeta(this, ["b-route"]);
 
             var partWhereJustHalls = Instantiate(lBoss);
@@ -2507,14 +2517,14 @@ Current Build: LONG WAIT DX EDITION", false);
             partWhereJustHalls.exitCount = 1;
             //partWhereJustHalls.elevatorRoom = emptyRoom;
             partWhereJustHalls.potentialStructures = [];
-            partWhereJustHalls.forcedStructures[partWhereJustHalls.forcedStructures.ToList().FindIndex(struc => struc.parameters.prefab.ToList().Exists(x => x.selection.GetComponent<SwingDoor>()))] = new StructureWithParameters()
+            partWhereJustHalls.forcedStructures[partWhereJustHalls.forcedStructures.LastIndex(struc => struc.parameters.prefab.ToList().Exists(x => x.selection.GetComponent<SwingDoor>()))] = new StructureWithParameters()
             {
-                prefab = Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").forcedStructures.First(struc => struc.parameters.prefab.ToList().Exists(x => x.selection.GetComponent<SwingDoor>())).prefab,
+                prefab = Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").forcedStructures.First(struc => struc.parameters.prefab.ToList().Exists(x => x.selection.GetComponent<SwingDoor>())).prefab,
                 parameters = new StructureParameters()
                 {
                     chance = [0.4f],
-                    minMax = [Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").forcedStructures.First(struc => struc.parameters.prefab.ToList().Exists(x => x.selection.GetComponent<SwingDoor>())).parameters.minMax[0]],
-                    prefab = [Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").forcedStructures.First(struc => struc.parameters.prefab.ToList().Exists(x => x.selection.GetComponent<SwingDoor>())).parameters.prefab[0]]
+                    minMax = [Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").forcedStructures.First(struc => struc.parameters.prefab.ToList().Exists(x => x.selection.GetComponent<SwingDoor>())).parameters.minMax[0]],
+                    prefab = [Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").forcedStructures.First(struc => struc.parameters.prefab.ToList().Exists(x => x.selection.GetComponent<SwingDoor>())).parameters.prefab[0]]
                 }
             };
             partWhereJustHalls.minSpecialBuilders = 0;
@@ -2529,7 +2539,7 @@ Current Build: LONG WAIT DX EDITION", false);
             ItemMetaStorage.Instance.FindByEnum(Items.Quarter).value, profitCard,
             ItemMetaStorage.Instance.FindByEnum(Items.Quarter).value, profitCard,
             ItemMetaStorage.Instance.FindByEnum(Items.Quarter).value, profitCard];
-            partWhereJustHalls.potentialItems = [.. Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").potentialItems.Where(i => i.selection.itemType != Items.NanaPeel && i.selection.itemType != Items.DoorLock)];
+            partWhereJustHalls.potentialItems = [.. Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").potentialItems.Where(i => i.selection.itemType != Items.NanaPeel && i.selection.itemType != Items.DoorLock)];
 
             var roomsDuh = Instantiate(lBoss);
             roomsDuh.name = "BasementBoss_Stealth";
@@ -2568,11 +2578,11 @@ Current Build: LONG WAIT DX EDITION", false);
             roomsDuh.forcedItems = [ItemMetaStorage.Instance.FindByEnum(Items.ChalkEraser).value, ItemMetaStorage.Instance.FindByEnum(Items.Quarter).value, profitCard, ItemMetaStorage.Instance.FindByEnum(Items.Bsoda).value, ItemMetaStorage.Instance.FindByEnum(Items.ZestyBar).value,
             ItemMetaStorage.Instance.FindByEnum(Items.ChalkEraser).value, ItemMetaStorage.Instance.FindByEnum(Items.Quarter).value, profitCard, ItemMetaStorage.Instance.FindByEnum(Items.Bsoda).value, ItemMetaStorage.Instance.FindByEnum(Items.ZestyBar).value,
             ItemMetaStorage.Instance.FindByEnum(Items.ChalkEraser).value, ItemMetaStorage.Instance.FindByEnum(Items.Quarter).value, profitCard, ItemMetaStorage.Instance.FindByEnum(Items.Bsoda).value, ItemMetaStorage.Instance.FindByEnum(Items.ZestyBar).value];
-            roomsDuh.potentialItems = [.. Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").potentialItems.Where(i => i.selection.itemType != Items.ChalkEraser && i.selection.itemType != Items.DietBsoda)];
+            roomsDuh.potentialItems = [.. Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").potentialItems.Where(i => i.selection.itemType != Items.ChalkEraser && i.selection.itemType != Items.DietBsoda)];
 
             var thesilent = Instantiate(lBoss);
             thesilent.name = "BasementBoss_SuperLibrary";
-            thesilent.potentialSpecialRooms = [.. Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").potentialSpecialRooms.Where(rm => rm.selection.name.ToLower().Contains("libra"))];
+            thesilent.potentialSpecialRooms = [.. Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").potentialSpecialRooms.Where(rm => rm.selection.name.ToLower().Contains("libra"))];
             thesilent.specialRoomsStickToEdge = false;
             thesilent.minSpecialRooms = 10;
             thesilent.maxSpecialRooms = 20;
@@ -2595,7 +2605,7 @@ Current Build: LONG WAIT DX EDITION", false);
             ItemMetaStorage.Instance.FindByEnum(Items.InvisibilityElixir).value, ItemMetaStorage.Instance.FindByEnum(Items.ChalkEraser).value, ItemMetaStorage.Instance.FindByEnum(Items.ZestyBar).value, ItemMetaStorage.Instance.FindByEnum(Items.AlarmClock).value,
             ItemMetaStorage.Instance.FindByEnum(Items.InvisibilityElixir).value, ItemMetaStorage.Instance.FindByEnum(Items.ChalkEraser).value, ItemMetaStorage.Instance.FindByEnum(Items.ZestyBar).value, ItemMetaStorage.Instance.FindByEnum(Items.AlarmClock).value,
             ItemMetaStorage.Instance.FindByEnum(Items.InvisibilityElixir).value, ItemMetaStorage.Instance.FindByEnum(Items.ChalkEraser).value, ItemMetaStorage.Instance.FindByEnum(Items.ZestyBar).value, ItemMetaStorage.Instance.FindByEnum(Items.AlarmClock).value,];
-            thesilent.potentialItems = [.. Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").potentialItems.Where(i => i.selection.itemType != Items.AlarmClock && i.selection.itemType != Items.DietBsoda)];
+            thesilent.potentialItems = [.. Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").potentialItems.Where(i => i.selection.itemType != Items.AlarmClock && i.selection.itemType != Items.DietBsoda)];
 
             var deadends = Instantiate(lBoss);
             deadends.name = "BasementBoss_SuperF";
@@ -2625,7 +2635,7 @@ Current Build: LONG WAIT DX EDITION", false);
             ItemMetaStorage.Instance.FindByEnum(Items.InvisibilityElixir).value,ItemMetaStorage.Instance.FindByEnum(Items.Bsoda).value, ItemMetaStorage.Instance.FindByEnum(Items.Teleporter).value,
             ItemMetaStorage.Instance.FindByEnum(Items.InvisibilityElixir).value,ItemMetaStorage.Instance.FindByEnum(Items.Bsoda).value, ItemMetaStorage.Instance.FindByEnum(Items.Teleporter).value,
             ItemMetaStorage.Instance.FindByEnum(Items.InvisibilityElixir).value,ItemMetaStorage.Instance.FindByEnum(Items.Bsoda).value, ItemMetaStorage.Instance.FindByEnum(Items.Teleporter).value];
-            deadends.potentialItems = [.. Resources.FindObjectsOfTypeAll<LevelObject>().ToList().Find(x => x.name == "Schoolhouse_Lvl3").potentialItems.Where(i => i.selection.itemType != Items.InvisibilityElixir && i.selection.itemType != Items.Teleporter && i.selection.itemType != Items.DietBsoda)];
+            deadends.potentialItems = [.. Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").potentialItems.Where(i => i.selection.itemType != Items.InvisibilityElixir && i.selection.itemType != Items.Teleporter && i.selection.itemType != Items.DietBsoda)];
 
             lsubBoss = [partWhereJustHalls, roomsDuh, thesilent, deadends];
             lBoss.roomGroup = lBoss.roomGroup.AddToArray(new RoomGroup()
@@ -2645,7 +2655,7 @@ Current Build: LONG WAIT DX EDITION", false);
                 stickToHallChance = 9f
 
             });
-
+#endif
             yield return "Finalizing...";
             GeneratorManagement.Register(this, GenerationModType.Addend, (floorName, floorNum, ld) =>
             {
@@ -2973,7 +2983,7 @@ Current Build: LONG WAIT DX EDITION", false);
                     if (floorName == "F2" || floorName == "F3")
                         level.forcedStructures = level.forcedStructures.AddToArray(new StructureWithParameters()
                         {
-                            prefab = Resources.FindObjectsOfTypeAll<Structure_EnvironmentObjectPlacer>().ToList().Find(s => s.name == "Structure_EnvironmentObjectBuilder_Individual"),
+                            prefab = Resources.FindObjectsOfTypeAll<Structure_EnvironmentObjectPlacer>().Last(s => s.name == "Structure_EnvironmentObjectBuilder_Individual"),
                             parameters = new StructureParameters()
                             {
                                 chance = [.1f],
@@ -2991,13 +3001,12 @@ Current Build: LONG WAIT DX EDITION", false);
             });
             GeneratorManagement.Register(this, GenerationModType.Finalizer, (name, num, ld) =>
             {
-                if (ld == sBasement
-                || ld == sBoss)
+                if (ld == sBasement)
                 {
                     var levelobject = ld.levelObject as CustomLevelObject;
                     ld.additionalNPCs = 0;
                     ld.potentialNPCs = [];
-                    ld.forcedNpcs = [];
+                    ld.forcedNpcs = ld == sBasement ? [prototypeBot] : [];
                     ld.levelObject.minEvents = 0;
                     ld.levelObject.maxEvents = 0;
                     if (Chainloader.PluginInfos.ContainsKey("pixelguy.pixelmodding.baldiplus.bbextracontent"))
@@ -3058,6 +3067,9 @@ Current Build: LONG WAIT DX EDITION", false);
             LevelLoaderAdds.AddToLoader();
             if (Chainloader.PluginInfos.ContainsKey("mtm101.rulerp.baldiplus.levelstudio"))
                 LevelStudioAdds.EditorAdds();
+
+            if (Chainloader.PluginInfos.ContainsKey("mtm101.rulerp.baldiplus.baldiarcade"))
+                ArcadeGauntletAdds.EternityAdds();
 #if DEBUG
             // I know my mistake that FasGuy made this for one of Missed the Texture's mods during the v0.3.X era, but I am using this for the "Link Data" menu.
             var logo = new Texture2D(1,1,TextureFormat.RGBA32,false);
@@ -3136,7 +3148,7 @@ Current Build: LONG WAIT DX EDITION", false);
                 var color = 
                     me is RPSGuy ? RPSGuyColor.Value : 
                     me is ERRORBOT ? ERRORBOTColor.Value : 
-                    me is SiegeCanonCart ? SiegeCartColor.Value : 
+                    me is SiegeCannonCart ? SiegeCartColor.Value : 
                     me is MrPortalMan ? MrPortalManColor.Value :
                     me is PrototypeBot ? ProtoColor : 
                     Color.clear;
@@ -3156,13 +3168,14 @@ Current Build: LONG WAIT DX EDITION", false);
     {
         public static BCPPSave Instance => BCPPPlugin.Instance.SaveData;
         [NonSerialized] public ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource("BCPPSave");
-        [NonSerialized] public const string Version = "1.6.0";
+        [NonSerialized] public const string Version = "1.6.0", Build = "earlybird"; // BepinEx 5 does not support semantic versioning, which they have lied in their tutorial documentation until BepInEx 6 comes out.
         internal static Version typeVersion => new Version(Version);
 
-        internal string version = Version;
-        public bool basementCompleted;
-        public bool firstTime = true;
-        public bool death;
+        internal string version = Version, build = Build;
+        internal bool basementCompleted, firstTime = true, death;
+
+        public bool BasementCompleted => basementCompleted;
+        public bool B2 => death;
 
 
         internal bool Load()
@@ -3222,6 +3235,7 @@ Current Build: LONG WAIT DX EDITION", false);
         internal void Save()
         {
             version = Version;
+            build = Build;
             string path = Path.Combine(ModdedSaveSystem.GetCurrentSaveFolder(BCPPPlugin.Instance), "BCPP.dat");
             File.WriteAllText(path, RijndaelEncryption.Encrypt(JsonUtility.ToJson(this), "BCPP_" + PlayerFileManager.Instance.fileName));
         }
@@ -3229,6 +3243,7 @@ Current Build: LONG WAIT DX EDITION", false);
         internal void SetDefaults()
         {
             version = Version;
+            build = Build;
             if (typeVersion >= new Version("1.1.0"))
                 basementCompleted = false;
             if (typeVersion >= new Version("1.6.0"))
@@ -3252,13 +3267,6 @@ Current Build: LONG WAIT DX EDITION", false);
             File.WriteAllText(path, RijndaelEncryption.Encrypt(JsonUtility.ToJson(data), "BCarnellLink"));
         }
 #endif
-    }
-
-    public class CustomSpriteRotatorAnimator : CustomAnimator<SpriteAnimation, SpriteFrame, Sprite>
-    {
-        public AnimatedSpriteRotator renderer;
-
-        public override void ApplyFrame(Sprite frame) => renderer.targetSprite = frame;
     }
 }
 #if DEBUG

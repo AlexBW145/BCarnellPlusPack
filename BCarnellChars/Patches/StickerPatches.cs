@@ -2,7 +2,6 @@
 using BCarnellChars.OtherStuff;
 using HarmonyLib;
 using MTM101BaldAPI.Registers;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -34,7 +33,7 @@ internal class StickerPatches
     [HarmonyPatch(typeof(ITM_Teleporter), nameof(ITM_Teleporter.Use)), HarmonyPostfix]
     private static void WhyIsItNotUseThat(PlayerManager pm) => AnyportalManSet(default, pm.plm.Entity);
 
-    private static bool usedUp = false; // __state is that confusing why is it not doing anything in two prefixes no postfixes??
+    private static bool usedUp = false; // __state does not work as intended for different patches from not the same methods.
     [HarmonyPatch(typeof(ItemManager), nameof(ItemManager.UseItem)), HarmonyPrefix]
     private static void WellItDoesNotCount(ItemManager __instance, bool ___disabled)
     {

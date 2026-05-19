@@ -29,8 +29,9 @@ namespace BCarnellChars.Patches
         {
             if (_item == EnumExtensions.GetFromExtendedName<Items>("SecuredYellowLock"))
             {
-                __instance.gameObject.AddComponent<SecuredSwingingDoor>();
-                //__instance.gameObject.GetComponent<SecuredSwingingDoor>().originalOverlays = __instance.overlayLocked;
+                var component = __instance.gameObject.AddComponent<SecuredSwingingDoor>();
+                component.swingDoor = __instance;
+                component.Initialize();
                 return false;
             }    
             return true;

@@ -1,5 +1,4 @@
-﻿using BCarnellChars.Patches;
-using HarmonyLib;
+﻿using HarmonyLib;
 using MonoMod.Utils;
 using MTM101BaldAPI.AssetTools;
 using PlusLevelStudio;
@@ -36,7 +35,7 @@ internal static class LevelStudioAdds
                     { "Ed_Tool_item_bhammer_Desc", "Not safe for windows (and rock guys)" },
                     { "Ed_Tool_item_unsecuredyellowkey_Desc", "Don't lose it!" },
                     { "Ed_Tool_item_securedyellowlock_Desc", "Don't place it!" },
-                    { "Ed_Tool_item_anyportaloutput_Desc", "Can only be placed if Mr. Portal Man is present, but its usable for planned escape routes!" },
+                    { "Ed_Tool_item_anyportaloutput_Desc", "Can only be placed if Mr. Portal Man is present, but it's usable for planned escape routes!" },
                     { "Ed_Tool_item_taserpulse_Desc", "ZAP! This bad boy chains through three bad criminals! But can lethally get you into trouble!" },
                     { "Ed_Tool_item_stickerpack_securedlocked_Title", "Secured Locked Sticker Packet" },
                     { "Ed_Tool_item_stickerpack_securedlocked_Desc", "Contains 1 BCPP-related sticker and 2 randomly selected stickers. This packet is not yet opened, you must search for a Unsecured Key in order to open!" },
@@ -59,12 +58,14 @@ internal static class LevelStudioAdds
                     { "Ed_BCPP_MrRobber_Title", "Mr. Robber" },
                     { "Ed_BCPP_MrRobber_Desc", "This thief is off onto collecting notebooks, but you shouldn't be alone by now..." },
                 });
-
-        NPC rpsguy = BCPPPlugin.bcppAssets.Get<NPC>("NPCs/RPS Guy");
-        NPC errorbot = BCPPPlugin.bcppAssets.Get<NPC>("NPCs/ERROR-BOT_ITEM-STEALER");
-        NPC siegecannoncart = BCPPPlugin.bcppAssets.Get<NPC>("NPCs/Siege Cannon Cart");
-        NPC mrportalman = BCPPPlugin.bcppAssets.Get<NPC>("NPCs/Mr Portal Man");
-        NPC mrrobber = BCPPPlugin.bcppAssets.Get<NPC>("NPCs/Mr Robber");
+        var studioslot = AssetLoader.SpriteFromMod(BCPPPlugin.Instance, Vector2.one / 2f, 1f, "Texture2D", "UI", "StudioSlotBCPP.png");
+        BCPPPlugin.bcppAssets.Add("StudioSlot", studioslot);
+        NPC 
+            rpsguy = BCPPPlugin.bcppAssets.Get<NPC>("NPCs/RPS Guy"),
+            errorbot = BCPPPlugin.bcppAssets.Get<NPC>("NPCs/ERROR-BOT_ITEM-STEALER"),
+            siegecannoncart = BCPPPlugin.bcppAssets.Get<NPC>("NPCs/Siege Cannon Cart"),
+            mrportalman = BCPPPlugin.bcppAssets.Get<NPC>("NPCs/Mr Portal Man"),
+            mrrobber = BCPPPlugin.bcppAssets.Get<NPC>("NPCs/Mr Robber");
         EditorInterface.AddNPCVisual("rpsguy", rpsguy);
         EditorInterface.AddNPCVisual("errorbot", errorbot);
         EditorInterface.AddNPCVisual("siegecanoncart", siegecannoncart);
@@ -131,16 +132,16 @@ internal static class LevelStudioAdds
                 new NPCToolBCPP("mrrobber", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/NPC_mrrobber"), "Ed_BCPP_MrRobber_Title", "Ed_BCPP_MrRobber_Desc"),
                 ]);
             EditorInterfaceModes.AddToolsToCategory(mode, "items", [
-                new ItemTool("profitcard"),
-                new ItemTool("bhammer"),
-                new ItemTool("unsecuredyellowkey"),
-                new ItemTool("securedyellowlock"),
-                new ItemTool("anyportaloutput"),
-                new ItemTool("taserpulse"),
-                new ItemTool("stickerpack_securedlocked", false)
+                new ItemTool("profitcard") { frameOverride = studioslot },
+                new ItemTool("bhammer") { frameOverride = studioslot },
+                new ItemTool("unsecuredyellowkey") { frameOverride = studioslot },
+                new ItemTool("securedyellowlock") { frameOverride = studioslot },
+                new ItemTool("anyportaloutput") { frameOverride = studioslot },
+                new ItemTool("taserpulse") { frameOverride = studioslot },
+                new ItemTool("stickerpack_securedlocked", false) { frameOverride = studioslot }
                 ]);
-            EditorInterfaceModes.AddToolToCategory(mode, "doors", new DoorTool("inflocked", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/inflocked_SwingDoorED")));
-            EditorInterfaceModes.AddToolToCategory(mode, "objects", new ObjectToolNoRotation("bcpp_randomitemmachine", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/Object_bcpp_randomitemmachine")));
+            EditorInterfaceModes.AddToolToCategory(mode, "doors", new DoorTool("inflocked", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/inflocked_SwingDoorED")) { frameOverride = studioslot });
+            EditorInterfaceModes.AddToolToCategory(mode, "objects", new ObjectToolNoRotation("bcpp_randomitemmachine", BCPPPlugin.bcppAssets.Get<Sprite>("EditorUI/Object_bcpp_randomitemmachine")) { frameOverride = studioslot });
         });
     }
 
@@ -152,7 +153,14 @@ internal static class LevelStudioAdds
         {
             if (mode.id != "rooms")
                 foreach (var soda in LevelLoaderAdds.profitconverted)
-                    EditorInterfaceModes.AddToolToCategory(mode, "objects", new ObjectToolProfitCard(soda + "_profit", mode.availableTools["objects"].Find(x => x is ObjectTool && ((ObjectTool)x).type == soda).sprite));
+                {
+                    var ogtool = mode.availableTools["objects"].Find(x => x is ObjectTool && ((ObjectTool)x).type == soda);
+                    if (ogtool == null) continue;
+                    EditorInterfaceModes.AddToolToCategory(mode, "objects", new ObjectToolProfitCard(soda + "_profit", ogtool.sprite)
+                    {
+                        frameOverride = ogtool.frameOverride
+                    });
+                }
         });
     }
 }
@@ -165,22 +173,21 @@ public class NPCToolBCPP : NPCTool
     {
         _titleKey = titleKey;
         _descKey = descKey;
+        frameOverride = BCPPPlugin.bcppAssets.Get<Sprite>("StudioSlot");
     }
 
     public override string titleKey => _titleKey;
     public override string descKey => _descKey;
 }
 
-public class ObjectToolProfitCard : ObjectTool
+public class ObjectToolProfitCard(string type, Sprite sprite) : ObjectTool(type, sprite)
 {
-    public ObjectToolProfitCard(string type, Sprite sprite) : base(type, sprite) { }
-
     public override string titleKey => LocalizationManager.Instance.GetLocalizedText(base.titleKey.Replace("_profit", "")) + LocalizationManager.Instance.GetLocalizedText("Ed_Tool_object_profitmachine_Title");
     public override string descKey => "Ed_Tool_object_profitmachine_Desc";
 }
 
 [HarmonyPatch(typeof(HotSlotScript))]
-class ProfitIcon
+class ProfitIcon // Hacky stuff before frame overwrites were a thing.
 {
     [HarmonyPatch("Start"), HarmonyPostfix]
     static void InsertNewww(HotSlotScript __instance) => __instance.StartCoroutine(waitforMe(__instance));

@@ -3,160 +3,68 @@
   "WorkspaceRootPath": "D:\\source\\repos\\BCarnellPlusPack\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\levelstudioadds.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\levelstudioadds.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\levelloaderadds.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\levelloaderadds.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\bcppplugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\bcppplugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\patches\\swingingdoorpatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\patches\\swingingdoorpatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\bcarnellchars.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\bcarnellchars.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\itemstuff\\itm_unsecuredkey.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\itemstuff\\itm_unsecuredkey.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\characters\\mrportalman.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\characters\\mrportalman.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\itemstuff\\itm_taserpulse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\itemstuff\\itm_taserpulse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\itemstuff\\itm_anyportaloutput.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\itemstuff\\itm_anyportaloutput.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\otherstuff\\stickerstuff.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\otherstuff\\stickerstuff.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{78AA05C5-96FE-47D4-AE4F-C52FA89417D6}|PrototypeBotAnywhere\\PrototypeBotAnywhere.csproj|d:\\source\\repos\\bcarnellpluspack\\prototypebotanywhere\\plugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{78AA05C5-96FE-47D4-AE4F-C52FA89417D6}|PrototypeBotAnywhere\\PrototypeBotAnywhere.csproj|solutionrelative:prototypebotanywhere\\plugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{78AA05C5-96FE-47D4-AE4F-C52FA89417D6}|PrototypeBotAnywhere\\PrototypeBotAnywhere.csproj|d:\\source\\repos\\bcarnellpluspack\\prototypebotanywhere\\prototypebot01_teacher.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{78AA05C5-96FE-47D4-AE4F-C52FA89417D6}|PrototypeBotAnywhere\\PrototypeBotAnywhere.csproj|solutionrelative:prototypebotanywhere\\prototypebot01_teacher.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\characters\\bcarnellboss.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\characters\\bcarnellboss.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\otherstuff\\carnellbossmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\otherstuff\\carnellbossmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\otherstuff\\dogcheckbcpp.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\otherstuff\\dogcheckbcpp.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\discordrpcstuff.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\discordrpcstuff.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\patches\\npcpatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\patches\\npcpatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\patches\\otherpatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\patches\\otherpatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\protagoniststuff.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\protagoniststuff.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\custommodebroute.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\custommodebroute.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\otherstuff\\cryingportal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\otherstuff\\cryingportal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\patches\\advancedpatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\patches\\advancedpatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\update.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\update.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\otherstuff\\pac-machine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\otherstuff\\pac-machine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\otherstuff\\advancededitionadds.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\otherstuff\\advancededitionadds.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\otherstuff\\brouteearlyendingmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\otherstuff\\brouteearlyendingmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\levelloaderadds.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\levelloaderadds.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\levelstudioadds.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\levelstudioadds.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\patches\\stickerpatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\patches\\stickerpatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\characters\\siegecanoncart.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\characters\\siegecanoncart.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\patches\\otherpatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\patches\\otherpatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\otherstuff\\siegecartballs.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\otherstuff\\siegecartballs.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\characters\\siegecannoncart.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\characters\\siegecannoncart.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\otherstuff\\basementgamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\otherstuff\\basementgamemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\otherstuff\\arcadegauntletadds.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\otherstuff\\arcadegauntletadds.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellteacher\\plugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|solutionrelative:bcarnellteacher\\plugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\custommodebroute.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\custommodebroute.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellteacher\\bcarnell.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|solutionrelative:bcarnellteacher\\bcarnell.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\characters\\errorbot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\characters\\errorbot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\characters\\rpsguy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\characters\\rpsguy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\characters\\prototypebot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\characters\\prototypebot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{78AA05C5-96FE-47D4-AE4F-C52FA89417D6}|PrototypeBotAnywhere\\PrototypeBotAnywhere.csproj|d:\\source\\repos\\bcarnellpluspack\\prototypebotanywhere\\prototypebot01_teacher_states.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{78AA05C5-96FE-47D4-AE4F-C52FA89417D6}|PrototypeBotAnywhere\\PrototypeBotAnywhere.csproj|solutionrelative:prototypebotanywhere\\prototypebot01_teacher_states.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{78AA05C5-96FE-47D4-AE4F-C52FA89417D6}|PrototypeBotAnywhere\\PrototypeBotAnywhere.csproj|d:\\source\\repos\\bcarnellpluspack\\prototypebotanywhere\\patches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{78AA05C5-96FE-47D4-AE4F-C52FA89417D6}|PrototypeBotAnywhere\\PrototypeBotAnywhere.csproj|solutionrelative:prototypebotanywhere\\patches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellteacher\\bcarnell_states.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|solutionrelative:bcarnellteacher\\bcarnell_states.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellteacher\\patches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|solutionrelative:bcarnellteacher\\patches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellteacher\\policenerd_states.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|solutionrelative:bcarnellteacher\\policenerd_states.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellteacher\\policenerd.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|solutionrelative:bcarnellteacher\\policenerd.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\otherstuff\\randommachine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\otherstuff\\randommachine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\otherstuff\\rockpaperscissors.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\otherstuff\\rockpaperscissors.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\itemstuff\\itm_hammer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\itemstuff\\itm_hammer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\characters\\pac75ghost.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\characters\\pac75ghost.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellchars\\patches\\npcpatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99FB493D-0820-405F-A89C-53BBF789FCD0}|BCarnellChars\\BCarnellChars.csproj|solutionrelative:bcarnellchars\\patches\\npcpatches.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -166,7 +74,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -174,479 +82,207 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "LevelStudioAdds.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\LevelStudioAdds.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\LevelStudioAdds.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\LevelStudioAdds.cs",
-              "RelativeToolTip": "BCarnellChars\\LevelStudioAdds.cs",
-              "ViewState": "AgIAAF0AAAAAAAAAAAAowGwAAABRAAAAAAAAAA==",
+              "DocumentIndex": 3,
+              "Title": "CryingPortal.cs",
+              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\CryingPortal.cs",
+              "RelativeDocumentMoniker": "BCarnellChars\\OtherStuff\\CryingPortal.cs",
+              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\CryingPortal.cs",
+              "RelativeToolTip": "BCarnellChars\\OtherStuff\\CryingPortal.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAsAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-01T17:54:03.055Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "ITM_AnyportalOutput.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\ItemStuff\\ITM_AnyportalOutput.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\ItemStuff\\ITM_AnyportalOutput.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\ItemStuff\\ITM_AnyportalOutput.cs",
-              "RelativeToolTip": "BCarnellChars\\ItemStuff\\ITM_AnyportalOutput.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-01T17:40:26.559Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "BCPPPlugin.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\BCPPPlugin.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\BCPPPlugin.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\BCPPPlugin.cs",
-              "RelativeToolTip": "BCarnellChars\\BCPPPlugin.cs",
-              "ViewState": "AgIAAD4AAAAAAAAAAAAswFgAAAA2AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-14T19:50:56.479Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "StickerStuff.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\StickerStuff.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\OtherStuff\\StickerStuff.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\StickerStuff.cs",
-              "RelativeToolTip": "BCarnellChars\\OtherStuff\\StickerStuff.cs",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAowBcAAAAkAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-25T03:46:27.746Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "DogcheckBCPP.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\DogcheckBCPP.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\OtherStuff\\DogcheckBCPP.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\DogcheckBCPP.cs",
-              "RelativeToolTip": "BCarnellChars\\OtherStuff\\DogcheckBCPP.cs",
-              "ViewState": "AgIAADYAAAAAAAAAAAAowD8AAAAhAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-29T21:08:23.453Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "PrototypeBot01_Teacher.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\PrototypeBotAnywhere\\PrototypeBot01_Teacher.cs",
-              "RelativeDocumentMoniker": "PrototypeBotAnywhere\\PrototypeBot01_Teacher.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\PrototypeBotAnywhere\\PrototypeBot01_Teacher.cs",
-              "RelativeToolTip": "PrototypeBotAnywhere\\PrototypeBot01_Teacher.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAADMAAABWAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-25T01:21:22.122Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "ITM_TaserPulse.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\ItemStuff\\ITM_TaserPulse.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\ItemStuff\\ITM_TaserPulse.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\ItemStuff\\ITM_TaserPulse.cs",
-              "RelativeToolTip": "BCarnellChars\\ItemStuff\\ITM_TaserPulse.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAA8AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-18T05:31:05.052Z",
+              "WhenOpened": "2026-05-19T16:46:32.786Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "ITM_UnsecuredKey.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\ItemStuff\\ITM_UnsecuredKey.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\ItemStuff\\ITM_UnsecuredKey.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\ItemStuff\\ITM_UnsecuredKey.cs",
-              "RelativeToolTip": "BCarnellChars\\ItemStuff\\ITM_UnsecuredKey.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAABoAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-25T03:44:21.199Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "LevelLoaderAdds.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\LevelLoaderAdds.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\LevelLoaderAdds.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\LevelLoaderAdds.cs",
-              "RelativeToolTip": "BCarnellChars\\LevelLoaderAdds.cs",
-              "ViewState": "AgIAABwAAAAAAAAAAAAgwEoAAAAnAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-01T16:01:57.675Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "BCarnellBoss.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Characters\\BCarnellBoss.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\Characters\\BCarnellBoss.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Characters\\BCarnellBoss.cs",
-              "RelativeToolTip": "BCarnellChars\\Characters\\BCarnellBoss.cs",
-              "ViewState": "AgIAAK0AAAAAAAAAAAAAAL4AAAA2AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-29T00:28:39.686Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "SwingingDoorPatch.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Patches\\SwingingDoorPatch.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\Patches\\SwingingDoorPatch.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Patches\\SwingingDoorPatch.cs",
-              "RelativeToolTip": "BCarnellChars\\Patches\\SwingingDoorPatch.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAC8AAABjAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-17T00:20:47.954Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "CarnellBossManager.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\CarnellBossManager.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\OtherStuff\\CarnellBossManager.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\CarnellBossManager.cs",
-              "RelativeToolTip": "BCarnellChars\\OtherStuff\\CarnellBossManager.cs",
-              "ViewState": "AgIAAJAAAAAAAAAAAAAIwKcAAAAkAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-29T00:28:53.689Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
-              "Title": "CustomModeBRoute.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\CustomModeBRoute.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\CustomModeBRoute.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\CustomModeBRoute.cs",
-              "RelativeToolTip": "BCarnellChars\\CustomModeBRoute.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAACQAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-15T22:26:01.883Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 20,
-              "Title": "StickerPatches.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Patches\\StickerPatches.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\Patches\\StickerPatches.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Patches\\StickerPatches.cs",
-              "RelativeToolTip": "BCarnellChars\\Patches\\StickerPatches.cs",
-              "ViewState": "AgIAAIEAAAAAAAAAAADwv5cAAABZAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-17T00:23:46.9Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 19,
-              "Title": "Update.txt",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Update.txt",
-              "RelativeDocumentMoniker": "BCarnellChars\\Update.txt",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Update.txt",
-              "RelativeToolTip": "BCarnellChars\\Update.txt",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAVAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
-              "WhenOpened": "2025-11-15T20:10:26.667Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "Plugin.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\PrototypeBotAnywhere\\Plugin.cs",
-              "RelativeDocumentMoniker": "PrototypeBotAnywhere\\Plugin.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\PrototypeBotAnywhere\\Plugin.cs",
-              "RelativeToolTip": "PrototypeBotAnywhere\\Plugin.cs",
-              "ViewState": "AgIAABgAAAAAAAAAAAAAAC4AAABMAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-21T22:26:06.113Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "DiscordRPCStuff.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\DiscordRPCStuff.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\DiscordRPCStuff.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\DiscordRPCStuff.cs",
-              "RelativeToolTip": "BCarnellChars\\DiscordRPCStuff.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-01T16:23:00.071Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "OtherPatches.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Patches\\OtherPatches.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\Patches\\OtherPatches.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Patches\\OtherPatches.cs",
-              "RelativeToolTip": "BCarnellChars\\Patches\\OtherPatches.cs",
-              "ViewState": "AgIAAFwAAAAAAAAAAAASwHAAAACOAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-21T23:35:40.184Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 25,
-              "Title": "BCarnell.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTeacher\\BCarnell.cs",
-              "RelativeDocumentMoniker": "BCarnellTeacher\\BCarnell.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTeacher\\BCarnell.cs",
-              "RelativeToolTip": "BCarnellTeacher\\BCarnell.cs",
-              "ViewState": "AgIAAAsAAAAAAAAAAAAQwCQAAAAeAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-21T20:22:36.769Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "NPCPatches.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Patches\\NPCPatches.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\Patches\\NPCPatches.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Patches\\NPCPatches.cs",
-              "RelativeToolTip": "BCarnellChars\\Patches\\NPCPatches.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAfAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-15T22:18:56.074Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 16,
-              "Title": "ProtagonistStuff.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\ProtagonistStuff.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\ProtagonistStuff.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\ProtagonistStuff.cs",
-              "RelativeToolTip": "BCarnellChars\\ProtagonistStuff.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-01T16:04:11.291Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 24,
-              "Title": "Plugin.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTeacher\\Plugin.cs",
-              "RelativeDocumentMoniker": "BCarnellTeacher\\Plugin.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTeacher\\Plugin.cs",
-              "RelativeToolTip": "BCarnellTeacher\\Plugin.cs",
-              "ViewState": "AgIAAIIAAAAAAAAAAAAcwJoAAABWAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-21T20:22:21.356Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 27,
-              "Title": "RPSGuy.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Characters\\RPSGuy.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\Characters\\RPSGuy.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Characters\\RPSGuy.cs",
-              "RelativeToolTip": "BCarnellChars\\Characters\\RPSGuy.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAACAAAAAwAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-17T22:24:05.022Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 18,
               "Title": "AdvancedPatches.cs",
               "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Patches\\AdvancedPatches.cs",
               "RelativeDocumentMoniker": "BCarnellChars\\Patches\\AdvancedPatches.cs",
               "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Patches\\AdvancedPatches.cs",
               "RelativeToolTip": "BCarnellChars\\Patches\\AdvancedPatches.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACIAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAyAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-15T22:34:59.125Z"
+              "WhenOpened": "2026-05-19T16:44:38.851Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 28,
-              "Title": "PrototypeBot.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Characters\\PrototypeBot.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\Characters\\PrototypeBot.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Characters\\PrototypeBot.cs",
-              "RelativeToolTip": "BCarnellChars\\Characters\\PrototypeBot.cs",
-              "ViewState": "AgIAAHcAAAAAAAAAAADwv4QAAAAsAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "BCPPPlugin.cs",
+              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\BCPPPlugin.cs",
+              "RelativeDocumentMoniker": "BCarnellChars\\BCPPPlugin.cs",
+              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\BCPPPlugin.cs",
+              "RelativeToolTip": "BCarnellChars\\BCPPPlugin.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-25T00:54:00.563Z"
+              "WhenOpened": "2026-05-19T16:30:49.241Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
-              "Title": "SiegeCanonCart.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Characters\\SiegeCanonCart.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\Characters\\SiegeCanonCart.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Characters\\SiegeCanonCart.cs",
-              "RelativeToolTip": "BCarnellChars\\Characters\\SiegeCanonCart.cs",
-              "ViewState": "AgIAABsAAAAAAAAAAAAowC0AAAA5AAAAAAAAAA==",
+              "DocumentIndex": 5,
+              "Title": "PAC-Machine.cs",
+              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\PAC-Machine.cs",
+              "RelativeDocumentMoniker": "BCarnellChars\\OtherStuff\\PAC-Machine.cs",
+              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\PAC-Machine.cs",
+              "RelativeToolTip": "BCarnellChars\\OtherStuff\\PAC-Machine.cs",
+              "ViewState": "AgIAAJEAAAAAAAAAAAAswKEAAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-29T00:36:53.91Z"
+              "WhenOpened": "2026-05-19T16:29:49.466Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
-              "Title": "SiegeCartBalls.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\SiegeCartBalls.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\OtherStuff\\SiegeCartBalls.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\SiegeCartBalls.cs",
-              "RelativeToolTip": "BCarnellChars\\OtherStuff\\SiegeCartBalls.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAAACUAAAA4AAAAAAAAAA==",
+              "DocumentIndex": 6,
+              "Title": "AdvancedEditionAdds.cs",
+              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\AdvancedEditionAdds.cs",
+              "RelativeDocumentMoniker": "BCarnellChars\\OtherStuff\\AdvancedEditionAdds.cs",
+              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\AdvancedEditionAdds.cs",
+              "RelativeToolTip": "BCarnellChars\\OtherStuff\\AdvancedEditionAdds.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAoAAAApAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-29T02:27:29.141Z"
+              "WhenOpened": "2026-05-19T16:24:15.722Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
-              "Title": "BasementGameManager.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\BasementGameManager.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\OtherStuff\\BasementGameManager.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\BasementGameManager.cs",
-              "RelativeToolTip": "BCarnellChars\\OtherStuff\\BasementGameManager.cs",
-              "ViewState": "AgIAALYAAAAAAAAAAAAswNUAAABiAAAAAAAAAA==",
+              "DocumentIndex": 10,
+              "Title": "StickerPatches.cs",
+              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Patches\\StickerPatches.cs",
+              "RelativeDocumentMoniker": "BCarnellChars\\Patches\\StickerPatches.cs",
+              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Patches\\StickerPatches.cs",
+              "RelativeToolTip": "BCarnellChars\\Patches\\StickerPatches.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAA0AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-24T22:10:10.179Z"
+              "WhenOpened": "2026-05-19T15:55:03.892Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 26,
-              "Title": "ERRORBOT.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Characters\\ERRORBOT.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\Characters\\ERRORBOT.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Characters\\ERRORBOT.cs",
-              "RelativeToolTip": "BCarnellChars\\Characters\\ERRORBOT.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 2,
+              "Title": "MrPortalMan.cs",
+              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Characters\\MrPortalMan.cs",
+              "RelativeDocumentMoniker": "BCarnellChars\\Characters\\MrPortalMan.cs",
+              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Characters\\MrPortalMan.cs",
+              "RelativeToolTip": "BCarnellChars\\Characters\\MrPortalMan.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-29T02:24:23.637Z"
+              "WhenOpened": "2026-05-19T15:53:53.372Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 29,
-              "Title": "PrototypeBot01_Teacher_States.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\PrototypeBotAnywhere\\PrototypeBot01_Teacher_States.cs",
-              "RelativeDocumentMoniker": "PrototypeBotAnywhere\\PrototypeBot01_Teacher_States.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\PrototypeBotAnywhere\\PrototypeBot01_Teacher_States.cs",
-              "RelativeToolTip": "PrototypeBotAnywhere\\PrototypeBot01_Teacher_States.cs",
-              "ViewState": "AgIAAJAAAAAAAAAAAAAiwKoAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-25T01:49:34.816Z"
+              "DocumentIndex": 1,
+              "Title": "BCarnellChars.csproj",
+              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\BCarnellChars.csproj",
+              "RelativeDocumentMoniker": "BCarnellChars\\BCarnellChars.csproj",
+              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\BCarnellChars.csproj",
+              "RelativeToolTip": "BCarnellChars\\BCarnellChars.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAG8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-05-19T12:50:13.612Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 30,
-              "Title": "Patches.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\PrototypeBotAnywhere\\Patches.cs",
-              "RelativeDocumentMoniker": "PrototypeBotAnywhere\\Patches.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\PrototypeBotAnywhere\\Patches.cs",
-              "RelativeToolTip": "PrototypeBotAnywhere\\Patches.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAANAAAAAAAAAA==",
+              "DocumentIndex": 13,
+              "Title": "ArcadeGauntletAdds.cs",
+              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\ArcadeGauntletAdds.cs",
+              "RelativeDocumentMoniker": "BCarnellChars\\OtherStuff\\ArcadeGauntletAdds.cs",
+              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\ArcadeGauntletAdds.cs",
+              "RelativeToolTip": "BCarnellChars\\OtherStuff\\ArcadeGauntletAdds.cs",
+              "ViewState": "AgIAAIwAAAAAAAAAAADwv6QAAABUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-21T23:34:25.96Z"
+              "WhenOpened": "2026-05-18T05:01:11.497Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 32,
-              "Title": "Patches.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTeacher\\Patches.cs",
-              "RelativeDocumentMoniker": "BCarnellTeacher\\Patches.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTeacher\\Patches.cs",
-              "RelativeToolTip": "BCarnellTeacher\\Patches.cs",
-              "ViewState": "AgIAAOAAAAAAAAAAAAAqwPcAAABzAAAAAAAAAA==",
+              "DocumentIndex": 8,
+              "Title": "LevelLoaderAdds.cs",
+              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\LevelLoaderAdds.cs",
+              "RelativeDocumentMoniker": "BCarnellChars\\LevelLoaderAdds.cs",
+              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\LevelLoaderAdds.cs",
+              "RelativeToolTip": "BCarnellChars\\LevelLoaderAdds.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAABVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-21T20:54:55.737Z"
+              "WhenOpened": "2026-05-18T05:00:14.858Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 33,
-              "Title": "PoliceNerd_States.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTeacher\\PoliceNerd_States.cs",
-              "RelativeDocumentMoniker": "BCarnellTeacher\\PoliceNerd_States.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTeacher\\PoliceNerd_States.cs",
-              "RelativeToolTip": "BCarnellTeacher\\PoliceNerd_States.cs",
-              "ViewState": "AgIAAIkAAAAAAAAAAAAlwEMBAAAnAAAAAAAAAA==",
+              "DocumentIndex": 14,
+              "Title": "CustomModeBRoute.cs",
+              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\CustomModeBRoute.cs",
+              "RelativeDocumentMoniker": "BCarnellChars\\CustomModeBRoute.cs",
+              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\CustomModeBRoute.cs",
+              "RelativeToolTip": "BCarnellChars\\CustomModeBRoute.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAABkAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-21T20:46:02.835Z"
+              "WhenOpened": "2026-05-18T04:58:51.528Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 34,
-              "Title": "PoliceNerd.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTeacher\\PoliceNerd.cs",
-              "RelativeDocumentMoniker": "BCarnellTeacher\\PoliceNerd.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTeacher\\PoliceNerd.cs",
-              "RelativeToolTip": "BCarnellTeacher\\PoliceNerd.cs",
-              "ViewState": "AgIAAMgAAAAAAAAAAAAAAPEAAABRAAAAAAAAAA==",
+              "DocumentIndex": 7,
+              "Title": "BRouteEarlyEndingManager.cs",
+              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\BRouteEarlyEndingManager.cs",
+              "RelativeDocumentMoniker": "BCarnellChars\\OtherStuff\\BRouteEarlyEndingManager.cs",
+              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\BRouteEarlyEndingManager.cs",
+              "RelativeToolTip": "BCarnellChars\\OtherStuff\\BRouteEarlyEndingManager.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAA5AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-21T20:44:52.272Z"
+              "WhenOpened": "2026-05-18T03:19:02.77Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 31,
-              "Title": "BCarnell_States.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTeacher\\BCarnell_States.cs",
-              "RelativeDocumentMoniker": "BCarnellTeacher\\BCarnell_States.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTeacher\\BCarnell_States.cs",
-              "RelativeToolTip": "BCarnellTeacher\\BCarnell_States.cs",
-              "ViewState": "AgIAAB0AAAAAAAAAAAAWwGQAAAAuAAAAAAAAAA==",
+              "DocumentIndex": 9,
+              "Title": "LevelStudioAdds.cs",
+              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\LevelStudioAdds.cs",
+              "RelativeDocumentMoniker": "BCarnellChars\\LevelStudioAdds.cs",
+              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\LevelStudioAdds.cs",
+              "RelativeToolTip": "BCarnellChars\\LevelStudioAdds.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-21T20:27:32.53Z"
+              "WhenOpened": "2026-05-18T03:06:54.589Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 35,
-              "Title": "RandomMachine.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\RandomMachine.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\OtherStuff\\RandomMachine.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\RandomMachine.cs",
-              "RelativeToolTip": "BCarnellChars\\OtherStuff\\RandomMachine.cs",
-              "ViewState": "AgIAAA4AAAAAAAAAAAAxwCsAAAAVAAAAAAAAAA==",
+              "DocumentIndex": 11,
+              "Title": "OtherPatches.cs",
+              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Patches\\OtherPatches.cs",
+              "RelativeDocumentMoniker": "BCarnellChars\\Patches\\OtherPatches.cs",
+              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Patches\\OtherPatches.cs",
+              "RelativeToolTip": "BCarnellChars\\Patches\\OtherPatches.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAABZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-18T20:55:36.337Z"
+              "WhenOpened": "2026-05-18T03:06:27.881Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 37,
-              "Title": "ITM_Hammer.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\ItemStuff\\ITM_Hammer.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\ItemStuff\\ITM_Hammer.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\ItemStuff\\ITM_Hammer.cs",
-              "RelativeToolTip": "BCarnellChars\\ItemStuff\\ITM_Hammer.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAA9AAAAAAAAAA==",
+              "DocumentIndex": 15,
+              "Title": "NPCPatches.cs",
+              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Patches\\NPCPatches.cs",
+              "RelativeDocumentMoniker": "BCarnellChars\\Patches\\NPCPatches.cs",
+              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Patches\\NPCPatches.cs",
+              "RelativeToolTip": "BCarnellChars\\Patches\\NPCPatches.cs",
+              "ViewState": "AgIAADUAAAAAAAAAAAAgwF0AAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-17T22:55:44.615Z"
+              "WhenOpened": "2026-05-18T03:06:09.084Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 36,
-              "Title": "RockPaperScissors.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\RockPaperScissors.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\OtherStuff\\RockPaperScissors.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\OtherStuff\\RockPaperScissors.cs",
-              "RelativeToolTip": "BCarnellChars\\OtherStuff\\RockPaperScissors.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAyAAAAAAAAAA==",
+              "DocumentIndex": 12,
+              "Title": "SiegeCannonCart.cs",
+              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Characters\\SiegeCannonCart.cs",
+              "RelativeDocumentMoniker": "BCarnellChars\\Characters\\SiegeCannonCart.cs",
+              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Characters\\SiegeCannonCart.cs",
+              "RelativeToolTip": "BCarnellChars\\Characters\\SiegeCannonCart.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAABIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-17T22:55:26.908Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 38,
-              "Title": "PAC75Ghost.cs",
-              "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Characters\\PAC75Ghost.cs",
-              "RelativeDocumentMoniker": "BCarnellChars\\Characters\\PAC75Ghost.cs",
-              "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellChars\\Characters\\PAC75Ghost.cs",
-              "RelativeToolTip": "BCarnellChars\\Characters\\PAC75Ghost.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAxAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-17T00:18:53.26Z"
+              "WhenOpened": "2026-05-18T03:03:22.101Z"
             }
           ]
         }

@@ -6,166 +6,160 @@ using System;
 using System.Linq;
 using UnityEngine;
 
-namespace BCarnellChars.Characters
+namespace BCarnellChars.Characters;
+
+public class RPSGuy : NPC, IItemAcceptor
 {
-    public class RPSGuy : NPC, IItemAcceptor
+    [SerializeField] internal Sprite alive, dead, aliveH, deadH;
+    private bool IsSeasonal => DateTime.Now.Month == 10;
+    internal Sprite AliveSpr => IsSeasonal ? aliveH : alive;
+    internal Sprite DeadSpr => IsSeasonal ? deadH : dead;
+
+    private RockPaperScissors curRPS;
+    [SerializeField] internal RockPaperScissors rpsPre;
+
+    [SerializeField] internal AudioManager audMan;
+    /*private SoundObject audCall = new SoundObject();
+    private SoundObject audLetsPlay;
+    private SoundObject audGo;*/
+    [SerializeField] internal SoundObject[] audCongrats;
+    [SerializeField] internal SoundObject audWannaPlay, audFine, audYouLose, audDestroyed;
+
+    private float normSpeed = 12f, runSpeed = 20f, initialCooldown = 25f;
+
+    private bool isDead = false, playing = false;
+    public bool Dead => isDead;
+    public bool Playing => playing;
+    private readonly int streakInitial = 15;
+    private int StreakInitTotal => streakInitial + (streakInitial * Mathf.CeilToInt(1.05f * StickerManager.Instance.StickerValue(StickerPatches.rpsSticker)));
+    private int streakPoints;
+    public int StreakPoints => streakPoints;
+
+    private static readonly string[] hammers = new string[] { "BHammer".ToLower(), "Hammer".ToLower() };
+    public bool ItemFits(Items item) => hammers.Contains(item.ToStringExtended().ToLower()) && playing && !isDead;
+    public void InsertItem(PlayerManager player, EnvironmentController ec) => fuckingDies();
+
+    public override void Initialize()
     {
-        [SerializeField] internal Sprite alive, dead, aliveH, deadH;
-        private bool IsSeasonal => DateTime.Now.Month == 10;
-        internal Sprite AliveSpr => IsSeasonal ? aliveH : alive;
-        internal Sprite DeadSpr => IsSeasonal ? deadH : dead;
+        this.ChangeRadarColor();
+        spriteRenderer[0].sprite = AliveSpr;
+        base.Initialize();
+        streakPoints = StreakInitTotal;
+        behaviorStateMachine.ChangeState(new RPSGuy_Wandering(this));
+        navigator.maxSpeed = normSpeed;
+        navigator.SetSpeed(normSpeed);
+    }
 
-        private RockPaperScissors curRPS;
-        [SerializeField] internal RockPaperScissors rpsPre;
+    public override void Despawn()
+    {
+        if (curRPS != null) EndRPS(false, true);
+        base.Despawn();
+    }
 
-        [SerializeField] internal AudioManager audMan;
-        /*private SoundObject audCall = new SoundObject();
-        private SoundObject audLetsPlay;
-        private SoundObject audGo;*/
-        [SerializeField] internal SoundObject[] audCongrats;
-        [SerializeField] internal SoundObject audWannaPlay, audFine, audYouLose, audDestroyed;
+    protected override void VirtualUpdate()
+    {
+        base.VirtualUpdate();
+    }
 
-        private float normSpeed = 12f, runSpeed = 20f, initialCooldown = 25f;
+    public void PersuePlayer(PlayerManager player)
+    {
+        behaviorStateMachine.CurrentNavigationState.UpdatePosition(player.transform.position);
+        if (!isDead)
+            navigator.maxSpeed = runSpeed;
+        navigator.SetSpeed(runSpeed);
+    }
 
-        private bool isDead = false, playing = false;
-        public bool Dead => isDead;
-        public bool Playing => playing;
-        private readonly int streakInitial = 15;
-        private int StreakInitTotal => streakInitial + (streakInitial * Mathf.CeilToInt(1.05f * StickerManager.Instance.StickerValue(StickerPatches.rpsSticker)));
-        private int streakPoints;
-        public int StreakPoints => streakPoints;
+    public void StartPersuingPlayer(PlayerManager player)
+    {
+        behaviorStateMachine.ChangeNavigationState(new NavigationState_TargetPlayer(this, 63, player.transform.position));
+        if (!audMan.AnyAudioIsPlaying)
+            audMan.PlaySingle(audWannaPlay);
+    }
 
-        public bool ItemFits(Items item)
+    public void PlayerTurnAround(PlayerManager player)
+    {
+        Directions.ReverseList(navigator.currentDirs);
+        behaviorStateMachine.ChangeNavigationState(new NavigationState_WanderRandom(this, 0));
+        if (!isDead)
+            navigator.maxSpeed = normSpeed;
+        navigator.SetSpeed(normSpeed);
+    }
+
+    public void EndRPS(bool won, bool destroyGame)
+    {
+        if (won)
         {
-            return new string[] {"BHammer".ToLower(), "Hammer".ToLower()}.Contains(item.ToStringExtended().ToLower()) && playing && !isDead;
+            CoreGameManager.Instance.AddPoints(streakPoints, curRPS.player.playerNumber, true);
+            if (!GlobalCam.Instance.TransitionActive) GlobalCam.Instance.Transition(UiTransition.Dither, 0.01666667f);
+            audMan.PlayRandomAudio(audCongrats);
+            streakPoints += StreakInitTotal;
         }
-        public void InsertItem(PlayerManager player, EnvironmentController ec)
-        {
-            fuckingDies();
+        if (destroyGame) {
+            curRPS.Destroy();
+            if (!won && !isDead)
+                audMan.PlaySingle(audFine);
         }
-
-        public override void Initialize()
+        if (!isDead)
         {
-            this.ChangeRadarColor();
+            navigator.maxSpeed = normSpeed;
+            navigator.SetSpeed(normSpeed);
+            behaviorStateMachine.ChangeState(new RPSGuy_Cooldown(this, initialCooldown));
+        }
+        playing = false;
+    }
+
+    // What a waste...
+    public void Losah()
+    {
+        if (!GlobalCam.Instance.TransitionActive) GlobalCam.Instance.Transition(UiTransition.Dither, 0.01666667f);
+        audMan.PlaySingle(audYouLose);
+        streakPoints = StreakInitTotal;
+    }
+
+    public void EndCooldown()
+    {
+        if (isDead)
+        {
             spriteRenderer[0].sprite = AliveSpr;
-            base.Initialize();
-            streakPoints = StreakInitTotal;
-            behaviorStateMachine.ChangeState(new RPSGuy_Wandering(this, this));
+            isDead = false;
             navigator.maxSpeed = normSpeed;
             navigator.SetSpeed(normSpeed);
         }
+        behaviorStateMachine.ChangeState(new RPSGuy_Wandering(this));
+    }
 
-        public override void Despawn()
+    public void StartRPS(PlayerManager player)
+    {
+        playing = true;
+        if (curRPS != null)
+            curRPS.Destroy();
+        // IF PLAYTIME IS PLAYIN' WITH PLAYER, MAKE HER SAD BCUS SHE WAS INTERRUPTED!!
+        if (player.jumpropes.Count > 0)
         {
-            if (curRPS != null) EndRPS(false, true);
-            base.Despawn();
+            while (player.jumpropes.Count > 0)
+                player.jumpropes[0].End(false);
         }
+        curRPS = Instantiate(rpsPre);
+        curRPS.gameObject.SetActive(true);
+        if (!GlobalCam.Instance.TransitionActive) GlobalCam.Instance.FadeIn(UiTransition.Dither, 0.01666667f);
+        curRPS.player = player;
+        curRPS.rps = this;
+        navigator.maxSpeed = 0f;
+        navigator.Entity.AddForce(new Force(transform.position - player.transform.position, 20f, -60f));
+        //audMan.PlaySingle(audGo);
+        behaviorStateMachine.ChangeState(new RPSGuy_Playing(this));
+    }
 
-        protected override void VirtualUpdate()
-        {
-            base.VirtualUpdate();
-        }
-
-        public void PersuePlayer(PlayerManager player)
-        {
-            behaviorStateMachine.CurrentNavigationState.UpdatePosition(player.transform.position);
-            if (!isDead)
-                navigator.maxSpeed = runSpeed;
-            navigator.SetSpeed(runSpeed);
-        }
-
-        public void StartPersuingPlayer(PlayerManager player)
-        {
-            behaviorStateMachine.ChangeNavigationState(new NavigationState_TargetPlayer(this, 63, player.transform.position));
-            if (!audMan.audioDevice.isPlaying)
-                audMan.PlaySingle(audWannaPlay);
-        }
-
-        public void PlayerTurnAround(PlayerManager player)
-        {
-            Directions.ReverseList(navigator.currentDirs);
-            behaviorStateMachine.ChangeNavigationState(new NavigationState_WanderRandom(this, 0));
-            if (!isDead)
-                navigator.maxSpeed = normSpeed;
-            navigator.SetSpeed(normSpeed);
-        }
-
-        public void EndRPS(bool won, bool destroyGame)
-        {
-            if (won)
-            {
-                CoreGameManager.Instance.AddPoints(streakPoints, curRPS.player.playerNumber, true);
-                if (!GlobalCam.Instance.TransitionActive) GlobalCam.Instance.Transition(UiTransition.Dither, 0.01666667f);
-                audMan.PlayRandomAudio(audCongrats);
-                streakPoints += StreakInitTotal;
-            }
-            if (destroyGame) {
-                curRPS.Destroy();
-                if (!won && !isDead)
-                    audMan.PlaySingle(audFine);
-            }
-            if (!isDead)
-            {
-                navigator.maxSpeed = normSpeed;
-                navigator.SetSpeed(normSpeed);
-                behaviorStateMachine.ChangeState(new RPSGuy_Cooldown(this, this, initialCooldown));
-            }
-            playing = false;
-        }
-
-        // What a waste...
-        public void Losah()
-        {
-            if (!GlobalCam.Instance.TransitionActive) GlobalCam.Instance.Transition(UiTransition.Dither, 0.01666667f);
-            audMan.PlaySingle(audYouLose);
-            streakPoints = StreakInitTotal;
-        }
-
-        public void EndCooldown()
-        {
-            if (isDead)
-            {
-                spriteRenderer[0].sprite = AliveSpr;
-                isDead = false;
-                navigator.maxSpeed = normSpeed;
-                navigator.SetSpeed(normSpeed);
-            }
-            behaviorStateMachine.ChangeState(new RPSGuy_Wandering(this, this));
-        }
-
-        public void StartRPS(PlayerManager player)
-        {
-            playing = true;
-            if (curRPS != null)
-                curRPS.Destroy();
-            // IF PLAYTIME IS PLAYIN' WITH PLAYER, MAKE HER SAD BCUS SHE WAS INTERRUPTED!!
-            if (player.jumpropes.Count > 0)
-            {
-                while (player.jumpropes.Count > 0)
-                    player.jumpropes[0].End(false);
-            }
-            curRPS = Instantiate(rpsPre);
-            curRPS.gameObject.SetActive(true);
-            if (!GlobalCam.Instance.TransitionActive) GlobalCam.Instance.FadeIn(UiTransition.Dither, 0.01666667f);
-            curRPS.player = player;
-            curRPS.rps = this;
-            navigator.maxSpeed = 0f;
-            navigator.Entity.AddForce(new Force(transform.position - player.transform.position, 20f, -60f));
-            //audMan.PlaySingle(audGo);
-            behaviorStateMachine.ChangeState(new RPSGuy_Playing(this, this));
-        }
-
-        public void fuckingDies()
-        {
-            if (isDead) return;
-            isDead = true;
-            if (curRPS != null) EndRPS(false, true);
-            behaviorStateMachine.ChangeState(new RPSGuy_Cooldown(this, this, 30f));
-            audMan.FlushQueue(true);
-            audMan.PlaySingle(audDestroyed);
-            spriteRenderer[0].sprite = DeadSpr;
-            navigator.maxSpeed = 0f;
-            navigator.SetSpeed(0f);
-        }
+    public void fuckingDies()
+    {
+        if (isDead) return;
+        isDead = true;
+        if (curRPS != null) EndRPS(false, true);
+        behaviorStateMachine.ChangeState(new RPSGuy_Cooldown(this, 30f));
+        audMan.FlushQueue(true);
+        audMan.PlaySingle(audDestroyed);
+        spriteRenderer[0].sprite = DeadSpr;
+        navigator.maxSpeed = 0f;
+        navigator.SetSpeed(0f);
     }
 }

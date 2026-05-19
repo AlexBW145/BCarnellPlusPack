@@ -38,7 +38,7 @@ internal class DogcheckBCPP : MonoBehaviour
         gameObject.SetActive(false);
         gameObject.AddComponent<BaldiBG>().faceAnchor = bg;
         gameObject.SetActive(true);
-        Sprite beans = Resources.FindObjectsOfTypeAll<Sprite>().ToList().Find(x => x.name == "BaldiChalkSheet_0");
+        Sprite beans = Resources.FindObjectsOfTypeAll<Sprite>().Last(x => x.name == "BaldiChalkSheet_0");
         var baldibg = Resources.FindObjectsOfTypeAll<CoreGameManager>().Last(x => x.name == "CoreGameManager").transform.Find("PauseMenuScreens").Find("PauseScreen").Find("BaldiBG");
         for (int i = 0; i < 24; i++)
         {

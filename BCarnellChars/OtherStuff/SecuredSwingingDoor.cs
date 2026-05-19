@@ -1,29 +1,18 @@
-﻿using MTM101BaldAPI.Registers;
+﻿using BCarnellChars.OtherStuff;
 using MTM101BaldAPI;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
 using System.Linq;
+using UnityEngine;
 
 namespace BCarnellChars.OtherStuff
 {
     public class SecuredSwingingDoor : MonoBehaviour, IItemAcceptor
     {
-        private SwingDoor swingDoor;
+        [SerializeField] internal SwingDoor swingDoor;
 
-        public Material[] originalOverlays = new Material[0];
-        private bool lockOnStart = true;
+        [SerializeField] internal Material[] originalOverlays = new Material[0];
         private int attemptsofBreak = 0, maximumAttempts = 5;
-
-        private void Start()
+        public void Initialize()
         {
-            swingDoor = gameObject.GetComponent<SwingDoor>();
-            if (swingDoor == null || swingDoor.ec == null)
-                return;
-                
-            gameObject.GetComponent<AudioManager>().enabled = true;
-
             if (originalOverlays.Length == 0)
             {
                 originalOverlays = new Material[swingDoor.overlayLocked.Length];
@@ -33,12 +22,7 @@ namespace BCarnellChars.OtherStuff
                     swingDoor.overlayLocked[i] = BCPPPlugin.securedYellowSwingingDoor;
                 }
             }
-
-            if (lockOnStart)
-            {
-                swingDoor.Lock(true);
-                lockOnStart = false;
-            }
+            swingDoor.Lock(true);
         }
 
         public void InsertItem(PlayerManager player, EnvironmentController ec)
@@ -62,13 +46,26 @@ namespace BCarnellChars.OtherStuff
             Destroy(this);
         }
 
+        private static readonly string[] hammers = new string[] { "BHammer".ToLower(), "Hammer".ToLower() };
         public bool ItemFits(Items item)
         {
-            if (new string[] { "BHammer".ToLower(), "Hammer".ToLower() }.Contains(item.ToStringExtended().ToLower()))
+            if (hammers.Contains(item.ToStringExtended().ToLower()))
                 AttemptBreak();
             else if (item == EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey") || item.ToStringExtended().ToLower() == "IOU".ToLower())
                 UnlockFully();
-            return item == EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey") || item.ToStringExtended().ToLower() == "IOU".ToLower() || new string[] { "BHammer".ToLower(), "Hammer".ToLower() }.Contains(item.ToStringExtended().ToLower());
+            return item == EnumExtensions.GetFromExtendedName<Items>("UnsecuredYellowKey") || item.ToStringExtended().ToLower() == "IOU".ToLower() || hammers.Contains(item.ToStringExtended().ToLower());
         }
+    }
+}
+
+public class SwingDoor_Secured : SwingDoor
+{
+    [SerializeField]
+    internal SecuredSwingingDoor securedDoor;
+
+    public override void Initialize()
+    {
+        base.Initialize();
+        securedDoor.Initialize();
     }
 }

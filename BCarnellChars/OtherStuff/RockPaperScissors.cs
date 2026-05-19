@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using BCarnellChars.Characters;
 using TMPro;
 using UnityEngine;
@@ -182,8 +180,7 @@ namespace BCarnellChars.OtherStuff
                 thing.color = new Color(thing.color.r, thing.color.g, thing.color.b, timer);
                 yield return null;
             }
-            if (act != null)
-                act.Invoke();
+            act?.Invoke();
             yield break;
         }
 

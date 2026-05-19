@@ -30,7 +30,7 @@ namespace BCarnellChars.Characters
             Teleport();
             audMan.SetLoop(false);
             audMan.FlushQueue(true);
-            behaviorStateMachine.ChangeState(new ERRORBOT_Cooldown(this, this, UnityEngine.Random.RandomRangeInt(90, 120)));
+            behaviorStateMachine.ChangeState(new ERRORBOT_Cooldown(this, UnityEngine.Random.RandomRangeInt(90, 120)));
             behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 99));
             navigator.maxSpeed = 0;
             navigator.SetSpeed(0);
@@ -41,7 +41,7 @@ namespace BCarnellChars.Characters
         {
             Teleport();
             //audMan.PlaySingle(audScan);
-            behaviorStateMachine.ChangeState(new ERRORBOT_Active(this, this));
+            behaviorStateMachine.ChangeState(new ERRORBOT_Active(this));
             spriteRenderer[1].color = Color.white;
         }
 
@@ -60,19 +60,15 @@ namespace BCarnellChars.Characters
             {
                 spawn = needed[UnityEngine.Random.Range(0, needed.Count)];
                 flag = true;
-                for (int k = 0; k < Singleton<CoreGameManager>.Instance.setPlayers; k++)
+                for (int k = 0; k < CoreGameManager.Instance.setPlayers; k++)
                 {
                     if (!flag)
-                    {
                         break;
-                    }
-                    if ((spawn.FloorWorldPosition + Vector3.up * 5f - Singleton<CoreGameManager>.Instance.GetPlayer(k).transform.position).magnitude <= 20f || ec.TrapCheck(spawn))
-                    {
+                    if ((spawn.CenterWorldPosition - CoreGameManager.Instance.GetPlayer(k).transform.position).magnitude <= 20f || ec.TrapCheck(spawn))
                         flag = false;
-                    }
                 }
             }
-            transform.position = spawn.FloorWorldPosition + Vector3.up * 5f;
+            transform.position = spawn.CenterWorldPosition;
         }
 
         public void BecomeEvil(bool hasItems, PlayerManager player)
@@ -82,13 +78,13 @@ namespace BCarnellChars.Characters
             {
                 looker.ReflectionSetVariable("layerMask", camMask);
                 navigator.maxSpeed = 25f;
-                behaviorStateMachine.ChangeState(new ERRORBOT_WithItemsMode(this, this, player));
+                behaviorStateMachine.ChangeState(new ERRORBOT_WithItemsMode(this, player));
             }
             else
-                behaviorStateMachine.ChangeState(new ERRORBOT_NoItemsMode(this, this, player));
+                behaviorStateMachine.ChangeState(new ERRORBOT_NoItemsMode(this, player));
         }
 
-        protected static HashSet<string> lockedinRuleBreaks = new HashSet<string>() // In case of compats...
+        protected static readonly HashSet<string> lockedinRuleBreaks = new HashSet<string>() // In case of compats...
         {
             "Faculty",
             "Escaping",
@@ -108,7 +104,7 @@ namespace BCarnellChars.Characters
             transform.position = player.transform.position;
             if (GetComponent<Entity>().Squished)
                 return;
-            behaviorStateMachine.ChangeState(new ERRORBOT_FinalCooldown(this, this, 120f));
+            behaviorStateMachine.ChangeState(new ERRORBOT_FinalCooldown(this, 120f));
             audMan.QueueAudio(audAlarm, true);
             audMan.SetLoop(true);
             ec.MakeNoise(transform.position, 112); // You're fucked.
@@ -128,13 +124,13 @@ namespace BCarnellChars.Characters
 
         public void SayByeByeToYourItems(PlayerManager player)
         {
-            behaviorStateMachine.ChangeState(new ERRORBOT_FinalCooldown(this, this, 0.2f));
+            behaviorStateMachine.ChangeState(new ERRORBOT_FinalCooldown(this, 0.2f));
             Singleton<CoreGameManager>.Instance.audMan.PlayRandomAudio(audItemGet);
             if (!navigator.Entity.Squished)
                 player.itm.RemoveRandomItem();
         }
 
-        public void Jammed(Collider other)
+        public void Jammed(Entity other)
         {
             if (other.CompareTag("GrapplingHook") || other.GetComponent<ITM_GrapplingHook>()
                 || other.GetComponent<ITM_BSODA>() || other.GetComponent<SiegeCartBalls>()
@@ -142,7 +138,7 @@ namespace BCarnellChars.Characters
             {
                 looker.ReflectionSetVariable("layerMask", regularMask);
                 spriteRenderer[1].color = other.GetComponent<ITM_BSODA>() ? Color.blue : other.GetComponent<Gum>() ? Color.magenta : Color.grey;
-                behaviorStateMachine.ChangeState(new ERRORBOT_Cooldown(this, this, 120f));
+                behaviorStateMachine.ChangeState(new ERRORBOT_Cooldown(this, 120f));
                 behaviorStateMachine.ChangeNavigationState(new NavigationState_DoNothing(this, 99));
                 navigator.maxSpeed = 0;
                 navigator.SetSpeed(0);

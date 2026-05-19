@@ -5,20 +5,21 @@ using UnityEngine;
 
 namespace BCarnellChars.OtherStuff;
 
+/*
 public class RPSGuySticker : ExtendedStickerData
 {
     public override bool CanBeApplied() => true;
     public override bool CanBeCovered(StickerStateData data) => !(!BaseGameManager.Instance.InPitstop() && BaseGameManager.Instance.Ec.EventsStarted);
-}
+}*/
 
-internal class DummySwitcherooCheck : MonoBehaviour
-{
-}
+internal class DummySwitcherooCheck : MonoBehaviour;
 
 public class SecuredPacket : ExtendedStickerData
 {
     public override bool CanBeApplied() => false;
-    public override bool CanBeCovered(StickerStateData data) => false;
+    public override BooleanHandshake CanBeCovered(StickerStateData thisSticker, StickerStateData coveringSticker) => BooleanHandshake.AlwaysFalse;
+    public override BooleanHandshake CanStackWith(StickerStateData thisSticker, StickerStateData otherSticker) => BooleanHandshake.AlwaysFalse;
+    public override BooleanHandshake CanCoverSticker(StickerStateData thisSticker, StickerStateData otherSticker, int heldStickerSlot, int otherStickerSlot) => BooleanHandshake.AlwaysFalse;
 }
 
 public static class BCPPStickerStuff

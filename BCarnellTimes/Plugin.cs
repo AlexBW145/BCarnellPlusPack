@@ -162,7 +162,7 @@ internal class BCPPCharacterReplacer : MonoBehaviour, INPCPrefab
                 correctingFloors.Add("F1");
                 blacklistFloors = true;
                 break;
-            case SiegeCanonCart:
+            case SiegeCannonCart:
                 Npc.MarkAsReplacement(50, Character.Prize);
                 correctingFloors.Add("F1");
                 blacklistFloors = true;

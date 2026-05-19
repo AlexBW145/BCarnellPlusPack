@@ -74,7 +74,7 @@ internal static class LevelLoaderAdds
         sodaProfitCard.SetActive(false);
         sodaProfitCard.SetActive(true);
     }
-
+#if !RELEASE
     internal static void PlatformsB2Loader()
     {
         LevelLoaderPlugin.Instance.basicObjects.AddRange(new Dictionary<string, GameObject>()
@@ -85,4 +85,5 @@ internal static class LevelLoaderAdds
             { "b2platform_open", BCPPPlugin.bcppAssets.Get<GameObject>("B2Platform/Open") }
         });
     }
+#endif
 }

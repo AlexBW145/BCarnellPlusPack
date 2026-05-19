@@ -16,8 +16,8 @@ namespace BCarnellChars.OtherStuff
     public class PAC_Machine : EnvironmentObject, IClickable<int>
     {
         private bool completed = false;
-        [SerializeField] private LevelObject pacLevel;
-        [SerializeField] private WeightedItemObject[] selection;
+        [SerializeField] internal LevelObject pacLevel;
+        [SerializeField] internal WeightedItemObject[] selection;
         private Vector3[] playerPrevPos;
         private Quaternion[] playerPrevRotat;
         private string prevMIDI;
@@ -155,7 +155,7 @@ namespace BCarnellChars.OtherStuff
             }
             AudioListener.pause = false;
             PropagatedAudioManager.paused = false;
-            ec.SetElevators(false);
+            ec.ElevatorManager.SetAllElevators(ElevatorState.Closed);
         }
     }
 
@@ -173,7 +173,6 @@ namespace BCarnellChars.OtherStuff
                 icon.gameObject.SetActive(false);
                 if (Powered)
                 {
-                    
                     other.GetComponent<PlayerManager>().plm.AddStamina(10, true);
                     PacGameManager.PacInstance.StartFlee();
                     return;

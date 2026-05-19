@@ -83,7 +83,9 @@ internal static class AdvancedEditionAdds
             { "Adv_Elv_Tip_BCPP_TASERPulse", "TASER™ Pulse can chain through 3 bad guys and lasts longer than the Diet BSODA!" },
             { "Adv_Elv_Tip_BCPP_RandomMachine", "There's this machine that requires a profit card and is stocked with a random amount of items..." },
             { "Adv_Elv_Tip_BCPP_B1", "A route to the basement requires more preparation than usual!" },
+#if !RELEASE
             { "Adv_Elv_Tip_BCPP_B2", "Are you forgetting something?" },
+#endif
         };
         AssetLoader.LocalizationFromFunction((lang) => localization);
         ApiManager.AddNewTips(BCPPPlugin.Instance.Info, localization.Keys.ToArray());

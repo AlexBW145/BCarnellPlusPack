@@ -31,37 +31,34 @@ public class SiegeCartBalls : MonoBehaviour, IEntityTrigger
         Destroy(gameObject);
     }
 
-    public void EntityTriggerEnter(Collider other, bool isValid)
+    public void EntityTriggerEnter(Entity entity, Collider other, bool isValid)
     {
         if (moveMod == null || !isValid) return;
         // The original concept was every collision would result the entity being squished, but due to physics, that is very out of context.
-        Entity component = other.GetComponent<Entity>();
-        if ((other.CompareTag("Player") || (other.CompareTag("NPC") && other.GetComponent<NPC>().Character.ToStringExtended() != "SiegeCanonCart")) && component != null)
+        if ((other.CompareTag("Player") || (other.CompareTag("NPC") && other.GetComponent<NPC>().Character.ToStringExtended() != "SiegeCanonCart")) && entity != null)
         {
-            component.ExternalActivity.moveMods.Add(moveMod);
-            activityMods.Add(component.ExternalActivity);
+            entity.ExternalActivity.moveMods.Add(moveMod);
+            activityMods.Add(entity.ExternalActivity);
         }
     }
 
-    public void EntityTriggerStay(Collider other, bool isValid)
+    public void EntityTriggerStay(Entity entity, Collider other, bool isValid)
     {
         if (moveMod == null || !entity.Squished) return;
-        Entity component = other.GetComponent<Entity>();
-        if ((other.CompareTag("Player") || (other.CompareTag("NPC") && other.GetComponent<NPC>().Character.ToStringExtended() != "SiegeCanonCart")) && component != null)
+        if ((other.CompareTag("Player") || (other.CompareTag("NPC") && other.GetComponent<NPC>().Character.ToStringExtended() != "SiegeCanonCart")) && entity != null)
         {
-            component.ExternalActivity.moveMods.Remove(moveMod);
-            activityMods.Remove(component.ExternalActivity);
+            entity.ExternalActivity.moveMods.Remove(moveMod);
+            activityMods.Remove(entity.ExternalActivity);
         }
     }
 
-    public void EntityTriggerExit(Collider other, bool isValid)
+    public void EntityTriggerExit(Entity entity, Collider other, bool isValid)
     {
         if (moveMod == null || !isValid) return;
-        Entity component = other.GetComponent<Entity>();
-        if ((other.CompareTag("Player") || (other.CompareTag("NPC") && other.GetComponent<NPC>().Character.ToStringExtended() != "SiegeCanonCart")) && component != null)
+        if ((other.CompareTag("Player") || (other.CompareTag("NPC") && other.GetComponent<NPC>().Character.ToStringExtended() != "SiegeCanonCart")) && entity != null)
         {
-            component.ExternalActivity.moveMods.Remove(moveMod);
-            activityMods.Remove(component.ExternalActivity);
+            entity.ExternalActivity.moveMods.Remove(moveMod);
+            activityMods.Remove(entity.ExternalActivity);
         }
     }
 
@@ -82,7 +79,7 @@ public class SiegeCartBalls : MonoBehaviour, IEntityTrigger
             time -= 1.5f * (Time.deltaTime * ec.NpcTimeScale);
     }
 }
-
+#if DEBUG
 public class Sawblades : MonoBehaviour, IEntityTrigger
 {
     [SerializeField] internal Entity entity;
@@ -110,23 +107,23 @@ public class Sawblades : MonoBehaviour, IEntityTrigger
         Destroy(gameObject);
     }
 
-    public void EntityTriggerEnter(Collider other, bool isValid)
+    public void EntityTriggerEnter(Entity entity, Collider other, bool isValid)
     {
         Entity component = other.GetComponent<Entity>();
         if (other.CompareTag("Player") && component != null && isValid)
             BaseGameManager.Instance.EndGame(other.transform, ec.Npcs.Find(x => x.GetComponent<Baldi>()).GetComponent<Baldi>());
     }
 
-    public void EntityTriggerStay(Collider other, bool isValid)
+    public void EntityTriggerStay(Entity entity, Collider other, bool isValid)
     {
     }
 
-    public void EntityTriggerExit(Collider other, bool isValid)
+    public void EntityTriggerExit(Entity entity, Collider other, bool isValid)
     {
     }
 
     private static readonly FieldInfo _broken = AccessTools.DeclaredField(typeof(Window), "broken");
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Entity entity, Collider other)
     {
         if (other.gameObject.CompareTag("Window"))
         {
@@ -142,3 +139,4 @@ public class Sawblades : MonoBehaviour, IEntityTrigger
             time -= 15f * (Time.deltaTime * ec.NpcTimeScale);
     }
 }
+#endif

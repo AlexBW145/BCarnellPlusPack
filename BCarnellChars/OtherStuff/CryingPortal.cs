@@ -1,31 +1,30 @@
 ﻿using UnityEngine;
 
-namespace BCarnellChars.GeneratorStuff
+namespace BCarnellChars.OtherStuff;
+
+public class CryingPortal : RoomFunction
 {
-    public class CryingPortal : RoomFunction
+    [SerializeField] internal Material mask;
+    private GameObject chalkboo;
+    private Cell cell;
+    public Vector3 CellPos => cell.CenterWorldPosition;
+    public Quaternion PortalRotat => chalkboo.transform.rotation * Quaternion.Euler(0f,180f,0f);
+
+    public CryingPortal Spawn(Cell tile)
     {
-        public Material mask;
-        private GameObject chalkboo;
-        private Cell cell;
-        public Vector3 CellPos => cell.CenterWorldPosition;
-        public Quaternion PortalRotat => chalkboo.transform.rotation * Quaternion.Euler(0f,180f,0f);
+        room = tile.room;
+        cell = tile;
+        chalkboo = transform.Find("Chalkbaord").gameObject;
+        var quad = chalkboo.transform.Find("Quad").gameObject;
+        Direction direction = tile.RandomUncoveredDirection(new System.Random(CoreGameManager.Instance.Seed()));
+        chalkboo.transform.parent = tile.TileTransform;
+        chalkboo.transform.rotation = direction.ToRotation();
+        chalkboo.transform.position += chalkboo.transform.forward * -0.1f;
+        tile.HardCoverWall(direction, true);
+        transform.position = tile.room.ec.RealRoomMid(tile.room) + Vector3.up * 5f;
 
-        public CryingPortal Spawn(Cell tile)
-        {
-            room = tile.room;
-            cell = tile;
-            chalkboo = transform.Find("Chalkbaord").gameObject;
-            var quad = chalkboo.transform.Find("Quad").gameObject;
-            Direction direction = tile.RandomUncoveredDirection(new System.Random(CoreGameManager.Instance.Seed()));
-            chalkboo.transform.parent = tile.TileTransform;
-            chalkboo.transform.rotation = direction.ToRotation();
-            chalkboo.transform.position += chalkboo.transform.forward * -0.1f;
-            tile.HardCoverWall(direction, true);
-            transform.position = tile.room.ec.RealRoomMid(tile.room) + Vector3.up * 5f;
-
-            MaterialModifier.ChangeHole(quad.GetComponent<MeshRenderer>(), mask, quad.GetComponent<MeshRenderer>().materials[1]);
-            MaterialModifier.SetBase(quad.GetComponent<MeshRenderer>(), BCPPPlugin.bcppAssets.Get<RenderTexture>("MrPortalMan/ManCamRender"));
-            return this;
-        }
+        MaterialModifier.ChangeHole(quad.GetComponent<MeshRenderer>(), mask, quad.GetComponent<MeshRenderer>().materials[1]);
+        MaterialModifier.SetBase(quad.GetComponent<MeshRenderer>(), BCPPPlugin.bcppAssets.Get<RenderTexture>("MrPortalMan/ManCamRender"));
+        return this;
     }
 }

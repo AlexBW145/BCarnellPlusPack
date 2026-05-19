@@ -16,7 +16,7 @@ namespace BCarnellChars.OtherStuff
         public static PacGameManager PacInstance => singleton;
 
         public static SceneObject previousScene { get; internal set; }
-        [SerializeField] private Ambience ambience;
+        [SerializeField] internal Ambience ambience;
         private ValueModifier speedMod = new ValueModifier(1, 1);
 
         private static float powerChance = 0.1f;

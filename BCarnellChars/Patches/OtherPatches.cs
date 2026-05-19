@@ -17,14 +17,13 @@ namespace BCarnellChars.Patches
     [HarmonyPatch]
     class B1Patches
     {
-        [HarmonyPatch(typeof(FloodEvent), "Initialize"), HarmonyPrefix]
-        static void BasementDirtyWaterFill(ref float ___height, ref float ___volume, ref float ___riseSpeed)
+        [HarmonyPatch(typeof(FloodEvent), nameof(FloodEvent.Initialize)), HarmonyPostfix]
+        static void BasementDirtyWaterFill(ref float ___height, ref float ___riseSpeed)
         {
-            if (BaseGameManager.Instance.levelObject?.name == BCPPPlugin.Instance.lBasement.name
-                || BaseGameManager.Instance.levelObject?.name == BCPPPlugin.Instance.lBoss.name)
+            if (CoreGameManager.Instance.sceneObject == BCPPPlugin.Instance.sBasement
+                || CoreGameManager.Instance.sceneObject == BCPPPlugin.Instance.sBoss)
             {
                 ___height = 10.1f;
-                ___volume = 3f;
                 ___riseSpeed = 1.5f;
             }
         }
@@ -72,6 +71,7 @@ namespace BCarnellChars.Patches
         {
             if (SwitchNextFloorBCPP.enabledSwitch && CoreGameManager.Instance.sceneObject.levelNo == 0 && CoreGameManager.Instance.sceneObject.levelTitle == "F1")
             {
+                __instance.StopAllCoroutines();
                 __instance.Ec.gameObject.SetActive(false);
                 _PrepareToLoad.Invoke(__instance, []);
                 CoreGameManager.Instance.PrepareForReload();
@@ -120,7 +120,7 @@ PAC-MAN is owned by and all rights reserved to Bandai Namco Entertainment</size>
                 credits2.gameObject.name = "BCPP Credits Tools";
                 credits2.GetComponentsInChildren<TextMeshProUGUI>()[0].text = @"Tools Used for <color=red>BC</color><color=yellow>PP</color>
 
-paint.NET, Anim8or, Audacity, Firealpaca, GIMP, Photopea, TTSMP3 (prior to v1.1.1), Visual Studio 2022, Flipnote Studio, & Flipnote Studio 3D.";
+paint.NET, Anim8or, Audacity, Firealpaca, GIMP, Photopea, TTSMP3 (prior to v1.0.0), Visual Studio 2022, Flipnote Studio, & Flipnote Studio 3D.";
 
                 var credits3 = GameObject.Instantiate(__instance.screens[0]);
                 credits3.gameObject.name = "BCPP Credits Samples";
@@ -207,7 +207,7 @@ paint.NET, Anim8or, Audacity, Firealpaca, GIMP, Photopea, TTSMP3 (prior to v1.1.
         }
     }
 
-    [ConditionalPatchNoMod("pixelguy.pixelmodding.baldiplus.moddedmodesapi"), HarmonyPatch(typeof(MainMenu), "Start")]
+    [ConditionalPatchNever, ConditionalPatchNoMod("pixelguy.pixelmodding.baldiplus.moddedmodesapi"), HarmonyPatch(typeof(MainMenu), "Start")]
     class DoneForDay
     {
         static void Postfix()
@@ -258,7 +258,7 @@ paint.NET, Anim8or, Audacity, Firealpaca, GIMP, Photopea, TTSMP3 (prior to v1.1.
                 while (lb.levelInProgress && !lb.levelCreated)
                     yield return null;
                 Debug.Log("PAC MAN");
-                GameObject.FindObjectOfType<PacGameManager>().Initialize();
+                gm.Initialize();
                 yield break;
             }
             while (result.MoveNext())
@@ -268,7 +268,7 @@ paint.NET, Anim8or, Audacity, Firealpaca, GIMP, Photopea, TTSMP3 (prior to v1.1.
         static void NoExits(EnvironmentController ec, IntVector2 position, Elevator __instance, ref AudioManager ___audMan)
         {
             if (CoreGameManager.Instance.sceneObject != BCPPPlugin.Instance.sPac) return;
-            __instance.Close();
+            __instance.SetState(ElevatorState.NoPower);
             ___audMan.FlushQueue(true);
             foreach (var gatewall in __instance.transform.Find("Gate").GetComponentsInChildren<MeshRenderer>())
             {
@@ -280,12 +280,19 @@ paint.NET, Anim8or, Audacity, Firealpaca, GIMP, Photopea, TTSMP3 (prior to v1.1.
             // Insert some attempts trying to make it disappear and make the other walls fill its mesh.
         }
     }
-
+#if !RELEASE
     [HarmonyPatch]
     class B2Patches
     {
         [HarmonyPatch(typeof(CoreGameManager), nameof(CoreGameManager.BackupMap)), HarmonyPrefix]
         static bool StopBackingUpMaps() => !(CarnellBossManager.BossInstance != null || (CoreGameManager.Instance.sceneObject.levelTitle == "B2" && CoreGameManager.Instance.sceneObject.levelNo == -2));
+        [HarmonyPatch(typeof(ExtendedStickerData), nameof(ExtendedStickerData.CanBeApplied)), HarmonyPostfix]
+        static void AffectGeneratorRegardless(ref bool __result, ExtendedStickerData __instance)
+        {
+            if (__instance.affectsLevelGeneration && !__result &&
+                (CarnellBossManager.BossInstance != null || (CoreGameManager.Instance.sceneObject.levelTitle == "B2" && CoreGameManager.Instance.sceneObject.levelNo == -2)))
+                __result = true;
+        }
 
         [HarmonyPatch(typeof(EnvironmentController), nameof(EnvironmentController.CreateCell), [typeof(int), typeof(Transform), typeof(IntVector2), typeof(RoomController), typeof(bool), typeof(bool)]), HarmonyPostfix]
         static void B2Refresh(int tileBin, Transform parent, IntVector2 position, RoomController room, bool destroyExisting, bool lockCell, EnvironmentController __instance)
@@ -295,6 +302,7 @@ paint.NET, Anim8or, Audacity, Firealpaca, GIMP, Photopea, TTSMP3 (prior to v1.1.
                 room.functionObject.GetComponent<B2HallRoomFunction>().Refresh();
         }
     }
+#endif
 #if DEBUG
     [HarmonyPatch(typeof(LevelGenerator), "StartGenerate")]
     class EveryoneIsHere // This is outdated since v0.8 released.
@@ -329,7 +337,7 @@ paint.NET, Anim8or, Audacity, Firealpaca, GIMP, Photopea, TTSMP3 (prior to v1.1.
                 gl.AssignElevatorScreen(evl);
                 evl.gameObject.SetActive(true);
                 //gl.LoadLevel(Resources.FindObjectsOfTypeAll<SceneObject>().ToList().Find(x => x.name == "MainLevel_3"));
-                gl.LoadLevel(BasePlugin.Instance.sBoss);
+                gl.LoadLevel(BCPPPlugin.Instance.sBoss);
                 evl.Initialize();
                 gl.SetSave(false);
             });
