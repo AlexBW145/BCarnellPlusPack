@@ -3169,7 +3169,7 @@ namespace BCarnellChars
     {
         public static BCPPSave Instance => BCPPPlugin.Instance.SaveData;
         [NonSerialized] public ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource("BCPPSave");
-        [NonSerialized] public const string Version = "1.6.0", Build = "earlybird.1"; // BepinEx 5 does not support semantic versioning, which they have lied in their tutorial documentation until BepInEx 6 comes out.
+        [NonSerialized] public const string Version = "1.6.0", Build = "earlybird.2"; // BepinEx 5 does not support semantic versioning, which they have lied in their tutorial documentation until BepInEx 6 comes out.
         internal static Version typeVersion => new Version(Version);
 
         internal string version = Version, build = Build;
