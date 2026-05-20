@@ -151,7 +151,21 @@ public class BasementGameManager : BaseGameManager
 
     public override void LoadNextLevel()
     {
-        int stickerBonuses = CoreGameManager.Instance.GetStickerBonuses(ec.RemainingTime, (ec.GetBaldi() != null) ? ec.NavigableDistance(ec.CellFromPosition(CoreGameManager.Instance.GetPlayer(0).transform.position), ec.CellFromPosition(ec.GetBaldi().transform.position), PathType.Nav) : 0, ec.map.PlayerDiscoveredCells);
+        HighlightManager.Instance.Highlight("steam_completed", LocalizationManager.Instance.GetLocalizedText("Steam_Highlight_Win"), string.Format(LocalizationManager.Instance.GetLocalizedText("Steam_Highlight_Win_Desc"), CurrentLevel + 1), 2u, 0f, 0f, TimelineEventClipPriority.Standard);
+        int num = 0;
+        var robot = ec.Npcs.Find(x => x is PrototypeBot);
+        if (robot != null)
+        {
+            num = ec.NavigableDistance(ec.CellFromPosition(CoreGameManager.Instance.GetPlayer(0).transform.position), ec.CellFromPosition(robot.transform.position), PathType.Nav);
+            if (num < 0)
+            {
+                num = ec.NavigableDistance(ec.CellFromPosition(CoreGameManager.Instance.GetPlayer(0).transform.position), ec.CellFromPosition(robot.transform.position), PathType.Const) * 2;
+                if (num < 0)
+                    num = 100;
+            }
+        }
+
+        int stickerBonuses = CoreGameManager.Instance.GetStickerBonuses(ec.RemainingTime, num, ec.map.PlayerDiscoveredCells);
         CoreGameManager.Instance.AddPoints(stickerBonuses, 0, false, false, true);
         CoreGameManager.Instance.saveMapAvailable = false;
         CoreGameManager.Instance.saveMapPurchased = false;
@@ -162,17 +176,15 @@ public class BasementGameManager : BaseGameManager
         elevatorScreen = Instantiate(elevatorScreenPre);
         elevatorScreen.OnLoadReady += base.LoadNextLevel;
         elevatorScreen.Initialize();
-        if (time <= levelObject.timeBonusLimit)
-            _ = levelObject.timeBonusVal;
 
         if (problems > 0)
+        {
             CoreGameManager.Instance.GradeVal += -Mathf.RoundToInt(gradeValue * ((float)correctProblems / (float)problems * 2f - 1f));
+        }
 
         elevatorScreen.ShowResults(time, Mathf.RoundToInt((float)stickerBonuses * CoreGameManager.Instance.YtpMultiplier));
-        if (CoreGameManager.Instance.GetPoints(0) > 0)
-            _ = levelObject.finalLevel;
-        if (CoreGameManager.Instance.SaveEnabled && MTM101BaldiDevAPI.SaveGamesEnabled && levelObject.name == "Basement1"
-            && CoreGameManager.Instance.currentMode != Mode.Free && levelObject.finalLevel)
+        if (CoreGameManager.Instance.SaveEnabled && MTM101BaldiDevAPI.SaveGamesEnabled && CoreGameManager.Instance.sceneObject == BCPPPlugin.Instance.sBasement
+            && CoreGameManager.Instance.currentMode != Mode.Free)
         {
             BCPPSave.Instance.basementCompleted = true;
             BCPPSave.Instance.Save();
@@ -227,8 +239,8 @@ public class BasementGameManager : BaseGameManager
     public override void ActivityCompleted(bool correct, Activity activity)
     {
         base.ActivityCompleted(correct, activity);
-        if (correct && ec.Npcs.Find(x => x.GetComponent<PrototypeBot>()))
-            ec.Npcs.Find(x => x.GetComponent<PrototypeBot>()).gameObject.GetComponent<PrototypeBot>().MechFunctInvoke();
+        if (correct && ec.Npcs.Exists(x => x is PrototypeBot))
+            ec.Npcs.Find(x => x is PrototypeBot).GetComponent<PrototypeBot>().MechFunctInvoke();
     }
 }
 
@@ -238,11 +250,12 @@ public class SwitchNextFloorBCPP : MonoBehaviour, IButtonReceiver
     private static bool but = false;
     internal static bool enabledSwitch => but;
     internal TimeScaleModifier itshard = new TimeScaleModifier();
+    [SerializeField] private SoundObject uhoh = Resources.FindObjectsOfTypeAll<SoundObject>().Last(x => x.name == "LAt_Sighted" && x.GetInstanceID() >= 0);
     public void ButtonPressed(bool val)
     {
         if (!but && BaseGameManager.Instance != null && CoreGameManager.Instance != null)
         {
-            CoreGameManager.Instance.audMan.PlaySingle(Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(x => x.name == "LAt_Sighted"));
+            CoreGameManager.Instance.audMan.PlaySingle(uhoh);
             ec.FlickerLights(true);
             ec.AddTimeScale(itshard);
 
@@ -278,7 +291,7 @@ public class SwitchNextFloorBCPP : MonoBehaviour, IButtonReceiver
 
 public class FacultyButtonBuilderBCPP : StructureBuilder
 {
-    public GameButton buttonPre;
+    [SerializeField] internal GameButton buttonPre;
 
     public override void OnGenerationFinished(LevelBuilder lg)
     {
@@ -319,10 +332,6 @@ public class FacultyButtonBuilderBCPP : StructureBuilder
                 tilesOfShape.RemoveAt(index);
         }
         //BCPPSave.Instance.logger.LogWarning(tilesOfShape.Count <= 0 ? "WTF FAILURE???" : "ItDone!");
-    }
-
-    protected override void Finished()
-    {
     }
 }
 

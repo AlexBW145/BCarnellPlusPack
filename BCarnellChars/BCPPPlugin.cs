@@ -2187,6 +2187,7 @@ namespace BCarnellChars
                 .Build();
             sBoss.manager = placeholderman;
             sBasement.nextLevel = sBoss;
+            sBasement.levelObject.finalLevel = true;
             sBoss.AddMeta(this, ["ending"]);
 #else
             yield return "Initializing v1.6 stuff...";
