@@ -77,19 +77,19 @@ internal static class LevelStudioAdds
         EditorInterface.AddDoor<DoorDisplay>("inflocked", DoorIngameStatus.AlwaysObject, Resources.FindObjectsOfTypeAll<SwingDoor>().Last().mask[0], [infdoorlocked, infdoorlocked]);
 
 #if DEBUG
-        var basicobject = EditorInterface.AddObjectVisual("b2platform_sideways", BasePlugin.bcppAssets.Get<GameObject>("B2Platform/Sideways"), true);
+        var basicobject = EditorInterface.AddObjectVisual("b2platform_sideways", BCPPPlugin.bcppAssets.Get<GameObject>("B2Platform/Sideways"), true);
         foreach (var collid in basicobject.ingameColliders)
             GameObject.DestroyImmediate(collid);
         basicobject.ingameColliders.Clear();
-        basicobject = EditorInterface.AddObjectVisual("b2platform_corner", BasePlugin.bcppAssets.Get<GameObject>("B2Platform/Corner"), true);
+        basicobject = EditorInterface.AddObjectVisual("b2platform_corner", BCPPPlugin.bcppAssets.Get<GameObject>("B2Platform/Corner"), true);
         foreach (var collid in basicobject.ingameColliders)
             GameObject.DestroyImmediate(collid);
         basicobject.ingameColliders.Clear();
-        basicobject = EditorInterface.AddObjectVisual("b2platform_oneside", BasePlugin.bcppAssets.Get<GameObject>("B2Platform/OneSide"), true);
+        basicobject = EditorInterface.AddObjectVisual("b2platform_oneside", BCPPPlugin.bcppAssets.Get<GameObject>("B2Platform/OneSide"), true);
         foreach (var collid in basicobject.ingameColliders)
             GameObject.DestroyImmediate(collid);
         basicobject.ingameColliders.Clear();
-        basicobject = EditorInterface.AddObjectVisual("b2platform_open", BasePlugin.bcppAssets.Get<GameObject>("B2Platform/Open"), true);
+        basicobject = EditorInterface.AddObjectVisual("b2platform_open", BCPPPlugin.bcppAssets.Get<GameObject>("B2Platform/Open"), true);
         foreach (var collid in basicobject.ingameColliders)
             GameObject.DestroyImmediate(collid);
         basicobject.ingameColliders.Clear();

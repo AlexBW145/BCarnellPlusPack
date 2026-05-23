@@ -74,7 +74,7 @@ internal static class LevelLoaderAdds
         sodaProfitCard.SetActive(false);
         sodaProfitCard.SetActive(true);
     }
-#if !RELEASE
+#if !EARLYBIRD
     internal static void PlatformsB2Loader()
     {
         LevelLoaderPlugin.Instance.basicObjects.AddRange(new Dictionary<string, GameObject>()

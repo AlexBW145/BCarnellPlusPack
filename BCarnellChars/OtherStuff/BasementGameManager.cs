@@ -4,6 +4,7 @@ using HarmonyLib;
 using MTM101BaldAPI;
 using MTM101BaldAPI.Components.Animation;
 using MTM101BaldAPI.Registers;
+using MTM101BaldAPI.SaveSystem;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,6 +59,9 @@ public class BasementGameManager : BaseGameManager
     {
         base.BeginPlay();
         MusicManager.Instance.StopMidi();
+        ModdedFileManager.Instance.saveData.saveAvailable = false;
+        PlayerFileManager.Instance.savedGameData.saveAvailable = false;
+        PlayerFileManager.Instance.Save();
         ambience.Initialize(ec);
         foreach (Activity activity in ec.activities)
             if (activity.Corrupted)
@@ -103,7 +107,7 @@ public class BasementGameManager : BaseGameManager
         }
         foreach (Cell light in ec.lights)
         {
-            if (!(lightonRNG.NextDouble() < lightonChance))
+            if (!(lightonRNG.NextDouble() < (double)lightonChance))
                 light.SetPower(false);
         }
 

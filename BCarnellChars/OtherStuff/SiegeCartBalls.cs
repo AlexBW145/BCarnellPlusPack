@@ -76,10 +76,10 @@ public class SiegeCartBalls : MonoBehaviour, IEntityTrigger
     private void OnTriggerStay(Collider other)
     {
         if (other.CompareTag("Wall") && other.enabled && other.gameObject.activeSelf && other.transform.parent.gameObject.activeSelf)
-            time -= 1.5f * (Time.deltaTime * ec.NpcTimeScale);
+            time -= 1.5f * (Time.deltaTime * ec.EnvironmentTimeScale);
     }
 }
-#if DEBUG
+#if !EARLYBIRD
 public class Sawblades : MonoBehaviour, IEntityTrigger
 {
     [SerializeField] internal Entity entity;
@@ -102,6 +102,11 @@ public class Sawblades : MonoBehaviour, IEntityTrigger
             return;
         entity.UpdateInternalMovement(transform.forward * speed * ec.EnvironmentTimeScale);
         time -= Time.deltaTime * ec.NpcTimeScale;
+        if (!ec.ContainsCoordinates(transform.position))
+        {
+            Destroy(gameObject);
+            return;
+        }
         if (!(time <= 0f))
             return;
         Destroy(gameObject);
@@ -109,8 +114,7 @@ public class Sawblades : MonoBehaviour, IEntityTrigger
 
     public void EntityTriggerEnter(Entity entity, Collider other, bool isValid)
     {
-        Entity component = other.GetComponent<Entity>();
-        if (other.CompareTag("Player") && component != null && isValid)
+        if (other.CompareTag("Player") && entity != null && isValid)
             BaseGameManager.Instance.EndGame(other.transform, ec.Npcs.Find(x => x.GetComponent<Baldi>()).GetComponent<Baldi>());
     }
 
@@ -136,7 +140,7 @@ public class Sawblades : MonoBehaviour, IEntityTrigger
     private void OnTriggerStay(Collider other)
     {
         if (other.CompareTag("Wall") && other.enabled && other.gameObject.activeSelf && other.transform.parent.gameObject.activeSelf)
-            time -= 15f * (Time.deltaTime * ec.NpcTimeScale);
+            time -= 15f * (Time.deltaTime * ec.EnvironmentTimeScale);
     }
 }
 #endif

@@ -1,10 +1,10 @@
 ﻿using BCarnellChars.Characters;
-using BepInEx.Bootstrap;
 using HarmonyLib;
 using MTM101BaldAPI;
 using MTM101BaldAPI.Components;
 using MTM101BaldAPI.PlusExtensions;
 using MTM101BaldAPI.Registers;
+using MTM101BaldAPI.SaveSystem;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -30,8 +30,11 @@ internal class CarnellBossManager : BaseGameManager
     private List<EnvironmentController> LastEnvironments;
     internal List<LevelGenerationParameters> levelObjects;
     private List<LevelGenerationParameters> LastLevelObjects;
+    private EnvironmentController endingEC;
 
     private IEnumerator ItemHallSpawner;
+    internal B2Button myman;
+    [SerializeField] internal B2BattleObject battle;
 
     protected override void AwakeFunction()
     {
@@ -40,22 +43,31 @@ internal class CarnellBossManager : BaseGameManager
 
     private static readonly FieldInfo _seedText = AccessTools.DeclaredField(typeof(ElevatorScreen), "seedText");
 
+    private void UpdateLightmap()
+    {
+        for (int x = 0; x < ec.levelSize.x; x++)
+            for (int z = 0; z < ec.levelSize.z; z++)
+                ec.UpdateLightingAtCell(ec.cells[x, z]);
+        CoreGameManager.Instance.UpdateLightMap();
+    }
+
     protected new void Start()
     {
+        SubInitializer subin;
         Environments = [ec];
         levelObjects = [levelObject];
         lightonRNG = new System.Random(CoreGameManager.Instance.Seed());
         for (int i = 0; i < 4; i++)
         {
-            var subin = Instantiate(subinitPre, null, false);
+            subin = Instantiate(subinitPre, null, false);
             subin.subLevelObject = BCPPPlugin.Instance.lsubBoss[i];
             subin.baseGameManager = this;
             subin.onReady = (lb, gm) =>
             {
                 Environments.Add(lb.Ec);
-                lb.Ec.mainHall.functionObject.GetComponent<RoomFunctionContainer>().AddFunction(lb.Ec.mainHall.functionObject.AddComponent<B2HallRoomFunction>());
+                /*lb.Ec.mainHall.functionObject.GetComponent<RoomFunctionContainer>().AddFunction(lb.Ec.mainHall.functionObject.AddComponent<B2HallRoomFunction>());
                 lb.Ec.mainHall.functionObject.GetComponent<RoomFunctionContainer>().Initialize(lb.Ec.mainHall);
-                lb.Ec.mainHall.functionObject.GetComponent<RoomFunctionContainer>().OnGenerationFinished();
+                lb.Ec.mainHall.functionObject.GetComponent<RoomFunctionContainer>().OnGenerationFinished();*/
                 lb.Ec.PauseEnvironment(false);
                 lb.Ec.PauseEvents(false);
                 //GC.Collect();
@@ -71,7 +83,7 @@ internal class CarnellBossManager : BaseGameManager
                 lb.Ec.SetAllLights(false);
                 foreach (Cell light in lb.Ec.lights)
                 {
-                    if (lightonRNG.NextDouble() < lightonChance)
+                    if (light.room.category == RoomCategory.Special || lightonRNG.NextDouble() < (double)lightonChance)
                         light.SetLight(true);
                 }
                 lb.Ec.gameObject.SetActive(false);
@@ -93,6 +105,19 @@ internal class CarnellBossManager : BaseGameManager
             subinit.Add(subin);
             subin.gameObject.SetActive(true);
         }
+        subin = Instantiate(subinitPre, null, false);
+        subin.subLevelAsset = new(BCPPPlugin.Instance.sendBoss.levelAsset, BCPPPlugin.Instance.sendBoss.extraAsset);
+        subin.baseGameManager = this;
+        subin.onReady = (lb, gm) =>
+        {
+            Environments.Add(lb.Ec);
+            endingEC = lb.Ec;
+            lb.Ec.PauseEnvironment(false);
+            lb.Ec.PauseEvents(false);
+            lb.Ec.gameObject.SetActive(false);
+        };
+        subinit.Add(subin);
+        subin.gameObject.SetActive(true);
         IEnumerator WaitForGenerator()
         {
             while (!(subinit.TrueForAll(s => s.Ready) && singleton != null))
@@ -127,6 +152,7 @@ internal class CarnellBossManager : BaseGameManager
                     //CameraExtensions.GetUniversalAdditionalCameraData(CoreGameManager.Instance.GetCamera(i).camCom).cameraStack.Insert(2, subec.map.cams[i]);
                 }
             }
+            UpdateLightmap();
 
             generatorFinished = true;
             CollectNotebooks(0);
@@ -160,6 +186,7 @@ internal class CarnellBossManager : BaseGameManager
 
     public override void Initialize()
     {
+#if !DEBUG
         if (CoreGameManager.Instance.currentMode == Mode.Free || CoreGameManager.Instance.lifeMode == LifeMode.Explorer || !BCPPSave.Instance.basementCompleted
             || Chainloader.PluginInfos.ContainsKey("com.exmagikguy.baldi.loguscheats") || Chainloader.PluginInfos.ContainsKey("com.sinai.unityexplorer") || Chainloader.PluginInfos.ContainsKey("alexbw145.baldiplus.pinedebug"))
         {
@@ -167,9 +194,10 @@ internal class CarnellBossManager : BaseGameManager
             Destroy(gameObject);
             return;
         }
-        ec.mainHall.functionObject.GetComponent<RoomFunctionContainer>().AddFunction(ec.mainHall.functionObject.AddComponent<B2HallRoomFunction>());
+#endif
+        /*ec.mainHall.functionObject.GetComponent<RoomFunctionContainer>().AddFunction(ec.mainHall.functionObject.AddComponent<B2HallRoomFunction>());
         ec.mainHall.functionObject.GetComponent<RoomFunctionContainer>().Initialize(ec.mainHall);
-        ec.mainHall.functionObject.GetComponent<RoomFunctionContainer>().OnGenerationFinished();
+        ec.mainHall.functionObject.GetComponent<RoomFunctionContainer>().OnGenerationFinished();*/
         singleton = this;
         ec.ElevatorManager.PrepareToLeaveSpawn();
         var text = _seedText.GetValue(ElevatorScreen.Instance) as TMP_Text;
@@ -177,7 +205,7 @@ internal class CarnellBossManager : BaseGameManager
         ec.SetAllLights(false);
         foreach (Cell light in ec.lights)
         {
-            if (lightonRNG.NextDouble() < lightonChance)
+            if (light.room.category == RoomCategory.Special || lightonRNG.NextDouble() < (double)lightonChance)
                 light.SetLight(true);
         }
     }
@@ -198,8 +226,13 @@ internal class CarnellBossManager : BaseGameManager
     public override void BeginPlay()
     {
         base.BeginPlay();
-        LastEnvironments = Environments;
-        LastLevelObjects = levelObjects;
+        MusicManager.Instance.StopMidi();
+        ModdedFileManager.Instance.saveData.saveAvailable = false;
+        PlayerFileManager.Instance.savedGameData.saveAvailable = false;
+        PlayerFileManager.Instance.Save();
+        LastEnvironments = new(Environments);
+        LastEnvironments.Remove(endingEC);
+        LastLevelObjects = new(levelObjects);
     }
 
     public override void BeginSpoopMode()
@@ -216,7 +249,78 @@ internal class CarnellBossManager : BaseGameManager
         base.CallSpecialManagerFunction(val, source);
         switch (val)
         {
+            case 0:
+                if (!allNotebooksFound && !MusicManager.Instance.MidiPlaying)
+                    myman.waitingtogetcloser = true;
+                break;
             case 1:
+                if (!allNotebooksFound)
+                    ec.Npcs.DoIf(x => x is BCarnellBoss, x => x.GetComponent<BCarnellBoss>().IAmComing());
+                break;
+            case 2:
+                if (!allNotebooksFound && MusicManager.Instance.MidiPlaying && MusicManager.Instance.MidiPlayer.MPTK_MidiName == BCPPPlugin.bcppAssets.Get<string>("mus_BCarnellBossIntro"))
+                    THEBUTTONISPRESSED();
+                else if (allNotebooksFound)
+                {
+                    IEnumerator Transition()
+                    {
+                        float elaspedTime = 0f;
+                        var timescale = new TimeScaleModifier();
+                        ec.AddTimeScale(timescale);
+                        while (elaspedTime <= 2f)
+                        {
+                            timescale.npcTimeScale -= 0.35f * Time.deltaTime;
+                            timescale.npcTimeScale = Mathf.Max(0f, timescale.npcTimeScale);
+                            timescale.environmentTimeScale = timescale.playerTimeScale = timescale.npcTimeScale;
+                            if (!MusicManager.Instance.MidiPlayer.MPTK_IsPaused)
+                                MusicManager.Instance.MidiPlayer.MPTK_Speed -= 0.35f * Time.deltaTime;
+                            elaspedTime += Time.deltaTime;
+                            yield return null;
+                        }
+                        BCarnellBoss.B2Boss phase = BCarnellBoss.B2Boss.Phase1;
+                        ec.Npcs.DoIf(x => x is BCarnellBoss, x =>
+                        {
+                            x.GetComponent<AudioManager>().FlushQueue(true);
+                            phase = x.GetComponent<BCarnellBoss>().phases;
+                        });
+                        if (phase == BCarnellBoss.B2Boss.Phase4)
+                        {
+                            MusicManager.Instance.StopMidi();
+                            LastEnvironments = [endingEC];
+                            SwapEnvironment(0, true);
+                            for (int i = 0; i < CoreGameManager.Instance.setPlayers; i++)
+                            {
+                                CoreGameManager.Instance.GetPlayer(i).GetMovementStatModifier().modifiers["walkSpeed"].RemoveAll(x => x.multiplier == 2f);
+                                CoreGameManager.Instance.GetPlayer(i).GetMovementStatModifier().modifiers["runSpeed"].RemoveAll(x => x.multiplier == 2f);
+                                CoreGameManager.Instance.GetPlayer(i).Teleport(endingEC.spawnPoint);
+                                CoreGameManager.Instance.GetPlayer(i).transform.rotation = endingEC.spawnRotation;
+                                CoreGameManager.Instance.GetPlayer(i).itm.Disable(true);
+                            }
+                            endingEC.ElevatorManager.SetAllElevators(ElevatorState.Closed);
+                            CoreGameManager.Instance.disablePause = true;
+                            yield break;
+                        }
+                        MusicManager.Instance.MidiPlayer.MPTK_Speed = 1f + (1.5f * (float)phase);
+                        LastEnvironments = [.. LastEnvironments.Where(e => e != ec)];
+                        LastLevelObjects = [.. LastLevelObjects.Where(ld => ld != levelObject)];
+                        SwapEnvironment(Mathf.RoundToInt(UnityEngine.Random.Range(0f, LastEnvironments.Count - 1)), true);
+                        Teleporttt();
+                        ec.Npcs.DoIf(x => x is BCarnellBoss, x => x.GetComponent<BCarnellBoss>().InitPhase(++phase));
+                        ec.flickerSpeed = 0.05f;
+                        ec.mainHall.lights.Do(x => x.SetLight(true));
+                        ec.FlickerLights(true);
+                        StartItemSpawnInHall();
+                        yield break;
+                    }
+                    StartCoroutine(Transition());
+                }
+                break;
+            case 3:
+                if (endingEC.gameObject.activeSelf)
+                {
+                    var carnell = (BCarnellBoss)ec.SpawnNPC(BCPPPlugin.Instance.sBoss.baldiPrefab, IntVector2.GetGridPosition(ec.spawnPoint));
+                    carnell.InitPhase(BCarnellBoss.B2Boss.Phase5);
+                }
                 break;
         }
     }
@@ -225,6 +329,17 @@ internal class CarnellBossManager : BaseGameManager
     {
         if (ItemHallSpawner != null)
             StopCoroutine(ItemHallSpawner);
+        float distanceFromPlayer = 70f, distanceFromBattle = 125f;
+        HashSet<B2BattleObject> objects = new HashSet<B2BattleObject>();
+        List<Cell> cells = new(ec.mainHall.cells);
+        cells.ControlledShuffle(new System.Random(CoreGameManager.Instance.Seed()));
+        foreach (var cell in cells)
+        {
+            if (Vector3.Distance(cell.CenterWorldPosition, ec.Players[0].transform.position) <= distanceFromPlayer
+                || objects.Any(c => Vector3.Distance(cell.CenterWorldPosition, c.transform.position) <= distanceFromBattle))
+                continue;
+            objects.Add(Instantiate(battle, cell.CenterWorldPosition, default, ec.transform).Initialize(ec));
+        }
         IEnumerator Spawner()
         {
             while (ec != null)
@@ -236,8 +351,10 @@ internal class CarnellBossManager : BaseGameManager
                     yield return null;
                 }
                 var items = levelObject.forcedItems;
-                var cell = ec.mainHall.AllTilesNoGarbage(false, false)[UnityEngine.Random.Range(0, ec.mainHall.AllTilesNoGarbage(false, false).Count)];
-                ec.CreateItem(ec.mainHall, items[UnityEngine.Random.Range(0, items.Count - 1)], new(cell.CenterWorldPosition.x, cell.CenterWorldPosition.z));
+                var tiles = ec.mainHall.AllTilesNoGarbage(false, false);
+                var cell = tiles[UnityEngine.Random.Range(0, tiles.Count)];
+                var pickup = ec.CreateItem(ec.mainHall, items[UnityEngine.Random.Range(0, items.Count - 1)], new(cell.CenterWorldPosition.x, cell.CenterWorldPosition.z));
+                pickup.icon = ec.map.AddIcon(pickup.iconPre, pickup.transform, Color.white);
                 yield return null;
             }
         }
@@ -251,16 +368,16 @@ internal class CarnellBossManager : BaseGameManager
         if (allNotebooksFound) return;
         IEnumerator cutscene()
         {
-            ec.Npcs.DoIf(x => x.Character.ToStringExtended().ToLower() == "BCarnellBoss".ToLower(), x => x.GetComponent<BCarnellBoss>().TheDialogue(ec.Players[0]));
+            ec.Npcs.DoIf(x => x is BCarnellBoss, x => x.GetComponent<BCarnellBoss>().TheDialogue(ec.Players[0]));
             ec.AddTimeScale(new TimeScaleModifier(0f, 1f, 1f));
             MusicManager.Instance.PlayMidi(BCPPPlugin.bcppAssets.Get<string>("mus_BCarnellBossIntro"), false);
             yield return null;
             while (MusicManager.Instance.MidiPlaying)
                 yield return null;
-            ec.Npcs.DoIf(x => x.Character.ToStringExtended().ToLower() == "BCarnellBoss".ToLower(), x => x.GetComponent<AudioManager>().FlushQueue(true));
+            ec.Npcs.DoIf(x => x is BCarnellBoss, x => x.GetComponent<AudioManager>().FlushQueue(true));
             allNotebooksFound = true;
-            LastEnvironments = [.. Environments.Where(e => e != ec)];
-            LastLevelObjects = [.. levelObjects.Where(ld => ld != levelObject)];
+            LastEnvironments = [.. LastEnvironments.Where(e => e != ec)];
+            LastLevelObjects = [.. LastLevelObjects.Where(ld => ld != levelObject)];
             yield return null;
             SwapEnvironment(Mathf.RoundToInt(UnityEngine.Random.Range(0f, LastEnvironments.Count - 1)), true);
             MusicManager.Instance.PlayMidi(BCPPPlugin.bcppAssets.Get<string>("mus_BCarnellBoss01"), true);
@@ -272,7 +389,10 @@ internal class CarnellBossManager : BaseGameManager
                 CoreGameManager.Instance.GetPlayer(i).GetMovementStatModifier().modifiers["walkSpeed"].Add(speedMod);
                 CoreGameManager.Instance.GetPlayer(i).GetMovementStatModifier().modifiers["runSpeed"].Add(speedMod);
             }
-            ec.Npcs.DoIf(x => x.Character.ToStringExtended().ToLower() == "BCarnellBoss".ToLower(), x => x.GetComponent<BCarnellBoss>().InitPhase(BCarnellBoss.B2Boss.Phase1));
+            ec.Npcs.DoIf(x => x is BCarnellBoss, x => x.GetComponent<BCarnellBoss>().InitPhase(BCarnellBoss.B2Boss.Phase1));
+            ec.flickerSpeed = 0.05f;
+            ec.mainHall.lights.Do(x => x.SetLight(true));
+            ec.FlickerLights(true);
             StartItemSpawnInHall();
             yield break;
         }
@@ -284,7 +404,7 @@ internal class CarnellBossManager : BaseGameManager
         if (MusicManager.Instance.MidiPlaying && MusicManager.Instance.MidiPlayer.MPTK_MidiName == BCPPPlugin.bcppAssets.Get<string>("mus_BCarnellBossIntro")
             && MusicManager.Instance.MidiPlayer.MPTK_TickCurrent < 6912)
             MusicManager.Instance.MidiPlayer.MPTK_TickCurrent = 6912;
-        ec.Npcs.DoIf(x => x.Character.ToStringExtended().ToLower() == "BCarnellBoss".ToLower(), x => x.GetComponent<BCarnellBoss>().ButtonPressed(ec.Players[0]));
+        ec.Npcs.DoIf(x => x is BCarnellBoss, x => x.GetComponent<BCarnellBoss>().ButtonPressed());
     }
 
     private void Teleporttt()
@@ -292,8 +412,7 @@ internal class CarnellBossManager : BaseGameManager
         bool flag = false;
         List<Cell> path = new List<Cell>();
         IntVector2 position = ec.Elevators[UnityEngine.Random.Range(0, ec.Elevators.Count)].Door.position;
-        int num = 0;
-        int carnellpos = 64;
+        int num = 0, carnellpos = 64;
         while (!flag && num++ < 32)
         {
             ec.FindPath(ec.CellFromPosition(position), ec.mainHall.TileAtIndex(UnityEngine.Random.Range(0, ec.mainHall.TileCount)), PathType.Nav, out path, out var success);
@@ -306,11 +425,11 @@ internal class CarnellBossManager : BaseGameManager
         }
         if (flag)
         {
-            ec.Npcs.DoIf(x => x.Character.ToStringExtended().ToLower() == "BCarnellBoss".ToLower(), x =>
+            ec.Npcs.DoIf(x => x is BCarnellBoss, x =>
             {
                 var bald = x as BCarnellBoss;
                 bald.ClearSoundLocations();
-                x.transform.position = path[carnellpos].FloorWorldPosition + Vector3.up * 5f;
+                x.transform.position = path[carnellpos].CenterWorldPosition;
             });
             for (int i = 0; i < CoreGameManager.Instance.setPlayers; i++)
                 CoreGameManager.Instance.GetPlayer(i).Teleport(path[10].CenterWorldPosition);
@@ -337,12 +456,13 @@ internal class CarnellBossManager : BaseGameManager
         PropagatedAudioManager.paused = false;
         ec.AssignPlayers();
         ApplyMap(ec.map);
+        UpdateLightmap();
         for (int i = 0; i < CoreGameManager.Instance.setPlayers; i++)
         {
             CoreGameManager.Instance.GetPlayer(i).plm.Entity.Initialize(ec, CoreGameManager.Instance.GetPlayer(i).transform.position);
             CoreGameManager.Instance.GetCamera(i).mapCam.transform.SetParent(ec.map.transform, true);
-            GameCamera.dijkstraMap = new DijkstraMap(ec, PathType.Sound, int.MaxValue, CoreGameManager.Instance.GetCamera(i).listenerTra);
         }
+        GameCamera.dijkstraMap = new DijkstraMap(ec, PathType.Sound, int.MaxValue, CoreGameManager.Instance.GetCamera(0).listenerTra);
         GC.Collect();
         ec.Active = true;
         ec.BeginPlay();
@@ -407,6 +527,7 @@ public class SubInitializer : GameInitializer
     [SerializeField] public SceneObject subSceneObject;
     [SerializeField] public LevelObject subLevelObject;
     [SerializeField] public Tuple<LevelAsset, ExtraLevelDataAsset> subLevelAsset;
+    [SerializeField] public Tuple<LevelDataContainer, ExtraLevelDataAsset> subLevelContainer;
     [SerializeField] internal EnvironmentController ecPre;
     [SerializeField] internal LevelBuilder generatorPre, loaderPre;
     [SerializeField] internal Vector3 ecPos = Vector3.zero;
@@ -449,6 +570,12 @@ public class SubInitializer : GameInitializer
             levelBuilder.levelAsset = subLevelAsset.Item1;
             levelBuilder.extraAsset = subLevelAsset.Item2;
         }
+        else if (subLevelContainer != null)
+        {
+            levelBuilder = Instantiate(loaderPre);
+            levelBuilder.levelContainer = subLevelContainer.Item1;
+            levelBuilder.extraAsset = subLevelContainer.Item2;
+        }
 
         /*baseGameManager.levelObject = subLevelObject;
         baseGameManager.Ec = ec;
@@ -473,8 +600,15 @@ public class SubInitializer : GameInitializer
 
 public class B2HallRoomFunction : RoomFunction
 {
-    private int range = 9;
+    [SerializeField] internal Skybox skybox;
+    [Range(1, int.MaxValue)] private int range = 9;
+    private static readonly FieldInfo
+        _skyboxTileH = AccessTools.DeclaredField(typeof(Skybox), "modifiedMeshHeight"),
+        _tileH = AccessTools.DeclaredField(typeof(Skybox), "horizontalMesh"),
+        _tileV = AccessTools.DeclaredField(typeof(Skybox), "verticalMesh");
     private bool NotHall => Room?.category != RoomCategory.Hall;
+    [SerializeField] private Texture2D trans = Resources.FindObjectsOfTypeAll<Texture2D>().Last(x => x.name == "Transparent" && x.isReadable && x.GetInstanceID() >= 0);
+    [Obsolete("Classic Reimplemented Code", true)]
     private MeshRenderer CreateCellMesh(int typeBin, Vector3 position, Material mat)
     {
         GameObject gameObject = new GameObject();
@@ -487,13 +621,109 @@ public class B2HallRoomFunction : RoomFunction
         return meshRenderer;
     }
 
+    public override void Initialize(RoomController room)
+    {
+        base.Initialize(room);
+        room.florTex = room.ceilTex = trans;
+        float num = room.ec.RealRoomMax(room).x - room.ec.RealRoomMin(room).x;
+        float num2 = room.ec.RealRoomMax(room).z - room.ec.RealRoomMin(room).z;
+        Vector3 vector = new Vector3(room.ec.RealRoomMax(room).x - num / 2f, 5f, room.ec.RealRoomMax(room).z - num2 / 2f);
+        skybox.transform.position = vector;
+        Vector3 vector2 = room.ec.RealRoomSize(room);
+        vector2.x /= 10f;
+        vector2.z /= 10f;
+        vector2.y = 1;
+        skybox.transform.localScale = vector2;
+        _skyboxTileH.SetValue(skybox, range);
+        foreach (var rend in (MeshRenderer[])_tileH.GetValue(skybox))
+        {
+            rend.transform.localPosition = new(rend.transform.localPosition.x, rend.transform.localPosition.y < 0f ? -10f : 10f, rend.transform.localPosition.z);
+            rend.transform.localPosition += (rend.transform.localPosition.y < 0f ? Vector3.down : Vector3.up) * ((range - 1) * 5f);
+            rend.transform.localScale += Vector3.up * ((range - 1) * 10f);
+        }
+        foreach (var rend in (MeshRenderer[])_tileV.GetValue(skybox))
+        {
+            rend.transform.localPosition = new(rend.transform.localPosition.x, rend.transform.localPosition.y < 0f ? -10f : 10f, rend.transform.localPosition.z);
+            rend.transform.localPosition += (rend.transform.localPosition.y < 0f ? Vector3.down : Vector3.up) * ((range - 1) * 5f);
+            rend.transform.localScale += Vector3.up * ((range - 1) * 10f);
+        }
+        skybox.InitializeMaterials(room.wallTex, room.size.x, room.size.z);
+        room.cells[0].renderers.AddRange(skybox.GetComponent<RendererContainer>().renderers);
+    }
+
     public override void OnGenerationFinished()
     {
-        new Material(room.baseMat);
+        var entitysafe = room.AllEntitySafeCellsNoGarbage();
+        Dictionary<Direction, List<MeshRenderer>> renderers = new Dictionary<Direction, List<MeshRenderer>>();
+        foreach (var dir in Directions.All())
+            renderers.Add(dir, new List<MeshRenderer>());
+        for (var ch = 0; ch < skybox.transform.childCount; ch++)
+        {
+            var child = skybox.transform.GetChild(ch);
+            foreach (var dir in Directions.All())
+            {
+                if (child.localRotation.eulerAngles == dir.ToRotation().eulerAngles)
+                    renderers[dir].Add(child.GetComponent<MeshRenderer>());
+            }
+        }
+        for (int c = 0; c < room.cells.Count; c++)
+        {
+            var cell = room.cells[c];
+            if (cell.TileTransform.Find("FluorescentLight(Clone)") != null)
+                Destroy(cell.TileTransform.Find("FluorescentLight(Clone)").gameObject);
+            if (entitysafe.Contains(cell))
+            {
+                int bin = 0;
+                foreach (var dir in Directions.All())
+                {
+                    if (room.cells.Find(x => x.position == cell.position + Directions.ToIntVector2(dir)) != null &&
+                            !entitysafe.Contains(room.cells.Find(x => x.position == cell.position + Directions.ToIntVector2(dir))))
+                        bin |= Directions.ToBinary(dir);
+                }
+                for (int i = 0; i < 4; i++)
+                {
+                    if (bin.ContainsDirection((Direction)i))
+                    {
+                        cell.Block((Direction)i, true);
+                        cell.Tile.Collider((Direction)i).gameObject.SetActive(true);
+                        cell.Tile.Collider((Direction)i).gameObject.layer = LayerMask.NameToLayer("Ignore Raycast B");
+                    }
+                }
+            }
+            else
+            {
+                cell.TileTransform.gameObject.AddComponent<NavMeshObstacle>().size = Vector3.one * 10f;
+                cell.TileTransform.gameObject.GetComponent<NavMeshObstacle>().radius = 7f;
+                cell.TileTransform.gameObject.GetComponent<NavMeshObstacle>().height = 10f;
+                cell.TileTransform.gameObject.GetComponent<NavMeshObstacle>().carving = true;
+                for (int i = 0; i < 4; i++)
+                    cell.Block((Direction)i, true);
+            }
+            foreach (var dir in Directions.All())
+            {
+                if (!cell.hideFromMap && (/*room.cells.Find(x => x.position == cell.position + Directions.ToIntVector2(dir)) == null
+                    ||*/ room.cells.Find(x => x.position == cell.position + Directions.ToIntVector2(dir))?.hideFromMap == true))
+                {
+                    foreach (var rend in renderers[dir])
+                    {
+                        var newrend = Instantiate(rend, skybox.transform, true);
+                        newrend.transform.SetParent(null, true);
+                        newrend.transform.localScale = new(10f, newrend.transform.localScale.y, 10f);
+                        newrend.transform.SetParent(skybox.transform, true);
+                        newrend.transform.position = new(cell.TileTransform.position.x + (dir.ToVector3().x * 5f), newrend.transform.position.y, cell.TileTransform.position.z + (dir.ToVector3().z * 5f));
+                        cell.AddRenderer(newrend);
+                        var property = new MaterialPropertyBlock();
+                        newrend.GetPropertyBlock(property);
+                        property.SetVector("_Tiling", new Vector2(1, range));
+                        newrend.SetPropertyBlock(property);
+                    }
+                }
+            }
+        }
+        /*new Material(room.baseMat);
         Texture2D florTex = room.florTex;
         Texture2D wallTex = room.wallTex;
         Texture2D ceilTex = room.ceilTex;
-        Texture2D trans = Resources.FindObjectsOfTypeAll<Texture2D>().ToList().Find(x => x.name == "Transparent" && x.isReadable);
         room.wallTex = wallTex;
         room.florTex = trans;
         room.ceilTex = trans;
@@ -503,8 +733,8 @@ public class B2HallRoomFunction : RoomFunction
         room.florTex = florTex;
         room.ceilTex = ceilTex;
         room.GenerateTextureAtlas();
-        var entitysafe = room.AllEntitySafeCellsNoGarbage();
-        foreach (var cell in room.cells)
+        var entitysafe = room.AllEntitySafeCellsNoGarbage();*/
+        /*foreach (var cell in room.cells)
         {
             if ((!NotHall && cell.ConstBin == 0 && !room.ec.CellsFromPerimeter(cell.position, 2).Exists(x => x.ConstBin != 0))
                 || NotHall)
@@ -568,7 +798,7 @@ public class B2HallRoomFunction : RoomFunction
                         if (i != 0)
                             cell.AddRenderer(CreateCellMesh(bin, cell.FloorWorldPosition + Vector3.up * (10f * i), endlessMat));
             }
-        }
+        }*/
     }
 
     public void Refresh()
@@ -579,15 +809,11 @@ public class B2HallRoomFunction : RoomFunction
             if (entitysafe.Contains(cell))
             {
                 int bin = 0;
-                using (List<Direction>.Enumerator enumerator2 = Directions.All().GetEnumerator())
+                foreach (var dir in Directions.All())
                 {
-                    while (enumerator2.MoveNext())
-                    {
-                        Direction dir = enumerator2.Current;
-                        if (room.cells.Find(x => x.position == cell.position + Directions.ToIntVector2(dir)) != null &&
-                            !entitysafe.Contains(room.cells.Find(x => x.position == cell.position + Directions.ToIntVector2(dir))))
-                            bin |= Directions.ToBinary(dir);
-                    }
+                    if (room.cells.Find(x => x.position == cell.position + Directions.ToIntVector2(dir)) != null &&
+                        !entitysafe.Contains(room.cells.Find(x => x.position == cell.position + Directions.ToIntVector2(dir))))
+                        bin |= Directions.ToBinary(dir);
                 }
                 for (int i = 0; i < 4; i++)
                 {
@@ -609,5 +835,228 @@ public class B2HallRoomFunction : RoomFunction
                     cell.Block((Direction)i, true);
             }
         }
+    }
+}
+
+public class B2Button : EnvironmentObject, IClickable<int>
+{
+    public bool ClickableHidden() => false;
+
+    public bool ClickableRequiresNormalHeight() => true;
+
+    public void ClickableSighted(int player)
+    {
+    }
+
+    public void ClickableUnsighted(int player)
+    {
+    }
+
+    public void Clicked(int player)
+    {
+        BaseGameManager.Instance.CallSpecialManagerFunction(2, gameObject);
+    }
+
+    public override void LoadingFinished()
+    {
+        base.LoadingFinished();
+        transform.position += Vector3.up * 5f;
+        ec.OnEnvironmentBeginPlay += () => CarnellBossManager.BossInstance.myman = this;
+    }
+    internal bool waitingtogetcloser = false;
+
+    private void Update()
+    {
+        if (waitingtogetcloser)
+        {
+            for (int i = 0; i < CoreGameManager.Instance.setPlayers; i++)
+            {
+                if (Vector3.Distance(transform.position, CoreGameManager.Instance.GetPlayer(0).transform.position) <= 45f)
+                {
+                    waitingtogetcloser = false;
+                    BaseGameManager.Instance.CallSpecialManagerFunction(1, null);
+                }
+            }
+        }
+    }
+}
+
+public class B2BaseRoomFunction : RoomFunction
+{
+    [SerializeField] private List<Animator> exteriorSigns = new List<Animator>();
+    [SerializeField] internal Animator exteriorSignPrefab;
+    protected override void OnFirstPlayerEnter(PlayerManager player)
+    {
+        base.OnFirstPlayerEnter(player);
+        BaseGameManager.Instance.CallSpecialManagerFunction(0, null);
+    }
+
+    public override void OnGenerationFinished()
+    {
+        base.OnGenerationFinished();
+        foreach (Door door in room.doors)
+        {
+            if (door.CellOnOtherSide(room).room.type == RoomType.Hall)
+            {
+                exteriorSigns.Add(Instantiate(exteriorSignPrefab, door.transform));
+                DirectedIntVector2 directedIntVector = door.OtherSideDirectedIntVector2(room);
+                exteriorSigns[exteriorSigns.Count - 1].transform.position = room.ec.CellFromPosition(directedIntVector.position).FloorWorldPosition;
+                exteriorSigns[exteriorSigns.Count - 1].transform.rotation = directedIntVector.direction.ToRotation();
+            }
+        }
+    }
+}
+
+public class B2BattleObject : MonoBehaviour, IEntityTrigger
+{
+    [SerializeField] internal Entity entity;
+    [SerializeField] internal SpriteRenderer spriteRenderer;
+    [SerializeField] internal SoundObject buzz, collected, hurt;
+    [SerializeField] internal AudioManager audMan;
+    private static readonly Sprite[] randoms = Resources.FindObjectsOfTypeAll<Sprite>().Where(x => x.GetInstanceID() >= 0 && x.pixelsPerUnit >= 50f).ToArray();
+
+    internal B2BattleObject Initialize(EnvironmentController ec)
+    {
+        entity.Initialize(ec, transform.position);
+        spriteRenderer.sprite = randoms[UnityEngine.Random.RandomRangeInt(0, randoms.Length)];
+        spriteRenderer.gameObject.AddComponent<PickupBob>();
+        var propertyBlock = new MaterialPropertyBlock();
+        spriteRenderer.GetPropertyBlock(propertyBlock);
+        propertyBlock.SetInt("_SpriteColorGlitching", 1);
+        propertyBlock.SetFloat("_SpriteColorGlitchPercent", 0.5f);
+        propertyBlock.SetFloat("_SpriteColorGlitchVal", UnityEngine.Random.Range(0f, 4096f));
+        spriteRenderer.SetPropertyBlock(propertyBlock);
+        return this;
+    }
+
+    public void EntityTriggerEnter(Entity otherEntity, Collider other, bool validCollision)
+    {
+        var player = other.GetComponent<PlayerManager>();
+        if (other.CompareTag("Player") && validCollision && otherEntity != null && player != null)
+        {
+            entity.SetTrigger(false);
+            StartCoroutine(HeadToEvilGuy(entity.Ec.Npcs.First(x => x is BCarnellBoss).Entity));
+            player.plm.AddStamina(player.plm.StaminaMax / 4f, true);
+            audMan.PlaySingle(collected);
+        }
+    }
+
+    private IEnumerator HeadToEvilGuy(Entity evilPerson)
+    {
+        var oldpos = transform.position;
+        float elasped = 25f;
+        while (transform.position != evilPerson.transform.position)
+        {
+            if (Time.timeScale == 0f || entity.Ec.EnvironmentTimeScale == 0f)
+                yield return null;
+            elasped += elasped * (Time.deltaTime * entity.Ec.EnvironmentTimeScale);
+            transform.position = Vector3.MoveTowards(transform.position, evilPerson.transform.position, elasped * (Time.deltaTime * entity.Ec.EnvironmentTimeScale));
+            yield return null;
+        }
+        var movemod = new MovementModifier(default, 0f);
+        evilPerson.ExternalActivity.moveMods.Add(movemod);
+        evilPerson.GetComponent<AudioManager>()?.PlaySingle(hurt, 3f);
+        evilPerson.GetComponent<NPC>().Hear(null, oldpos, 126);
+        evilPerson.GetComponent<NPC>().behaviorStateMachine.CurrentState.Hear(null, oldpos, 125);
+        evilPerson.GetComponent<BCarnellBoss>().HP--;
+        entity.SetFrozen(true);
+        spriteRenderer.gameObject.SetActive(false);
+        audMan.FlushQueue(true);
+        audMan.audioSourceManager.spatialBlend = 0f;
+        audMan.volumeModifier = 0.4f;
+        audMan.QueueAudio(buzz, true);
+        audMan.audioSourceManager.time = 0.735f;
+        elasped = 0.25f;
+        Shader.SetGlobalInt("_ColorGlitching", 1);
+        Shader.SetGlobalInt("_SpriteColorGlitching", 1);
+        if (!PlayerFileManager.Instance.reduceFlashing)
+        {
+            Shader.SetGlobalFloat("_ColorGlitchPercent", 0.5f);
+            Shader.SetGlobalFloat("_SpriteColorGlitchPercent", 0.5f);
+        }
+        else
+        {
+            Shader.SetGlobalFloat("_ColorGlitchPercent", 0.025f);
+            Shader.SetGlobalFloat("_SpriteColorGlitchPercent", 0.025f);
+        }
+        while (elasped > 0f)
+        {
+            elasped -= Time.deltaTime;
+            float power = elasped * 10f;
+            Shader.SetGlobalFloat("_VertexGlitchSeed", UnityEngine.Random.Range(0f, 1000f));
+            Shader.SetGlobalFloat("_TileVertexGlitchSeed", UnityEngine.Random.Range(0f, 1000f));
+            if (!PlayerFileManager.Instance.reduceFlashing)
+            {
+                Shader.SetGlobalFloat("_VertexGlitchIntensity", Mathf.Pow(power, 2f));
+                Shader.SetGlobalFloat("_TileVertexGlitchIntensity", Mathf.Pow(power, 2f));
+                
+                Shader.SetGlobalInt("_ColorGlitchVal", UnityEngine.Random.Range(0, 4096));
+                Shader.SetGlobalInt("_SpriteColorGlitchVal", UnityEngine.Random.Range(0, 4096));
+            }
+            else
+            {
+                Shader.SetGlobalFloat("_VertexGlitchIntensity", power * 2f);
+                Shader.SetGlobalFloat("_TileVertexGlitchIntensity", power * 2f);
+            }
+            yield return null;
+        }
+        evilPerson.ExternalActivity.moveMods.Remove(movemod);
+        audMan.FlushQueue(true);
+        CoreGameManager.Instance.ResetShaders();
+        Destroy(gameObject);
+        yield break;
+    }
+
+    public void EntityTriggerExit(Entity otherEntity, Collider other, bool validCollision)
+    {
+    }
+
+    public void EntityTriggerStay(Entity otherEntity, Collider other, bool validCollision)
+    {
+    }
+}
+
+public class DeveloperNoteABW : Item
+{
+    [SerializeField] internal TextMeshProUGUI textt;
+    public override bool Use(PlayerManager pm)
+    {
+        CoreGameManager.Instance.disablePause = true;
+        pm.plm.Entity.CurrentRoom.doors.DoIf(x => x.GetComponent<SecuredSwingingDoor>() != null, x => x.GetComponent<SecuredSwingingDoor>().UnlockFully());
+        pm.ec.mainHall.doors.DoIf(x => x.GetComponent<SecuredSwingingDoor>() != null, x => x.GetComponent<SecuredSwingingDoor>().UnlockFully());
+        pm.plm.Entity.SetFrozen(true);
+        StartCoroutine(Hi(pm));
+        return true;
+    }
+    private IEnumerator Hi(PlayerManager pm)
+    {
+        var input = InputManager.Instance;
+        string[] text = [
+            "Hello player, written in plain English, it has been 7 or 8 major updates since B2 has been in development. (Input anything to continue!!)",
+            "I just want to thank you for not doing anything stupid during that time, especially when the early bird build has been released to the public.",
+            "This is the last content update for this mod until it ACTUALLY switches to LTS mode.",
+            "If Baldi's Basics Plus v1.0 comes out, this will be an ending route that you can take in this mod.",
+            "So far, this is one of my first passionate mods that made it this far way before v0.6.X and after the RPS Guy in BBP mod. (Yes that is my first Baldi's Basics Plus mod.)",
+            "If you were expecting more from me, this mod is not going to go more serious than B1 and B2 releases anymore.",
+            "This is mainly because BCMAC is no longer in development since I am actually 19 years old while writing this and I am slowly losing interest in decompile mod overhauls.",
+            "Well, it's sort of a decompile mod because it went straight to being a fan game, straight up no longer uses a decompile base and restarted progress to scratch.",
+            "If you want to see more content from me, then it's pretty rare because I have too many unfinished projects from now on.",
+            "Remember when this mod first is just a simple content pack?",
+            "It later straight up adding in a new floor in v1.1, which lead to B-Route being born in The Deluxe Update's announcement.",
+            "Which to be fair, v1.6 added in a sequel of that floor...",
+            "Also about that B. Carnell... He's the real one while a clone of his exists in a TeacherAPI mod.",
+            "I can really cause a dramatic ending but you gotta finish reading though...",
+            "Thanks for playing my mod... See you in the next era of modding!"
+            ];
+        for (int i = 0; i < text.Length; i++)
+        {
+            textt.text = text[i];
+            yield return input.AnyButton(true);
+        }
+        Destroy(gameObject);
+        pm.plm.Entity.SetFrozen(false);
+        pm.plm.am.moveMods.Add(new MovementModifier(default, 0f));
+        CarnellBossManager.Instance.CallSpecialManagerFunction(3, null);
+        yield break;
     }
 }

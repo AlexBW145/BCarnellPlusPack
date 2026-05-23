@@ -36,7 +36,7 @@ namespace BCarnellChars.OtherStuff
                 UnlockFully();
         }
 
-        private void UnlockFully()
+        internal void UnlockFully()
         {
             for (int i = 0; i < swingDoor.overlayLocked.Length; i++)
                 swingDoor.overlayLocked[i] = originalOverlays[i];
@@ -67,5 +67,7 @@ public class SwingDoor_Secured : SwingDoor
     {
         base.Initialize();
         securedDoor.Initialize();
+        if (ec.TrapCheck(aTile, true, out _) || ec.TrapCheck(bTile, true, out _))
+            securedDoor.UnlockFully();
     }
 }

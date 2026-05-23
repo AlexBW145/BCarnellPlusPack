@@ -15,19 +15,19 @@ namespace BCarnellChars
                 [
                     new RichPressenceData()
                     {
-                        sceneObject = BasePlugin.Instance.sBasement,
+                        sceneObject = BCPPPlugin.Instance.sBasement,
                         stateText = "Dwelling through the restricted basement",
                         largeImageURL = "https://images.gamebanana.com/img/ss/mods/66fa0f387213c.jpg"
                     },
                     new RichPressenceData()
                     {
-                        sceneObject = BasePlugin.Instance.sPac,
+                        sceneObject = BCPPPlugin.Instance.sPac,
                         stateText = "Playing PAC-75",
                         largeImageURL = "https://images.gamebanana.com/img/ss/mods/66fa0f387213c.jpg"
                     },
                     new RichPressenceData()
                     {
-                        sceneObject = BasePlugin.Instance.sBoss,
+                        sceneObject = BCPPPlugin.Instance.sBoss,
                         stateText = "WERE YOU LOOKING FOR SOMETHING?",
                         largeImageURL = "https://images.gamebanana.com/img/ss/mods/66fa0f387213c.jpg"
                     }

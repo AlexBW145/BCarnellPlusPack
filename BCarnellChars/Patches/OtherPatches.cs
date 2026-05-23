@@ -126,7 +126,7 @@ paint.NET, Anim8or, Audacity, Firealpaca, GIMP, Photopea, TTSMP3 (prior to v1.0.
                 credits3.gameObject.name = "BCPP Credits Samples";
                 credits3.GetComponentsInChildren<TextMeshProUGUI>()[0].text = @"Audio Samples used for <color=red>BC</color><color=yellow>PP</color>
 
-<size=85%>Pixabay (in most cases), ZERO-G - DATAFILE DISC ONE, Hollywood Edge - Cartoon Trax Sound Effects, 20th Century Fox Sound Effects Library, Scott Cawthon, Xfer Records - Serum (used for FX), the original PAC-MAN, PAC 365, SEGA, & unknown sources (part of Anyportal Output's sfx is taken from Video Game - The Blockheads).</size>";
+<size=85%>Pixabay (in most cases), ZERO-G - DATAFILE DISC ONE, Hollywood Edge - Cartoon Trax Sound Effects, 20th Century Fox Sound Effects Library, Scott Cawthon, Xfer Records - Serum (used for FX), the original PAC-MAN, PAC 365, SEGA, Lucasfilm Sound Effects Library, & unknown sources (part of Anyportal Output's sfx is taken from Video Game - The Blockheads).</size>";
 
                 GameObject.Destroy(credits.GetComponentsInChildren<TextMeshProUGUI>()[1]);
                 GameObject.Destroy(credits2.GetComponentsInChildren<TextMeshProUGUI>()[1]);
@@ -280,17 +280,17 @@ paint.NET, Anim8or, Audacity, Firealpaca, GIMP, Photopea, TTSMP3 (prior to v1.0.
             // Insert some attempts trying to make it disappear and make the other walls fill its mesh.
         }
     }
-#if !RELEASE
+#if !EARLYBIRD
     [HarmonyPatch]
     class B2Patches
     {
         [HarmonyPatch(typeof(CoreGameManager), nameof(CoreGameManager.BackupMap)), HarmonyPrefix]
-        static bool StopBackingUpMaps() => !(CarnellBossManager.BossInstance != null || (CoreGameManager.Instance.sceneObject.levelTitle == "B2" && CoreGameManager.Instance.sceneObject.levelNo == -2));
+        static bool StopBackingUpMaps() => !(CarnellBossManager.BossInstance != null || CoreGameManager.Instance.sceneObject == BCPPPlugin.Instance.sBoss);
         [HarmonyPatch(typeof(ExtendedStickerData), nameof(ExtendedStickerData.CanBeApplied)), HarmonyPostfix]
         static void AffectGeneratorRegardless(ref bool __result, ExtendedStickerData __instance)
         {
             if (__instance.affectsLevelGeneration && !__result &&
-                (CarnellBossManager.BossInstance != null || (CoreGameManager.Instance.sceneObject.levelTitle == "B2" && CoreGameManager.Instance.sceneObject.levelNo == -2)))
+                (CarnellBossManager.BossInstance != null || CoreGameManager.Instance.nextLevel == BCPPPlugin.Instance.sBoss))
                 __result = true;
         }
 
@@ -301,6 +301,22 @@ paint.NET, Anim8or, Audacity, Firealpaca, GIMP, Photopea, TTSMP3 (prior to v1.0.
             if (!__instance.cells[position.x, position.z].Null && room.functionObject?.GetComponent<B2HallRoomFunction>() != null)
                 room.functionObject.GetComponent<B2HallRoomFunction>().Refresh();
         }
+        [HarmonyPatch(typeof(PropagatedAudioManager), "VirtualUpdate"), HarmonyPrefix]
+        static void DoNotFuckUpThemAll(PropagatedAudioManager __instance, ref bool ___environmentSet, ref EnvironmentController ___environment)
+        {
+            if (!___environmentSet && CarnellBossManager.BossInstance != null)
+            {
+                Transform parent = __instance.transform;
+                while (parent != null && parent.GetComponent<EnvironmentController>() == null)
+                    parent = parent.parent;
+                if (parent?.GetComponent<EnvironmentController>() != null)
+                {
+                    ___environment = parent.GetComponent<EnvironmentController>();
+                    __instance.audioSourceManager.transform.SetParent(___environment.soundPropagationTransform);
+                    ___environmentSet = true;
+                }
+            }
+        }
     }
 #endif
 #if DEBUG
@@ -309,7 +325,7 @@ paint.NET, Anim8or, Audacity, Firealpaca, GIMP, Photopea, TTSMP3 (prior to v1.0.
     {
         static void Prefix(LevelGenerator __instance)
         {
-            __instance.ld.additionalNPCs = __instance.ld.potentialNPCs.Count;
+            //__instance.ld.additionalNPCs = __instance.ld.potentialNPCs.Count;
             /*__instance.ld.minSize = new IntVector2(99, 99);
             __instance.ld.maxSize = new IntVector2(99, 99);
             __instance.ld.minSpecialRooms = 9;

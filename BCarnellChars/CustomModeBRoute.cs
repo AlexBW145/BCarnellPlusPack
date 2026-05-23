@@ -18,7 +18,7 @@ namespace BCarnellChars
                     text.fontSize = 24 - 2;
                     BRoutePage.StandardButtonBuilder.AddDescriptionText(B1Button, "Men_Basement01");
                     //B1Button.gameObject.GetComponent<RectTransform>().anchoredPosition = Vector2.left * 190f;
-#if !RELEASE
+#if !EARLYBIRD
                     var B2Button = BRoutePage.StandardButtonBuilder.CreateModeButton(BCPPPlugin.Instance.sBoss, false, int.MaxValue, Mode.Main);
                     //B2Button.gameObject.GetComponent<RectTransform>().anchoredPosition = Vector2.right * 190f;
                     if (BCPPSave.Instance.death)
