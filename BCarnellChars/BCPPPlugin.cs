@@ -2928,9 +2928,20 @@ namespace BCarnellChars
                 .Build();
             canv.GetComponent<DeveloperNoteABW>().textt = canv.transform.GetChild(0).GetComponentInChildren<TextMeshProUGUI>(true);
             canv.GetComponent<DeveloperNoteABW>().textt.color = Color.white;
-            var canvblend = new GameObject("BG", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-            canvblend.transform.SetParent(canv.transform.GetChild(0), false);
-            canvblend.GetComponent<Image>().color = new(0f, 0f, 0f, 0.4f);
+            canv.GetComponent<DeveloperNoteABW>().canvas = canv.transform.GetComponentInChildren<Canvas>(true);
+            var scalerc = canv.GetComponent<DeveloperNoteABW>().canvas.GetComponent<CanvasScaler>();
+            scalerc.referencePixelsPerUnit = 1f;
+            scalerc.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
+            scalerc.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            var canvblend = new GameObject("BG", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image)).GetComponent<RectTransform>();
+            canvblend.SetParent(canv.transform.GetChild(0), false);
+            canvblend.GetComponent<Image>().sprite = null;
+            canvblend.GetComponent<Image>().color = new(0f, 0f, 0f, 0.6f);
+            canvblend.SetAsFirstSibling();
+            canvblend.anchorMin = new(0f, 0.5f);
+            canvblend.anchorMax = new(1f, 0.5f);
+            canvblend.pivot = new(0.5f, 0.5f);
+            canvblend.sizeDelta = new(0f, 360f);
             hal.items.First().item = devsnote;
 
             sendBoss.AddMeta(this, ["b-route", "ending"]);

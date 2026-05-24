@@ -67,7 +67,7 @@ public class SwingDoor_Secured : SwingDoor
     {
         base.Initialize();
         securedDoor.Initialize();
-        if (ec.TrapCheck(aTile, true, out _) || ec.TrapCheck(bTile, true, out _))
-            securedDoor.UnlockFully();
+        /*if (ec.TrapCheck(aTile, true, out _) || ec.TrapCheck(bTile, true, out _))
+            securedDoor.UnlockFully();*/
     }
 }

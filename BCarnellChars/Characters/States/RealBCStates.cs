@@ -145,17 +145,21 @@ public class BCarnellBoss_PostBattle(BCarnellBoss carnell) : BCarnellBoss_StateB
     {
         base.Initialize();
         ChangeNavigationState(new NavigationState_Disabled(bcarnell));
-        bcarnell.audMan.PlaySingle(bcarnell.postbattle);
+        bcarnell.audMan.QueueAudio(bcarnell.postbattle, true);
         IEnumerator Wellyoudie()
         {
             var source = bcarnell.audMan.audioSourceManager.GetAudioSource(SoundType.Effect);
             yield return new WaitUntil(() => source.time >= 12.42f);
-            CarnellBossManager.Instance.StartCoroutine(Bitch());
+            bcarnell.ec.StartCoroutine(Bitch());
+            CoreGameManager.Instance.audMan.volumeModifier = 0.6f;
             CoreGameManager.Instance.audMan.PlaySingle(bcarnell.death);
             yield return new WaitUntil(() => !bcarnell.audMan.AnyAudioIsPlaying);
             bcarnell.ec.ElevatorManager.SetTotalOutOfOrderElevators(0);
             bcarnell.ec.ElevatorManager.SetAllElevators(ElevatorState.OpenForExit);
             bcarnell.Despawn();
+            CoreGameManager.Instance.audMan.volumeModifier = 1f;
+            for (int i = 0; i < CoreGameManager.Instance.setPlayers; i++)
+                CoreGameManager.Instance.GetPlayer(i).Am.moveMods.RemoveAt(0);
             if (CoreGameManager.Instance.SaveEnabled && MTM101BaldiDevAPI.SaveGamesEnabled && CarnellBossManager.BossInstance != null
             && CoreGameManager.Instance.currentMode != Mode.Free)
             {
@@ -172,20 +176,21 @@ public class BCarnellBoss_PostBattle(BCarnellBoss carnell) : BCarnellBoss_StateB
                 elaspedTime += Time.deltaTime;
                 if (elaspedTime >= 10f)
                     elaspedTime += elaspedTime * Time.deltaTime;
+                bcarnell.spriteRenderer[0].transform.localScale -= Vector3.one * (elaspedTime * 0.00005f);
                 bcarnell.spriteRenderer[0].GetPropertyBlock(propertyBlock);
-                propertyBlock.SetInt("_ColorGlitching", 1);
-                propertyBlock.SetFloat("_ColorGlitchVal", Random.Range(0f, 4096f));
+                propertyBlock.SetInt("_SpriteColorGlitching", 1);
+                propertyBlock.SetFloat("_SpriteColorGlitchVal", Random.Range(0f, 4096f));
                 if (Random.Range(0f, 1f) <= 0.5f)
                 {
                     propertyBlock.SetInt("_AlphaGlitch", 1);
-                    propertyBlock.SetFloat("_ColorGlitchPercent", Mathf.Clamp(elaspedTime * 0.1f, 0f, 1f));
+                    propertyBlock.SetFloat("_SpriteColorGlitchPercent", Mathf.Clamp(elaspedTime * 0.1f, 0f, 1f));
                 }
                 else
                 {
                     propertyBlock.SetInt("_AlphaGlitch", 0);
-                    propertyBlock.SetFloat("_ColorGlitchPercent", 1f);
+                    propertyBlock.SetFloat("_SpriteColorGlitchPercent", 1f);
                 }
-                if (Random.Range(0f, 1f) <= elaspedTime * 0.05f)
+                if (Random.Range(0f, 1f) <= 0.5f)
                 {
                     propertyBlock.SetInt("_ChunkGlitch", 1);
                     propertyBlock.SetFloat("_ChunkGlitchThreshold", Mathf.Clamp(1f - elaspedTime * 0.05f, 0f, 1f));
@@ -193,13 +198,13 @@ public class BCarnellBoss_PostBattle(BCarnellBoss carnell) : BCarnellBoss_StateB
                 }
                 else
                     propertyBlock.SetInt("_ChunkGlitch", 0);
+                bcarnell.spriteRenderer[0].SetPropertyBlock(propertyBlock);
                 if (elaspedTime >= 7f && Random.Range(0f, 1f) <= 0.5f)
                     bcarnell.spriteRenderer[0].sprite = randoms[UnityEngine.Random.RandomRangeInt(0, randoms.Length)];
-                bcarnell.spriteRenderer[0].SetPropertyBlock(propertyBlock);
                 yield return null;
             }
         }
-        CarnellBossManager.Instance.StartCoroutine(Wellyoudie());
+        bcarnell.ec.StartCoroutine(Wellyoudie());
     }
 }
 

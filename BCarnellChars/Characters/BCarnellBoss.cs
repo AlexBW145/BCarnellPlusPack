@@ -56,8 +56,8 @@ namespace BCarnellChars.Characters
             set {
                 if (phases == B2Boss.Phase0 || phases >= B2Boss.Phase5) return;
                 hp = value;
-                GetAngry(((float)value / 10f));
-                MusicManager.Instance.MidiPlayer.MPTK_Speed += ((float)value / 10f);
+                SetAnger(anger + ((float)hp / 10f));
+                MusicManager.Instance.MidiPlayer.MPTK_Speed = 1f + ((0.2500000001f * (float)(phases - 1)) + ((15f - (float)hp) / 60f));
                 if (phases == B2Boss.Phase4 && hp == 1) // Plus does not have yet ported the hang function from BBCR.
                     MusicManager.OnMidiEvent += MidiEvent;
                 else if (hp <= 0)
@@ -74,7 +74,7 @@ namespace BCarnellChars.Characters
             if (midiEvent.Voices != null)
             {
                 foreach (fluid_voice fluid_voice2 in midiEvent.Voices)
-                    fluid_voice2.DurationTick = -1L;
+                    fluid_voice2.DurationTick = hp == 1 ? -1L : 0L;
             }
         }
 
@@ -114,7 +114,7 @@ namespace BCarnellChars.Characters
                     break;
                 case B2Boss.Phase5:
                     isThrusting = true;
-                    behaviorStateMachine.ChangeState(new BCarnellBoss_GoingTo(this, ec.Players[0].plm.Entity.CurrentRoom.doors[0].aTile.CenterWorldPosition, new BCarnellBoss_PostBattle(this)));
+                    behaviorStateMachine.ChangeState(new BCarnellBoss_GoingTo(this, ec.CellFromPosition(6, 38).CenterWorldPosition, new BCarnellBoss_PostBattle(this)));
                     navigator.SetSpeed(99f);
                     navigator.maxSpeed = 99f;
                     break;

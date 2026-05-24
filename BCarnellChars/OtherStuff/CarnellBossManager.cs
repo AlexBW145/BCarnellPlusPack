@@ -296,11 +296,14 @@ internal class CarnellBossManager : BaseGameManager
                                 CoreGameManager.Instance.GetPlayer(i).transform.rotation = endingEC.spawnRotation;
                                 CoreGameManager.Instance.GetPlayer(i).itm.Disable(true);
                             }
+                            if (ItemHallSpawner != null)
+                                StopCoroutine(ItemHallSpawner);
                             endingEC.ElevatorManager.SetAllElevators(ElevatorState.Closed);
                             CoreGameManager.Instance.disablePause = true;
+                            CoreGameManager.Instance.sceneObject = BCPPPlugin.Instance.sendBoss;
                             yield break;
                         }
-                        MusicManager.Instance.MidiPlayer.MPTK_Speed = 1f + (1.5f * (float)phase);
+                        MusicManager.Instance.MidiPlayer.MPTK_Speed = 1f + (0.2500000001f * (float)phase);
                         LastEnvironments = [.. LastEnvironments.Where(e => e != ec)];
                         LastLevelObjects = [.. LastLevelObjects.Where(ld => ld != levelObject)];
                         SwapEnvironment(Mathf.RoundToInt(UnityEngine.Random.Range(0f, LastEnvironments.Count - 1)), true);
@@ -318,6 +321,8 @@ internal class CarnellBossManager : BaseGameManager
             case 3:
                 if (endingEC.gameObject.activeSelf)
                 {
+                    foreach (var door in FindObjectsOfType<SecuredSwingingDoor>(false))
+                        door.UnlockFully();
                     var carnell = (BCarnellBoss)ec.SpawnNPC(BCPPPlugin.Instance.sBoss.baldiPrefab, IntVector2.GetGridPosition(ec.spawnPoint));
                     carnell.InitPhase(BCarnellBoss.B2Boss.Phase5);
                 }
@@ -445,7 +450,7 @@ internal class CarnellBossManager : BaseGameManager
         ec.PauseEvents(true);
         ec.Active = false;
         ec.gameObject.SetActive(false);
-        foreach (var banan in FindObjectsOfType<ITM_NanaPeel>(false))
+        foreach (var banan in FindObjectsOfType<Entity>(true).Where(x => x.transform.parent == null && x.Ec == ec && x.gameObject.scene.Equals(gameObject.scene)))
             Destroy(banan.gameObject);
         var thepropaganda = ec.soundPropagationTransform;
         ec = limited ? LastEnvironments[ecIndex] : Environments[ecIndex];
@@ -481,7 +486,7 @@ internal class CarnellBossManager : BaseGameManager
 
     public override void LoadNextLevel()
     {
-        int stickerBonuses = CoreGameManager.Instance.GetStickerBonuses(ec.RemainingTime, (ec.GetBaldi() != null) ? ec.NavigableDistance(ec.CellFromPosition(CoreGameManager.Instance.GetPlayer(0).transform.position), ec.CellFromPosition(ec.GetBaldi().transform.position), PathType.Nav) : 0, ec.map.PlayerDiscoveredCells);
+        /*int stickerBonuses = CoreGameManager.Instance.GetStickerBonuses(ec.RemainingTime, (ec.GetBaldi() != null) ? ec.NavigableDistance(ec.CellFromPosition(CoreGameManager.Instance.GetPlayer(0).transform.position), ec.CellFromPosition(ec.GetBaldi().transform.position), PathType.Nav) : 0, ec.map.PlayerDiscoveredCells);
         CoreGameManager.Instance.AddPoints(stickerBonuses, 0, false, false, true);
         CoreGameManager.Instance.saveMapAvailable = false;
         CoreGameManager.Instance.saveMapPurchased = false;
@@ -500,7 +505,16 @@ internal class CarnellBossManager : BaseGameManager
 
         elevatorScreen.ShowResults(time, Mathf.RoundToInt((float)stickerBonuses * CoreGameManager.Instance.YtpMultiplier));
         if (CoreGameManager.Instance.GetPoints(0) > 0)
-            _ = levelObject.finalLevel;
+            _ = levelObject.finalLevel;*/
+
+        elevatorScreen = Instantiate(elevatorScreenPre);
+        elevatorScreen.OnLoadReady += () =>
+        {
+            Destroy(ElevatorScreen.Instance.gameObject);
+            CoreGameManager.Instance.Quit();
+            Destroy(gameObject);
+        };
+        elevatorScreen.Initialize();
     }
 
     protected override void LoadSceneObject(SceneObject sceneObject, bool restarting)
@@ -945,10 +959,8 @@ public class B2BattleObject : MonoBehaviour, IEntityTrigger
     {
         var oldpos = transform.position;
         float elasped = 25f;
-        while (transform.position != evilPerson.transform.position)
+        while (Vector3.Distance(transform.position, evilPerson.transform.position) > 5f)
         {
-            if (Time.timeScale == 0f || entity.Ec.EnvironmentTimeScale == 0f)
-                yield return null;
             elasped += elasped * (Time.deltaTime * entity.Ec.EnvironmentTimeScale);
             transform.position = Vector3.MoveTowards(transform.position, evilPerson.transform.position, elasped * (Time.deltaTime * entity.Ec.EnvironmentTimeScale));
             yield return null;
@@ -1019,20 +1031,21 @@ public class B2BattleObject : MonoBehaviour, IEntityTrigger
 public class DeveloperNoteABW : Item
 {
     [SerializeField] internal TextMeshProUGUI textt;
+    [SerializeField] internal Canvas canvas;
     public override bool Use(PlayerManager pm)
     {
         CoreGameManager.Instance.disablePause = true;
-        pm.plm.Entity.CurrentRoom.doors.DoIf(x => x.GetComponent<SecuredSwingingDoor>() != null, x => x.GetComponent<SecuredSwingingDoor>().UnlockFully());
-        pm.ec.mainHall.doors.DoIf(x => x.GetComponent<SecuredSwingingDoor>() != null, x => x.GetComponent<SecuredSwingingDoor>().UnlockFully());
+        canvas.worldCamera = CoreGameManager.Instance.GetCamera(pm.playerNumber).canvasCam;
         pm.plm.Entity.SetFrozen(true);
         StartCoroutine(Hi(pm));
+        GlobalCam.Instance.Transition(UiTransition.Dither, 0.01666667f);
         return true;
     }
     private IEnumerator Hi(PlayerManager pm)
     {
         var input = InputManager.Instance;
         string[] text = [
-            "Hello player, written in plain English, it has been 7 or 8 major updates since B2 has been in development. (Input anything to continue!!)",
+            "Hello player, written in plain English, it has been 7 or 8 major updates since B2 has been in development. (Click to continue!!)",
             "I just want to thank you for not doing anything stupid during that time, especially when the early bird build has been released to the public.",
             "This is the last content update for this mod until it ACTUALLY switches to LTS mode.",
             "If Baldi's Basics Plus v1.0 comes out, this will be an ending route that you can take in this mod.",
@@ -1048,11 +1061,17 @@ public class DeveloperNoteABW : Item
             "I can really cause a dramatic ending but you gotta finish reading though...",
             "Thanks for playing my mod... See you in the next era of modding!"
             ];
-        for (int i = 0; i < text.Length; i++)
+        int i = 0;
+        while (i < text.Length)
         {
             textt.text = text[i];
-            yield return input.AnyButton(true);
+            yield return null;
+            while (!input.GetDigitalInput("Interact", true))
+                yield return null;
+            i++;
+            yield return null;
         }
+        GlobalCam.Instance.Transition(UiTransition.Dither, 0.01666667f);
         Destroy(gameObject);
         pm.plm.Entity.SetFrozen(false);
         pm.plm.am.moveMods.Add(new MovementModifier(default, 0f));
