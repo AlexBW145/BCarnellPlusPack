@@ -74,7 +74,7 @@ internal class DogcheckBCPP : MonoBehaviour
 
     private void Update()
     {
-        if (Input.anyKeyDown)
+        if (Input.anyKeyDown) // Todo: fix softlock because enviroment controller is gone.
             CoreGameManager.Instance.Quit();
     }
 
