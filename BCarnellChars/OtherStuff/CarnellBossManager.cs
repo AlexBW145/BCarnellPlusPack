@@ -1,4 +1,5 @@
 ﻿using BCarnellChars.Characters;
+using BepInEx.Bootstrap;
 using HarmonyLib;
 using MTM101BaldAPI;
 using MTM101BaldAPI.Components;
