@@ -163,8 +163,8 @@ public class BCarnellBoss_PostBattle(BCarnellBoss carnell) : BCarnellBoss_StateB
             if (CoreGameManager.Instance.SaveEnabled && MTM101BaldiDevAPI.SaveGamesEnabled && CarnellBossManager.BossInstance != null
             && CoreGameManager.Instance.currentMode != Mode.Free)
             {
-                BCPPSave.Instance.death = true;
-                BCPPSave.Instance.Save();
+                BCPPSave.Instance.death = true; // THE SOUL HAS BEEN CORRUPTED
+                BCPPSave.Instance.Save(); // REFER TO 99 OTHER FLOORS
             }
         }
         IEnumerator Bitch()
