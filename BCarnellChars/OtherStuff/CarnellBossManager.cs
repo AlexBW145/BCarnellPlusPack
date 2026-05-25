@@ -45,6 +45,8 @@ internal class CarnellBossManager : BaseGameManager
 
     private void UpdateLightmap()
     {
+        foreach (var evc in Environments)
+            evc.lightingOverride = !evc.gameObject.activeSelf;
         for (int x = 0; x < ec.levelSize.x; x++)
             for (int z = 0; z < ec.levelSize.z; z++)
                 ec.UpdateLightingAtCell(ec.cells[x, z]);
@@ -273,7 +275,7 @@ internal class CarnellBossManager : BaseGameManager
                             timescale.npcTimeScale = Mathf.Max(0f, timescale.npcTimeScale);
                             timescale.environmentTimeScale = timescale.playerTimeScale = timescale.npcTimeScale;
                             if (!MusicManager.Instance.MidiPlayer.MPTK_IsPaused)
-                                MusicManager.Instance.MidiPlayer.MPTK_Speed -= 0.35f * Time.deltaTime;
+                                MusicManager.Instance.MidiPlayer.MPTK_Speed -= (MusicManager.Instance.MidiPlayer.MPTK_Speed / 0.2500000001f) * Time.deltaTime;
                             elaspedTime += Time.deltaTime;
                             yield return null;
                         }
@@ -285,6 +287,7 @@ internal class CarnellBossManager : BaseGameManager
                         });
                         if (phase == BCarnellBoss.B2Boss.Phase4)
                         {
+                            BCarnellBoss.MidiHang(MusicManager.Instance.MidiPlayer, false, true);
                             MusicManager.Instance.StopMidi();
                             LastEnvironments = [endingEC];
                             SwapEnvironment(0, true);
@@ -303,7 +306,7 @@ internal class CarnellBossManager : BaseGameManager
                             CoreGameManager.Instance.sceneObject = BCPPPlugin.Instance.sendBoss;
                             yield break;
                         }
-                        MusicManager.Instance.MidiPlayer.MPTK_Speed = 1f + (0.2500000001f * (float)phase);
+                        MusicManager.Instance.MidiPlayer.MPTK_Speed = 1f + ((0.2500000001f * (float)(phase - 1)) + ((float)BCarnellBoss.initHP / 60f));
                         LastEnvironments = [.. LastEnvironments.Where(e => e != ec)];
                         LastLevelObjects = [.. LastLevelObjects.Where(ld => ld != levelObject)];
                         SwapEnvironment(Mathf.RoundToInt(UnityEngine.Random.Range(0f, LastEnvironments.Count - 1)), true);
@@ -978,7 +981,7 @@ public class B2BattleObject : MonoBehaviour, IEntityTrigger
         audMan.volumeModifier = 0.4f;
         audMan.QueueAudio(buzz, true);
         audMan.audioSourceManager.time = 0.735f;
-        elasped = 0.25f;
+        elasped = 0.25f * (1f + StickerManager.Instance.StickerValue(Sticker.BaldiPraise));
         Shader.SetGlobalInt("_ColorGlitching", 1);
         Shader.SetGlobalInt("_SpriteColorGlitching", 1);
         if (!PlayerFileManager.Instance.reduceFlashing)
@@ -1044,23 +1047,25 @@ public class DeveloperNoteABW : Item
     private IEnumerator Hi(PlayerManager pm)
     {
         var input = InputManager.Instance;
-        string[] text = [
-            "Hello player, written in plain English, it has been 7 or 8 major updates since B2 has been in development. (Click to continue!!)",
-            "I just want to thank you for not doing anything stupid during that time, especially when the early bird build has been released to the public.",
-            "This is the last content update for this mod until it ACTUALLY switches to LTS mode.",
-            "If Baldi's Basics Plus v1.0 comes out, this will be an ending route that you can take in this mod.",
-            "So far, this is one of my first passionate mods that made it this far way before v0.6.X and after the RPS Guy in BBP mod. (Yes that is my first Baldi's Basics Plus mod.)",
-            "If you were expecting more from me, this mod is not going to go more serious than B1 and B2 releases anymore.",
-            "This is mainly because BCMAC is no longer in development since I am actually 19 years old while writing this and I am slowly losing interest in decompile mod overhauls.",
-            "Well, it's sort of a decompile mod because it went straight to being a fan game, straight up no longer uses a decompile base and restarted progress to scratch.",
-            "If you want to see more content from me, then it's pretty rare because I have too many unfinished projects from now on.",
-            "Remember when this mod first is just a simple content pack?",
-            "It later straight up adding in a new floor in v1.1, which lead to B-Route being born in The Deluxe Update's announcement.",
-            "Which to be fair, v1.6 added in a sequel of that floor...",
-            "Also about that B. Carnell... He's the real one while a clone of his exists in a TeacherAPI mod.",
-            "I can really cause a dramatic ending but you gotta finish reading though...",
-            "Thanks for playing my mod... See you in the next era of modding!"
+        string[] text = [ // Some bullshit that you have to like, reach to the end yourself.
+            "+3BFdLHPWmG563wz4z5OqwGEPPVscdNy7D9gpW/tdWc0Uy3XTF1VRHDKLb6hlo3cKPq5Y4KzNG+W241mv9lFBX6JIGx2mrG1r90CDPYaW1KBYbzK+7JGN/TM9k4SnrklXVt4q3hnm+zGkCjjmuhaJzSUww3iClkmX6FU9Omg9Aze+JCZlmRvTJLQhM+oxrJCov7WgZgGHXhtUa4UmVg0jCZwe75DcP91sM5LXZMtHAliGfG7p/o14Cq0M8b8//AvmCoy6t2Gk+d06vk5AS2mHdHDea7nQpUbOt8no2r5oLs=",
+            "nHFcNhOHBUju/hPHpZygLcsBoxamDKe3L+FUrP5NJBfyWz3wS7A6eyfhyCuk61MojeYVmX+dH+4802ylVLeUZgB9+vqMkSABqSTjsN4bse7zkJNzpmIMrs50l1wL/DYpG09222/Lu2/vYS1Au6+B2VH/fEc/oef+qqElb0g3fjtnSwuvH8KStUdIGhA5rdQ8giIQeJ5TVDBbVoZbeV+kx9m/nNM8bs1k4UeGFjxNnRNLIeuXz/PDlIHQQ8KkgoTZVyTR9u/xKOncm4kSbzPq2X27VZTX3+GUP739qTcoeWA=",
+            "jYqrXiZV1PfowddeuhL+g4uSJb5AGpR+lUPcvsiUnoOUhRODd3LPpoTn+aksQVG9std1MEDL+JiR1eyfPJeurPN1/+mWLlDRFN7/V2TEDVtav1FQ3RHtVjafH5qmHYtHmMdEpXD3QZQJ8i0+ZdmOKDoXZg9Eahuw/o2cHKE+AwEq6SIsW/hA2+o3WoG/fWIvoxLmyCEL3iHmLHlzn9oCSQ==",
+            "K6j6DK+I55ZR4B9vgNtdnXJWBczG+thSHl47JyRGHBE1wXCxiD3sp1ydS46LJDT1hkBZQtLCDCZKcMRsRMrL907ILSZGYtZsw7Y0bWkLCcDSr6BbRjr3MmvYLvLZ69AtkEm2l/ZK3JiZsFSIZtbXf1syfmhpVzy8WYZgABa3bH90qbZ3KmdMw40KBYfnrrcxBq5x0EnYZy2OzZfJKpaO8VJ+NwBTGF+JI3T0Q1WdN5sHEyVSDXJtgjc5p9i/YmHb",
+            "42PPgBu0CiIp7N6yrrB+ppNEH71Jsmck6736cWeT1WxUffchViOSWEtg5Its38s2RIwo86jvj9BDEdD2rY9spEoeYRneVea23Z8wcsWC6uIeCnCgG8lEbcFDikUAggw5x1dcrcwsA0q8gfTDSANC3Jdsq4aQw0Xlo+4Ga/88cnLGaY3CVA/5j5ivQnb+7g2zAwpX5vsD8iV/6FXrVSn3hLtPb5POuREhazFJzsg2dNjAeN8fgDudlG5QM/Cj0tvN/O7yM3836GuDnCHhnWS/pHXNqqYnlAKkZZvvy/+6Ym+3YQIMcAmaV7udIj684SZEJzA1Re7HCO7dSMgqFijAcw==",
+            "2YRWJWIjSP8psXuQ3eUxYZZezLmczI68ehH0E8Cd/sV7TtXRDCNNTpgkXjAa4Re7cX0wy0d02mxY7kUSP9FnD2UpMbJDIxy0S93Yjjbv2x8nRcJ2IhkeIuwL2ZG3uKB9PGmT7CZEi5UrCFDrmYEq0mMXVfip9So9qfHP8drJ3p7Tlop9Zv/f+aTYjxRdPRNEv9KLqw/ZeA3I9HQW9GDY/IPhyGauScUK3f3+PUv89bY2frzQJDbHRCDqrEAH6MdS",
+            "JJgwiRDu7WtMZCBWSXgVGXKyy+/WbSGoBD9JC6go570omJkW49oFBaJfteLAUM5L5l4A6+vK0OWbkmjGRjVmVBPNBFOd329FUf0EnfhA4Uwe5W5ZbwAtD5iduKJIrxsO0fCrzU4UxLOZA9PfkUIv5C7GKsV8LZmE+2bFffFnLXzDzxy72+gyzuX+lYiudnMDh+Ax2Z/ytgImt7dxdVMZneTfgpV1Akhvx3McOMMZIpO9hP4K87w8vuLVJGxigD9kr888LOClEgSDll8K3JBvndyfVuvenbhnOTS8/F9K1C8yo9zzaW2XTXJ6HCp16ye1s6GoMrU7lfzbeMY5HTYHeg==",
+            "Cy5wnT7Y5OcGHP4S3YI/1r29c7GrGW7W8SvEchj+Q3WxDZaz+eFFWKExXQXzwh2E77RR7vnn1fz8cbqOB4HH0o+FeWR+CSuQOOToi3CgTFRyr97yo1n7WR3A+8vKsKXC200pwt2E1tLRD0JZOULRg8FLw3M1gTPGTmCI3bsuDtrylOOzeK95YfQT1V4GXtVy5bl0w9UoRCw4JiyFsSXhOuABid4RdQrUqZl4HcwLBpGKKkzdn82JrfIVelCjQLqPTU1oEcdok5XxhDf22TmrqKQvQamOUMkia4TAt0wIewk=",
+            "hNeKYBtXlJIU8bQ8XImHvSKMKJcj+a7dZVkDBUVRt7lGDOVZp9f2u40D46DX0pkd+nGlmCwYjb7yY/So7lGeatyOQSnohc2qGwEKH2wzvJAKC6+3V2bqwXeS/V0uqXXlZ1pGPQ4rP0DBI+1dTxag1fOavlPGRQSguwdBt4lHsaarNOVeA92hwUOKEBCmcnk/WH1Ri0LvwFj8jx6s9jNL8dhnCpfGjjCFSybQdOeoNtOgJdscpHKEDR49qdh/OGOx",
+            "OSWD9DQmEdJdHL//+Qexr5awlbWR2HNRqPflAjGcxrO0PvKicLcet4GKljvC0SdQJaf/jTIMoaImPfgWExcTHjlFJNK4Jb5hnzMsZhHgLV1GV7PayyqW8ZS3r+n9dUGGzlYiELjrgiY7RQwduoSeirqAwGKrknRTZCwVZVP21X0=",
+            "XzNmeM3bLTeZp20nzxrQ78l0of1/HVZcIGlZdbjvfd/D9WIZ8OCIrBdJ0lCz5KmvCrYASwK2kkAfJRv7+aGSYN/+UwHQUlGHysDaea27pQKYUtuUqZeDutbZQTYjqjTXqcRNMvT6eIYtSn21ewvXXuP5AWfVoaEIKdSlizniE8MP2w4C0HFceZuOUuSzpjdveHpxOZ/Q8ELO1ARBHfZyj+k60xmK7xYEquAXUqNJHG5AVYksLuR0a9RH6qxEvHIi",
+            "RvJI6Oxf3mBh+TYnU3AKvJrOlzby0mTf76zFM8gk5t+w57d+cU+VX34DxqSajp685f9sg/Rvom8WsGu7OhGyUfY6oeRGsZUR87vpJhRw08bdpHdrYZMsRvBM3jjv5K/gKRiTEiRJ9tXOX8KjKNWLW2WL92uo3P8nQU/BYmIeuFg=",
+            "5b9AQr5yzBRAJKu2PaJGizkSxC2m8Pxa49WTZjDAZrrmFNPSXqKgLEsmKhxKSNmxsPiUiI8PWfETBty40rU4BxuvqfqCcjNflA9sulcuQ1JGjAxblL+DDiEL1OgscIxCtB5a6FoJE05we9XoS28jQaEohmuRFIBeYdD6Er6Zcasd6kBkgUOgfClUy54nVy9cywTgA2Lf2TcQ9rTfdJRv5brg+ru0cE29wKMM+eIJUO7tk7AYc8zqp3YO69eyIuMS",
+            "FP6/q85xRy7AUtJFh7pdjERM3Lf7UbSjW+aImSsXy6JV3h/1Rh+rmhGUnmT2IuS8xKLvnYjMNxlzIldu9JGgoAJMHNoczGAPA/mCbMP2XJ/2uGogwLDUnIopLXMoloHHUaUy9/SgfLWRqXEbvOCjmXEhjSKCHsiGIeBLCEzONrRvhqmkgxs7ofgEHx6QDEMRz592N+AxV6Txxjt3f3dFmw==",
+            "y7IeJw0AsVsG6pbaCw8WvJPnm5OSl6lHhLy2pIMOyrT5BzxW5lYoa4Xk5f0xDmQGbhSxhQiQs+3cRpx0hprTRNk6ulfFds9AT/toVDRlR5VyzKYfW/ai9AFYSR14sxxgw/kY8YhJu4Mp0EHm4mMbSWCZEll8c9d6nQJ0DXv5i7+YYkwCVmWjtEfCPBOsKhs2HZNl4JsqcL8KJMWHYIW4YA=="
             ];
+        for (int t = 0; t < text.Length; t++)
+            text[t] = UnityCipher.RijndaelEncryption.Decrypt(text[t], "_ABW");
         int i = 0;
         while (i < text.Length)
         {

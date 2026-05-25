@@ -618,6 +618,225 @@ namespace BCarnellChars
                     time = 26.53f
                 }
                 ];
+            bcppAssets.Add<SoundObject[]>("BCarnellBoss/DialIntros", [
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_Intro1.wav"), "Vfx_BCarnell_Dial1", SoundType.Voice, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_Intro2.wav"), "Vfx_BCarnell_Dial2", SoundType.Voice, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_Intro3.wav"), "Vfx_BCarnell_Dial3", SoundType.Voice, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_Intro4.wav"), "Vfx_BCarnell_Dial4", SoundType.Voice, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_Intro5.wav"), "Vfx_BCarnell_Dial5", SoundType.Voice, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
+                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_Intro6.wav"), "Vfx_BCarnell_Dial6", SoundType.Voice, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
+                ]);
+            var dialIntro = bcppAssets.Get<SoundObject[]>("BCarnellBoss/DialIntros");
+            dialIntro[0].additionalKeys = [
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial1_0",
+                    time = 2.78f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial1_1",
+                    time = 5.76f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial1_2",
+                    time = 11.89f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial1_3",
+                    time = 12.85f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial1_4",
+                    time = 15.16f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial1_5",
+                    time = 18.18f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial1_6",
+                    time = 20.73f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial1_7",
+                    time = 21.7f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial1_8",
+                    time = 25.58f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial1_9",
+                    time = 28.24f
+                }
+                ];
+            dialIntro[1].additionalKeys = [
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial2_0",
+                    time = 3.06f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial2_1",
+                    time = 5.98f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial2_2",
+                    time = 9.14f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial2_3",
+                    time = 15.17f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial2_4",
+                    time = 17f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial2_5",
+                    time = 23.93f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial2_6",
+                    time = 28.14f
+                }
+                ];
+            dialIntro[2].additionalKeys = [
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial3_0",
+                    time = 4.68f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial3_1",
+                    time = 7.8f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial3_2",
+                    time = 9.14f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial3_3",
+                    time = 13.58f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial3_4",
+                    time = 28.04f
+                }
+                ];
+            dialIntro[3].additionalKeys = [
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial4_0",
+                    time = 4.04f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial4_1",
+                    time = 7.35f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial4_2",
+                    time = 9.77f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial4_3",
+                    time = 11.12f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial4_4",
+                    time = 13.96f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial4_5",
+                    time = 15.74f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial3_3",
+                    time = 20.73f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial4_6",
+                    time = 27.59f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial4_7",
+                    time = 29.40f
+                }
+                ];
+            dialIntro[4].additionalKeys = [
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial5_0",
+                    time = 4.43f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial5_1",
+                    time = 6f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial5_2",
+                    time = 8.52f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial5_3",
+                    time = 11.88f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial5_4",
+                    time = 16.08f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial5_5",
+                    time = 18.52f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial5_6",
+                    time = 21.37f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial3_3",
+                    time = 25.5f
+                },
+                new SubtitleTimedKey()
+                {
+                    key = "Vfx_BCarnell_Dial5_6",
+                    time = 26.63f
+                }
+                ];
             Texture2D LoadTextureFromResources(string name)
             {
                 using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("BCarnellChars.bcarnellpluspack.hiddenassets." + name);
@@ -1335,7 +1554,7 @@ namespace BCarnellChars
             swingingdoorInfLock.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("item", EnumExtensions.GetFromExtendedName<Items>("SecuredYellowLock"));
             swingingdoorInfLock.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("audUse", Resources.FindObjectsOfTypeAll<SoundObject>().Last(x => x.name == "Slap"));
             swingingdoorInfLock.item.GetComponent<ITM_Acceptable>().ReflectionSetVariable("layerMask", playerclicklayer);
-            GameObject inflockedSwingDoor = Instantiate(Resources.FindObjectsOfTypeAll<SwingDoor>().Last(p => p.name == "Door_Swinging"), MTM101BaldiDevAPI.prefabTransform).gameObject;
+            GameObject inflockedSwingDoor = Instantiate(AssetFinder.FindOfTypeWithName<SwingDoor>("Door_Swinging", true), MTM101BaldiDevAPI.prefabTransform).gameObject;
             inflockedSwingDoor.name = "Door_SwingingSecuredLock";
             var inflockeddoor = inflockedSwingDoor.SwapComponent<SwingDoor, SwingDoor_Secured>();
             inflockeddoor.securedDoor = inflockedSwingDoor.AddComponent<SecuredSwingingDoor>();
@@ -1345,7 +1564,6 @@ namespace BCarnellChars
             securedYellowSwingingDoor.SetMainTexture(bcppAssets.Get<Texture2D>("Obstacles/InfLockedSwingingDoor"));
             //inflockedSwingDoor.GetComponent<SecuredSwingingDoor>().doorOverlay = securedYellowSwingingDoor;
             //inflockedSwingDoor.SetActive(false);
-            inflockedSwingDoor.GetComponent<AudioManager>().enabled = false;
             //inflockedSwingDoor.ConvertToPrefab(true);
             CoinDoorBuilder builder = Instantiate(Resources.FindObjectsOfTypeAll<CoinDoorBuilder>().Last(x => x.name == "CoinDoorBuilder"), MTM101BaldiDevAPI.prefabTransform);
             builder.gameObject.name = "Inf Secured Swinging Door Builder";
@@ -1924,7 +2142,8 @@ namespace BCarnellChars
             lBasement.edgeBuffer = 3;
 
             lBasement.mapPrice = 1000;
-            lBasement.shopItems = [..Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl2").shopItems,
+            lBasement.shopItems = [..Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl2").shopItems.Where(x => x.selection.itemType != Items.Nametag && x.selection.itemType != Items.Scissors && x.selection.itemType != Items.DetentionKey && x.selection.itemType != Items.Boots && x.selection.itemType != Items.PrincipalWhistle
+            && x.selection.itemType != Items.Apple),
                             new WeightedItemObject()
                             {
                                 selection = profitCard,
@@ -2462,6 +2681,7 @@ namespace BCarnellChars
                 .SetWanderEnterRooms()
                 .SetAudioTimescaleType(TimeScaleType.Npc)
                 .IgnorePlayerVisibility()
+                .SetForcedSubtitleColor(new Color(0.01960784f, 0.3607843f, 0.7568628f))
                 .SetMetaTags(["BCPP", "adv_exclusion_hammer_immunity", "boss"])
                 .Build();
             realbcarnell.Navigator.accel = 0f;
@@ -2474,224 +2694,17 @@ namespace BCarnellChars
             realbcarnell.animator.AddAnimation("BoostPre", new SpriteAnimation(bcppAssets.Get<Sprite[]>("BCarnellBoss/BoostPre"), 0.5f));
             realbcarnell.animator.AddAnimation("Boosting", new SpriteAnimation([bcppAssets.Get<Sprite>("BCarnellBoss/Boosting")], 1f));
             realbcarnell.animator.AddAnimation("BoostOut", new SpriteAnimation(bcppAssets.Get<Sprite[]>("BCarnellBoss/Walk"), 0.5f));
-            realbcarnell.dialIntro = [
-                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_Intro1.wav"), "Vfx_BCarnell_Dial1", SoundType.Voice, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
-                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_Intro2.wav"), "Vfx_BCarnell_Dial2", SoundType.Voice, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
-                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_Intro3.wav"), "Vfx_BCarnell_Dial3", SoundType.Voice, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
-                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_Intro4.wav"), "Vfx_BCarnell_Dial4", SoundType.Voice, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
-                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_Intro5.wav"), "Vfx_BCarnell_Dial5", SoundType.Voice, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
-                ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, "AudioClip", "NPCs", "Real B. Carnell", "BCBoss_Intro6.wav"), "Vfx_BCarnell_Dial6", SoundType.Voice, new Color(0.01960784f, 0.3607843f, 0.7568628f)),
-                ];
-            realbcarnell.dialIntro[0].additionalKeys = [
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial1_0",
-                    time = 2.78f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial1_1",
-                    time = 5.76f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial1_2",
-                    time = 11.89f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial1_3",
-                    time = 12.85f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial1_4",
-                    time = 15.16f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial1_5",
-                    time = 18.18f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial1_6",
-                    time = 20.73f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial1_7",
-                    time = 21.7f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial1_8",
-                    time = 25.58f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial1_9",
-                    time = 28.24f
-                }
-                ];
-            realbcarnell.dialIntro[1].additionalKeys = [
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial2_0",
-                    time = 3.06f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial2_1",
-                    time = 5.98f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial2_2",
-                    time = 9.14f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial2_3",
-                    time = 15.17f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial2_4",
-                    time = 17f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial2_5",
-                    time = 23.93f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial2_6",
-                    time = 28.14f
-                }
-                ];
-            realbcarnell.dialIntro[2].additionalKeys = [
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial3_0",
-                    time = 4.68f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial3_1",
-                    time = 7.8f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial3_2",
-                    time = 9.14f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial3_3",
-                    time = 13.58f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial3_4",
-                    time = 28.04f
-                }
-                ];
-            realbcarnell.dialIntro[3].additionalKeys = [
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial4_0",
-                    time = 4.04f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial4_1",
-                    time = 7.35f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial4_2",
-                    time = 9.77f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial4_3",
-                    time = 11.12f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial4_4",
-                    time = 13.96f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial4_5",
-                    time = 15.74f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial3_3",
-                    time = 20.73f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial4_6",
-                    time = 27.59f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial4_7",
-                    time = 29.40f
-                }
-                ];
-            realbcarnell.dialIntro[4].additionalKeys = [
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial5_0",
-                    time = 4.43f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial5_1",
-                    time = 6f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial5_2",
-                    time = 8.52f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial5_3",
-                    time = 11.88f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial5_4",
-                    time = 16.08f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial5_5",
-                    time = 18.52f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial5_6",
-                    time = 21.37f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial3_3",
-                    time = 25.5f
-                },
-                new SubtitleTimedKey()
-                {
-                    key = "Vfx_BCarnell_Dial5_6",
-                    time = 26.63f
-                }
-                ];
+            realbcarnell.dialIntro = bcppAssets.Get<SoundObject[]>("BCarnellBoss/DialIntros");
+            realbcarnell.battleAud = Instantiate(Resources.FindObjectsOfTypeAll<CoreGameManager>().Last(x => x.GetInstanceID() >= 0).musicMan, realbcarnell.transform, false).gameObject.SwapComponent<AudioManager, PropagatedAudioManager>();
+            realbcarnell.battleAud.audioDevice.spatialBlend = 1f;
+            realbcarnell.battleAud.ReflectionSetVariable("pitchTimeScaleType", TimeScaleType.Npc);
+            realbcarnell.inbattle = prototypeBot.impatientSnd;
+            realbcarnell.battleAud.pitchModifier = 1.5f;
+            realbcarnell.battleAud.ReflectionSetVariable("maxDistance", 600f);
+            _loopAudOnStart.SetValue(realbcarnell.battleAud, true);
+            realbcarnell.battleAud.transform.localPosition = realbcarnell.spriteBase.transform.localPosition;
+            realbcarnell.battleAud.ReflectionSetVariable("disableSubtitles", false);
+            realbcarnell.battleAud.ReflectionSetVariable("subtitleColor", new Color(0.01960784f, 0.3607843f, 0.7568628f));
             GameObject sawblade = Instantiate(Resources.FindObjectsOfTypeAll<ITM_BSODA>().Last(x => x.name == "ITM_BSODA"), MTM101BaldiDevAPI.prefabTransform).gameObject;
             sawblade.name = "Sawblade";
             Destroy(sawblade.GetComponent<ITM_BSODA>());
@@ -2730,8 +2743,8 @@ namespace BCarnellChars
             realbcarnell.audMan = realbcarnell.gameObject.GetComponent<AudioManager>();
 
             var battleObj = new EntityBuilder()
-                .AddTrigger(0.5f)
-                .SetBaseRadius(0.5f)
+                .AddTrigger(1.5f)
+                .SetBaseRadius(1.5f)
                 .SetHeight(1f)
                 .SetLayer("StandardEntities")
                 .SetLayerCollisionMask((LayerMask)0)
@@ -2753,9 +2766,9 @@ namespace BCarnellChars
             bossManager.battle = battleObj;
 
             SubInitializer subinit = new GameObject("SubGame Initializer", typeof(SubInitializer)).GetComponent<SubInitializer>();
-            subinit.ecPre = Resources.FindObjectsOfTypeAll<EnvironmentController>().Last(x => x.name == "Environment Controller");
-            subinit.generatorPre = Resources.FindObjectsOfTypeAll<LevelGenerator>().Last(x => x.name == "LevelGenerator");
-            subinit.loaderPre = Resources.FindObjectsOfTypeAll<LevelLoader>().Last(x => x.name == "LevelLoader");
+            subinit.ecPre = Resources.FindObjectsOfTypeAll<EnvironmentController>().Last(x => x.name == "Environment Controller" && x.GetInstanceID() >= 0);
+            subinit.generatorPre = Resources.FindObjectsOfTypeAll<LevelGenerator>().Last(x => x.name == "LevelGenerator" && x.GetInstanceID() >= 0);
+            subinit.loaderPre = Resources.FindObjectsOfTypeAll<LevelLoader>().Last(x => x.name == "LevelLoader" && x.GetInstanceID() >= 0);
             subinit.gameObject.ConvertToPrefab(false);
             bcppAssets.Add<GameInitializer>("SubInitializer", subinit);
 
@@ -2768,6 +2781,7 @@ namespace BCarnellChars
                 weight = 75
             });
             lBoss.potentialItems = [.. lBoss.potentialItems.Where(x => x.selection.itemType != Items.Tape)];
+            lBoss.forcedItems.RemoveAll(x => x.itemType == Items.Tape);
             roomg = lBasement.roomGroup.Where(x => x.name.ToLower().Contains("facult") || x.name.ToLower().Contains("offic") || x.name == "LockedRoom").ToArray();
             lBoss.roomGroup = new RoomGroup[roomg.Length];
             for (int i = 0; i < roomg.Length; i++)
@@ -2877,6 +2891,7 @@ namespace BCarnellChars
             lBoss.timeOutEvent = null;
             lBoss.maxItemValue = 900 * 4;
             lBoss.duplicateItemWeightReduction = 0.50f;
+            lBoss.shopItems = lBoss.shopItems.Where(x => x.selection.itemType != Items.Tape).ToArray();
 
             sBoss = ScriptableObject.CreateInstance<SceneObject>();
             sBoss.name = "BasementLevel_Boss";
@@ -2928,6 +2943,8 @@ namespace BCarnellChars
                 .Build();
             canv.GetComponent<DeveloperNoteABW>().textt = canv.transform.GetChild(0).GetComponentInChildren<TextMeshProUGUI>(true);
             canv.GetComponent<DeveloperNoteABW>().textt.color = Color.white;
+            canv.GetComponent<DeveloperNoteABW>().textt.alignment = TextAlignmentOptions.Center;
+            canv.GetComponent<DeveloperNoteABW>().textt.rectTransform.anchoredPosition = Vector2.zero;
             canv.GetComponent<DeveloperNoteABW>().canvas = canv.transform.GetComponentInChildren<Canvas>(true);
             var scalerc = canv.GetComponent<DeveloperNoteABW>().canvas.GetComponent<CanvasScaler>();
             scalerc.referencePixelsPerUnit = 1f;
@@ -3619,7 +3636,7 @@ namespace BCarnellChars
     {
         public static BCPPSave Instance => BCPPPlugin.Instance.SaveData;
         [NonSerialized] public ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource("BCPPSave");
-        [NonSerialized] public const string Version = "1.6.0", Build = "bringtheboss"; // BepinEx 5 does not support semantic versioning, which they have lied in their tutorial documentation until BepInEx 6 comes out.
+        [NonSerialized] public const string Version = "1.6.0", Build = ""; // BepinEx 5 does not support semantic versioning, which they have lied in their tutorial documentation until BepInEx 6 comes out.
         internal static Version typeVersion => new Version(Version);
 
         internal string version = Version, build = Build;

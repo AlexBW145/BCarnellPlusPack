@@ -176,7 +176,7 @@ public class BCarnellBoss_PostBattle(BCarnellBoss carnell) : BCarnellBoss_StateB
                 elaspedTime += Time.deltaTime;
                 if (elaspedTime >= 10f)
                     elaspedTime += elaspedTime * Time.deltaTime;
-                bcarnell.spriteRenderer[0].transform.localScale -= Vector3.one * (elaspedTime * 0.00005f);
+                bcarnell.spriteRenderer[0].transform.localScale = Vector3.Max(Vector3.zero, Vector3.one - (Vector3.one * (elaspedTime * 0.00005f)));
                 bcarnell.spriteRenderer[0].GetPropertyBlock(propertyBlock);
                 propertyBlock.SetInt("_SpriteColorGlitching", 1);
                 propertyBlock.SetFloat("_SpriteColorGlitchVal", Random.Range(0f, 4096f));
@@ -193,8 +193,8 @@ public class BCarnellBoss_PostBattle(BCarnellBoss carnell) : BCarnellBoss_StateB
                 if (Random.Range(0f, 1f) <= 0.5f)
                 {
                     propertyBlock.SetInt("_ChunkGlitch", 1);
-                    propertyBlock.SetFloat("_ChunkGlitchThreshold", Mathf.Clamp(1f - elaspedTime * 0.05f, 0f, 1f));
-                    propertyBlock.SetFloat("_ChunkGlitchFullThreshold", Mathf.Clamp(1f - elaspedTime * 0.025f, 0f, 1f));
+                    propertyBlock.SetFloat("_ChunkGlitchThreshold", Mathf.Clamp(1f - (elaspedTime * 0.05f), 0f, 1f));
+                    propertyBlock.SetFloat("_ChunkGlitchFullThreshold", Mathf.Clamp(1f - (elaspedTime * 0.025f), 0f, 1f));
                 }
                 else
                     propertyBlock.SetInt("_ChunkGlitch", 0);

@@ -19,9 +19,10 @@ namespace BCarnellChars.Characters
             get => AudMan;
             set => _audMan.SetValue(this, value);
         }
+        [SerializeField] internal PropagatedAudioManager battleAud;
         [SerializeField] internal Sawblades sawbladePre;
 
-        [SerializeField] internal SoundObject stepSnd, boostCharge, boostGo, sawShoot, postbattle, death;
+        [SerializeField] internal SoundObject stepSnd, boostCharge, boostGo, sawShoot, postbattle, death, inbattle;
 
         private Queue<IEnumerator> enqueuedAttacks = new Queue<IEnumerator>();
         private float attackCooldown = 0f;
@@ -51,15 +52,16 @@ namespace BCarnellChars.Characters
         }
         [SerializeField] internal B2Boss phases { get; private set; } = B2Boss.Phase0;
         [SerializeField] internal SoundObject[] dialIntro;
+        internal const int initHP = 15;
         [Range(0, int.MaxValue)] private int hp;
         internal int HP { get => hp;
             set {
                 if (phases == B2Boss.Phase0 || phases >= B2Boss.Phase5) return;
                 hp = value;
-                SetAnger(anger + ((float)hp / 10f));
-                MusicManager.Instance.MidiPlayer.MPTK_Speed = 1f + ((0.2500000001f * (float)(phases - 1)) + ((15f - (float)hp) / 60f));
+                SetAnger(baseAnger + ((float)(initHP - hp) / 10f));
+                MusicManager.Instance.MidiPlayer.MPTK_Speed = 1f + ((0.2500000001f * (float)(phases - 1)) + ((float)(initHP - hp) / 60f));
                 if (phases == B2Boss.Phase4 && hp == 1) // Plus does not have yet ported the hang function from BBCR.
-                    MusicManager.OnMidiEvent += MidiEvent;
+                    MidiEvent(MusicManager.Instance.MidiPlayer);
                 else if (hp <= 0)
                 {
                     Entity.SetFrozen(true);
@@ -69,22 +71,32 @@ namespace BCarnellChars.Characters
             }
         }
 
-        private void MidiEvent(MPTKEvent midiEvent)
+        private void MidiEvent(MidiSynth player) => MidiHang(player, hp == 1, true);
+
+        internal static void MidiHang(MidiSynth player, bool stop, bool keepDrums)
         {
-            if (midiEvent.Voices != null)
+            for (int i = 0; i < 16; i++)
             {
-                foreach (fluid_voice fluid_voice2 in midiEvent.Voices)
-                    fluid_voice2.DurationTick = hp == 1 ? -1L : 0L;
+                if (i != 9)
+                    player.MPTK_ChannelEnableSet(i, !stop);
+                else
+                    player.MPTK_ChannelEnableSet(i, !stop || keepDrums);
+            }
+            if (_ActiveVoices.GetValue(player) != null)
+            {
+                foreach (fluid_voice fluid_voice2 in (List<fluid_voice>)_ActiveVoices.GetValue(player))
+                    fluid_voice2.DurationTick = stop ? -1L : 0L;
             }
         }
 
-        private void OnDestroy() => MusicManager.OnMidiEvent -= MidiEvent;
+        private void OnDestroy() => MidiHang(MusicManager.Instance.MidiPlayer, false, true);
 
         private static readonly FieldInfo
             _audMan = AccessTools.DeclaredField(typeof(Baldi), "audMan"),
             _smoothMove = AccessTools.DeclaredField(typeof(Baldi), "smoothMove"),
             _speedCurve = AccessTools.DeclaredField(typeof(Baldi), "speedCurve"),
-            _slapCurve = AccessTools.DeclaredField(typeof(Baldi), "slapCurve");
+            _slapCurve = AccessTools.DeclaredField(typeof(Baldi), "slapCurve"),
+            _ActiveVoices = AccessTools.DeclaredField(typeof(MidiSynth), "ActiveVoices");
         [SerializeField, HideInInspector] private Baldi baldiBase = Resources.FindObjectsOfTypeAll<Baldi>().First(x => x.name.Contains("3") && x.GetInstanceID() >= 0);
         [SerializeField] internal CustomSpriteRendererAnimator animator;
         private Vector3 spawnPos;
@@ -95,7 +107,7 @@ namespace BCarnellChars.Characters
         {
             base.CaughtPlayer(player);
             CoreGameManager.Instance.audMan.PlaySingle(BCPPPlugin.bcppAssets.Get<SoundObject>("BCarnellBoss/LOSE/caughtlayer"));
-            MusicManager.OnMidiEvent -= MidiEvent;
+            MidiHang(MusicManager.Instance.MidiPlayer, false, true);
         }
 
         internal void InitPhase(B2Boss phase)
@@ -107,10 +119,13 @@ namespace BCarnellChars.Characters
                 case B2Boss.Phase0:
                     break;
                 default:
-                    SetAnger(5f + (.5f * (float)phase));
+                    baseAnger = 5f + (.5f * (float)phase);
+                    SetAnger(baseAnger);
                     baseSpeed = 25f;
-                    hp = 15;
+                    hp = initHP;
                     behaviorStateMachine.ChangeState(new BCarnellBoss_ChaseIntense(this));
+                    battleAud.QueueAudio(inbattle, true);
+                    battleAud.SetLoop(true);
                     break;
                 case B2Boss.Phase5:
                     isThrusting = true;
