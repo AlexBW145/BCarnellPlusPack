@@ -21,7 +21,7 @@ public class BCarnellBoss_StateBase(BCarnellBoss carnell) : NpcState(carnell)
     {
         if (!IsActuallyHidden(player))
         {
-            bcarnell.ClearSoundLocations();
+            bcarnell.ClearSoundLocations(false, Vector3.zero);
             bcarnell.Hear(null, player.transform.position, 127, false);
         }
     }

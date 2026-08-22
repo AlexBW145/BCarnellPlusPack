@@ -7,3 +7,6 @@ It's a Baldi's Basics Plus BepInEx mod that ports most stuff from B. Carnell's M
 
 # Sure, how do I help?
 You don't, you cannot add in new stuff. The only way to help and that is limited to is balancing stuff. (Of course I'll need later help on creations that ain't even code based!)
+
+# Long Term Support Phase
+This mod is pretty much over and done with for major updates, this mod may or may not be ported to v1.0 of Baldi's Basics Plus.

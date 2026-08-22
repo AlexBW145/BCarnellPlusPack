@@ -437,7 +437,7 @@ internal class CarnellBossManager : BaseGameManager
             ec.Npcs.DoIf(x => x is BCarnellBoss, x =>
             {
                 var bald = x as BCarnellBoss;
-                bald.ClearSoundLocations();
+                bald.ClearSoundLocations(false, Vector3.zero);
                 x.transform.position = path[carnellpos].CenterWorldPosition;
             });
             for (int i = 0; i < CoreGameManager.Instance.setPlayers; i++)

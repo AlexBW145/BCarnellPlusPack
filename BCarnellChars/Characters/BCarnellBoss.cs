@@ -396,7 +396,7 @@ namespace BCarnellChars.Characters
             animator.Play("Boosting", 1f, true);
             if (targetPlayer)
             {
-                ClearSoundLocations();
+                ClearSoundLocations(false, Vector3.zero);
                 Hear(null, players[0].transform.position, 127, false);
             }
             else
