@@ -1,4 +1,4 @@
-﻿using BaldisBasicsPlusAdvanced.Game.Objects.Voting.Topics;
+﻿//using BaldisBasicsPlusAdvanced.Game.Objects.Voting.Topics;
 using BCarnellChars.Characters;
 using BCarnellChars.Characters.States;
 using BCarnellChars.OtherStuff;
@@ -14,7 +14,7 @@ namespace BCarnellChars.Patches;
 [ConditionalPatchMod("mrsasha5.baldi.basics.plus.advanced"), HarmonyPatch] // Useless as the voting random event got removed, our vote matters.
 class AdvancedPatches
 {
-    private static FieldInfo 
+    /*private static FieldInfo 
         _usesLeft = AccessTools.DeclaredField(typeof(RandomItemMachine), "usesLeft"),
         _numberOfFoodNeed = AccessTools.DeclaredField(typeof(MrPortalMan_Wandering), "numberOfFoodNeed");
     [HarmonyPatch(typeof(ConvertVendingMachinesTopic), nameof(ConvertVendingMachinesTopic.OnVotingEndedPre)), HarmonyPostfix]
@@ -61,5 +61,5 @@ class AdvancedPatches
     {
         if (!__result)
             __result = ___ec.npcsToSpawn.Exists(x => x is MrPortalMan);
-    }
+    }*/
 }
