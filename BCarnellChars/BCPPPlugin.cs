@@ -2091,8 +2091,9 @@ namespace BCarnellChars
                                 weight = 75
                             }
                         ];
-            lBasement.forcedItems = [..Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").forcedItems, profitCard,
-                Resources.FindObjectsOfTypeAll<ItemObject>().Last(x => x.itemType == Items.Tape)];
+            var tape = Resources.FindObjectsOfTypeAll<ItemObject>().Last(x => x.itemType == Items.Tape);
+            lBasement.forcedItems = [..Resources.FindObjectsOfTypeAll<LevelObject>().Last(x => x.name == "Schoolhouse_Lvl3").forcedItems, profitCard, profitCard,
+                tape, tape, tape];
             lBasement.maxItemValue *= 2;
             lBasement.singleEntranceItemVal = 10;
             lBasement.noHallItemVal = 15;
@@ -3361,7 +3362,7 @@ namespace BCarnellChars
                                 ]);
                             break;
                         case "F3" or "F5":
-                            level.forcedItems.Add(profitCard);
+                            level.forcedItems.AddRange([profitCard, swingingdoorInfKey]);
                             level.potentialItems = level.potentialItems.AddRangeToArray([
                                 new WeightedItemObject()
                             {
@@ -3402,7 +3403,7 @@ namespace BCarnellChars
                             break;
                         case "END":
                             level.forcedItems.Add(profitCard);
-                            level.potentialItems = level.potentialItems.AddRangeToArray([
+                            /*level.potentialItems = level.potentialItems.AddRangeToArray([
                                 new WeightedItemObject()
                             {
                                 selection = hammer,
@@ -3428,7 +3429,7 @@ namespace BCarnellChars
                                 selection = taserpulse,
                                 weight = 75
                             }
-                                ]);
+                                ]);*/
                             break;
                         default: // For floors that are from different mods
                             if (!level.forcedItems.Contains(profitCard) && floorName != "INF") level.forcedItems.Add(profitCard);
@@ -3636,7 +3637,7 @@ namespace BCarnellChars
     {
         public static BCPPSave Instance => BCPPPlugin.Instance.SaveData;
         [NonSerialized] public ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource("BCPPSave");
-        [NonSerialized] public const string Version = "1.6.0", Build = ""; // BepinEx 5 does not support semantic versioning, which they have lied in their tutorial documentation until BepInEx 6 comes out.
+        [NonSerialized] public const string Version = "1.6.1", Build = ""; // BepinEx 5 does not support semantic versioning, which they have lied in their tutorial documentation until BepInEx 6 comes out.
         internal static Version typeVersion => new Version(Version);
 
         internal string version = Version, build = Build;

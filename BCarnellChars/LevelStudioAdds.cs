@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using MTM101BaldAPI;
 
 namespace BCarnellChars;
 
@@ -186,7 +187,7 @@ public class ObjectToolProfitCard(string type, Sprite sprite) : ObjectTool(type,
     public override string descKey => "Ed_Tool_object_profitmachine_Desc";
 }
 
-[HarmonyPatch(typeof(HotSlotScript))]
+[ConditionalPatchMod("mtm101.rulerp.baldiplus.levelstudio"), HarmonyPatch(typeof(HotSlotScript))]
 class ProfitIcon // Hacky stuff before frame overwrites were a thing.
 {
     [HarmonyPatch("Start"), HarmonyPostfix]

@@ -148,5 +148,11 @@ namespace BCarnellChars.Characters
             whiteBang.color = Color.white;
             yield break;
         }
+
+        private void OnDestroy()
+        {
+            if (behaviorStateMachine.CurrentState is MrRobber_DoNothing && overlay?.gameObject.activeSelf == true && AudioListener.volume < 1f)
+                AudioListener.volume = 1f;
+        }
     }
 }

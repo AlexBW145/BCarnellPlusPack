@@ -175,6 +175,8 @@ public class AddSecuredLockedDoorElement : AddDoorElement
     protected override StructureBuilder GetBuilder() => BCPPPlugin.bcppAssets.Get<StructureBuilder>("SecuredLockedSwingingDoorConstructor");
 
     protected override GameObject GetPrefab() => BCPPPlugin.bcppAssets.Get<SecuredSwingingDoor>("Obstacles/SecuredSwingingDoor").gameObject;
+
+    public override bool CurrentlyValid(EndlessLevelRepresentation rep, int actingFloor) => rep.levelObject.minSize.x >= 75 && rep.levelObject.minSize.z >= 75;
 }
 
 public class AddATonOfSecuredLockedDoors : AddSecuredLockedDoorElement

@@ -105,8 +105,8 @@
   </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-	    <Exec Command="echo F|xcopy /Y &quot;$(ProjectDir)bin\$(Configuration)\netstandard2.0\$(AssemblyName).dll&quot; &quot;D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\BCPP\$(AssemblyName).dll&quot;" />
-	    <Exec Command="echo F|xcopy /Y &quot;$(ProjectDir)bin\$(Configuration)\netstandard2.0\$(AssemblyName).pdb&quot; &quot;D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\BCPP\$(AssemblyName).pdb&quot;" />
+	    <Exec Command="echo F|xcopy /Y &quot;$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).dll&quot; &quot;D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\BCPP\$(AssemblyName).dll&quot;" />
+	    <Exec Command="echo F|xcopy /Y &quot;$(ProjectDir)bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).pdb&quot; &quot;D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\BCPP\$(AssemblyName).pdb&quot;" />
 		<Exec Command="  xcopy /S /Q /Y /F &quot;$(ProjectDir)alexbw145.baldiplus.bcarnellchars\&quot; &quot;D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BALDI_Data\StreamingAssets\Modded\alexbw145.baldiplus.bcarnellchars\&quot;" />
     </Target>
 </Project>
