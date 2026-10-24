@@ -1,0 +1,14 @@
+{"items":[
+    {"key":"Event_BrokenRuler_BCarnell","value":"Uh oh, sounds like B. Carnell is going to need a new dagger...\n<size=60%><i>What do you mean B. Carnell is fine without one??</i></size>"},
+    {"key":"Event_Party_BCarnell","value":"Police Nerd has hosted a party at the Principal's office! Come and get your present!"},
+
+    {"key":"Sfx_BCarnell_Walk","value":"*Step*"},
+    {"key":"Sfx_BrokenDagger","value":"*SNAP*"},
+    {"key":"Sfx_RegenDagger","value":"*Sharp regenerated*"},
+    {"key":"Vfx_BCarnell_Angry","value":"*LONG YELLING*"},
+    {"key":"Vfx_BCarnell_FinalFloor","value":"*EXTREMELY LONG YELLING*"},
+
+    {"key":"Sfx_PoliceNerd_GoofyHorn","value":"*Long Horn Sounds*"},
+    {"key":"Sfx_BCarnell_CarOut","value":"*Police Car Ejects*"},
+    {"key":"Sfx_PoliceNerd_CarEnabled","value":"*Police Car Beeps*"}
+]}
