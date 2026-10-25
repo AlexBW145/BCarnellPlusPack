@@ -3,20 +3,20 @@
   "WorkspaceRootPath": "D:\\source\\repos\\BCarnellPlusPack\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellteacher\\bcarnell_states.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|solutionrelative:bcarnellteacher\\bcarnell_states.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellteacher\\itm_carnelldestabilizer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|solutionrelative:bcarnellteacher\\itm_carnelldestabilizer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellteacher\\carnellplugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|solutionrelative:bcarnellteacher\\carnellplugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellteacher\\bcarnell_states.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|solutionrelative:bcarnellteacher\\bcarnell_states.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellteacher\\bcarnell.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|solutionrelative:bcarnellteacher\\bcarnell.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellteacher\\itm_carnelldestabilizer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|solutionrelative:bcarnellteacher\\itm_carnelldestabilizer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{CCF50FF8-E6C5-4BB4-AE3B-B044EA8121FD}|BCarnellTeacher\\BCarnellTeacher.csproj|d:\\source\\repos\\bcarnellpluspack\\bcarnellteacher\\policenerd.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -30,7 +30,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Bookmark",
@@ -38,39 +38,39 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "BCarnell_States.cs",
               "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTeacher\\BCarnell_States.cs",
               "RelativeDocumentMoniker": "BCarnellTeacher\\BCarnell_States.cs",
               "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTeacher\\BCarnell_States.cs",
               "RelativeToolTip": "BCarnellTeacher\\BCarnell_States.cs",
-              "ViewState": "AgIAALoAAAAAAAAAAAAYwNMAAAApAAAAAAAAAA==",
+              "ViewState": "AgIAAJoAAAAAAAAAAAAIwKUAAAAhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-10-25T05:18:17.236Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "ITM_CarnellDestabilizer.cs",
               "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTeacher\\ITM_CarnellDestabilizer.cs",
               "RelativeDocumentMoniker": "BCarnellTeacher\\ITM_CarnellDestabilizer.cs",
               "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTeacher\\ITM_CarnellDestabilizer.cs",
               "RelativeToolTip": "BCarnellTeacher\\ITM_CarnellDestabilizer.cs",
-              "ViewState": "AgIAAB0AAAAAAAAAAAAwwDoAAABNAAAAAAAAAA==",
+              "ViewState": "AgIAACAAAAAAAAAAAAAIwDoAAABNAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-10-25T03:07:17.899Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "BCarnell.cs",
               "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTeacher\\BCarnell.cs",
               "RelativeDocumentMoniker": "BCarnellTeacher\\BCarnell.cs",
               "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTeacher\\BCarnell.cs",
               "RelativeToolTip": "BCarnellTeacher\\BCarnell.cs",
-              "ViewState": "AgIAAA4AAAAAAAAAAAAQwB8AAAA1AAAAAAAAAA==",
+              "ViewState": "AgIAAIIAAAAAAAAAAAAUwB8AAAA1AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-10-25T02:47:48.408Z",
               "EditorCaption": ""
@@ -90,13 +90,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "CarnellPlugin.cs",
               "DocumentMoniker": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTeacher\\CarnellPlugin.cs",
               "RelativeDocumentMoniker": "BCarnellTeacher\\CarnellPlugin.cs",
               "ToolTip": "D:\\source\\repos\\BCarnellPlusPack\\BCarnellTeacher\\CarnellPlugin.cs",
               "RelativeToolTip": "BCarnellTeacher\\CarnellPlugin.cs",
-              "ViewState": "AgIAAG8CAAAAAAAAAAAIwI0CAABKAAAAAAAAAA==",
+              "ViewState": "AgIAAEMCAAAAAAAAAAAmwFoCAABBAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-23T01:30:04.248Z",
               "EditorCaption": ""

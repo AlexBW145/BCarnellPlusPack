@@ -602,6 +602,7 @@ namespace BCarnellTeacher
             itemcomponent.audMan.audioDevice.spatialBlend = 1f;
             itemcomponent.audMan.audioDevice.playOnAwake = false;
             itemcomponent.audMan.ReflectionSetVariable("soundOnStart", new SoundObject[] { bcarnelAssets.Get<SoundObject>("Destabilizer/Idle") });
+            itemcomponent.audMan.ReflectionSetVariable("loopOnStart", true);
             var transformRend = new GameObject("RendererBase").transform;
             transformRend.SetParent(itemcomponent.transform, false);
             transformRend.gameObject.layer = LayerMask.NameToLayer("Billboard");
