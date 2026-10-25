@@ -46,7 +46,8 @@ public class ITM_Hammer : Item
                 if (component != null && !component.IsOpen)
                 {
                     component.Break(true);
-                    accepted = true;
+                    if (component.IsOpen)
+                        accepted = true;
                 }
             }
             else if (hit.transform.CompareTag("StandardDoor"))

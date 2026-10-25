@@ -8,7 +8,7 @@ using System.Reflection;
 using UnityEngine;
 namespace BCarnellTeacher
 {
-    public class PoliceNerd : Principal
+    public class PoliceNerd : Principal, ISerializationCallbackReceiver
     {
         private static FieldInfo
             _allKnowing = AccessTools.DeclaredField(typeof(Principal), "allKnowing"),
@@ -34,7 +34,7 @@ namespace BCarnellTeacher
         [SerializeField]
         internal SoundObject 
             bang = Resources.FindObjectsOfTypeAll<SoundObject>().ToList().Find(b => b.name == "Bang"),
-            whistle;
+            whistle, carOn, carOff;
 
         [SerializeField]
         private float
@@ -69,6 +69,15 @@ namespace BCarnellTeacher
         private bool allKnowing { get => (bool)_allKnowing.GetValue(this); set => _allKnowing.SetValue(this, value); }
         public bool AllKnowing => allKnowing;
 
+        private List<RoomController> AllOffices { get {
+                var offices = new List<RoomController>(ec.offices);
+                foreach (var room in ec.rooms)
+                {
+                    if (room.functionObject != null && room.functionObject.GetComponent<JailWindowRoomFunction>() != null)
+                        offices.Add(room);
+                }
+                return offices;
+            } }
         public override void Initialize()
         {
             base.Initialize();
@@ -108,10 +117,10 @@ namespace BCarnellTeacher
 
         public new void SendToDetention(bool validCollision) // Just makin' sure...
         {
-            if (ec.offices.Count > 0)
+            if (AllOffices.Count > 0)
             {
-                int index = UnityEngine.Random.Range(0, ec.offices.Count);
-                SendToDetention(ec.offices[index]);
+                int index = UnityEngine.Random.Range(0, AllOffices.Count);
+                SendToDetention(AllOffices[index]);
             }
         }
 
@@ -147,22 +156,21 @@ namespace BCarnellTeacher
             //base.transform.position = targetedPlayer.transform.position + targetedPlayer.transform.forward * 10f;
 
             office.functionObject.GetComponent<DetentionRoomFunction>().Activate(time, ec);
-            //audMan.QueueAudio(audTimes[detentionLevel]);
-            //audMan.QueueAudio(audDetention);
-            //audMan.QueueAudio(audScolds[UnityEngine.Random.Range(0, audScolds.Length)]);
+            audMan.QueueAudio(jailForYou);
             timeInSight[targetedPlayer.playerNumber] = 0f;
             //detentionLevel = Mathf.Min(detentionLevel + 1, audTimes.Length - 1);
+            ec.GetBaldi()?.ClearSoundLocations(true, ec.RealRoomMid(office));
             ec.MakeNoise(targetedPlayer.transform.position, detentionNoise);
             officeThatPlayersIsIn[targetedPlayer.playerNumber] = office;
         }
 
         public void TravelToDetention(Entity victim, bool isValid)
         {
-            if (ec.offices.Count > 0)
+            if (AllOffices.Count > 0)
             {
-                int index = UnityEngine.Random.Range(0, ec.offices.Count);
+                int index = UnityEngine.Random.Range(0, AllOffices.Count);
                 CarTransform(true);
-                behaviorStateMachine.ChangeState(new PoliceNerd_Carry(this, new PoliceNerd_Wandering(this), victim, ec.offices[index]));
+                behaviorStateMachine.ChangeState(new PoliceNerd_Carry(this, new PoliceNerd_Wandering(this), victim, AllOffices[index]));
                 if (isValid && victim.CompareTag("Player"))
                 {
                     overlay.gameObject.SetActive(true);
@@ -171,13 +179,45 @@ namespace BCarnellTeacher
             }
         }
 
+        private Dictionary<string, SoundObject> scolds = new();
+        [SerializeField, HideInInspector] private List<string> scoldRules;
+        [SerializeField, HideInInspector] private List<SoundObject> scoldLines;
+        public void OnBeforeSerialize()
+        {
+            scoldRules = new List<string>();
+            scoldLines = new List<SoundObject>();
+            foreach (var scold in scolds)
+            {
+                scoldRules.Add(scold.Key);
+                scoldLines.Add(scold.Value);
+            }
+        }
+
+        public void OnAfterDeserialize()
+        {
+            for (int i = 0; i < scoldRules.Count && i < scoldLines.Count; i++)
+                scolds.Add(scoldRules[i], scoldLines[i]);
+            scoldRules = null;
+            scoldLines = null;
+        }
+        public Dictionary<string, SoundObject> Scolds => scolds;
+        [SerializeField]
+        internal SoundObject
+            noDefault, noRobbery, noJailbreak, jailForYou;
         public new void Scold(string brokenRule)
         {
             audMan.FlushQueue(true);
-            if (brokenRule != null)
+            if (!string.IsNullOrWhiteSpace(brokenRule))
             {
-                if (targetedPlayer != null && !behaviorStateMachine.currentState.GetType().Equals(typeof(PoliceNerd_TargetingNPC))) savedRulebreak[targetedPlayer.playerNumber] = brokenRule;
-                audMan.QueueAudio(whistle);
+                if (targetedPlayer != null && behaviorStateMachine.currentState is not PoliceNerd_TargetingNPC) savedRulebreak[targetedPlayer.playerNumber] = brokenRule;
+                if (behaviorStateMachine.currentState is PoliceNerd_TargetingNPC && ((PoliceNerd_TargetingNPC)behaviorStateMachine.currentState).Target.Character.ToStringExtended() == "MrRobber")
+                    audMan.QueueAudio(noRobbery);
+                else if (targetedPlayer != null && brokenRule.ToLower() == "escaping" && officeThatPlayersIsIn[targetedPlayer.playerNumber]?.functionObject.GetComponent<JailWindowRoomFunction>() != null)
+                    audMan.QueueAudio(noJailbreak);
+                else if (!scolds.ContainsKey(brokenRule.ToLower()))
+                    audMan.QueueAudio(noDefault);
+                else
+                    audMan.QueueAudio(scolds[brokenRule.ToLower()]);
             }
         }
 
@@ -200,13 +240,13 @@ namespace BCarnellTeacher
         {
             if (whistleRng.NextDouble() < (double)whistleChance && !audMan.QueuedAudioIsPlaying)
             {
-                audMan.PlaySingle(CarnellPlugin.bcarnelAssets.Get<SoundObject>("PoliceNerd/GoofyHorn"));
+                audMan.PlaySingle(whistle);
             }
         }
 
         public void CarTransform(bool mode)
         {
-            audMan.PlaySingle(mode ? CarnellPlugin.bcarnelAssets.Get<SoundObject>("PoliceNerd/CarEnabled") : CarnellPlugin.bcarnelAssets.Get<SoundObject>("PoliceNerd/CarOut"));
+            audMan.PlaySingle(mode ? carOn : carOff);
             inCar = mode;
             spriteRenderer[1].gameObject.SetActive(mode);
             AccessTools.DeclaredField(typeof(Navigator), "decelerate").SetValue(navigator, mode);

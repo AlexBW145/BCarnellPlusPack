@@ -31,6 +31,11 @@ namespace BCarnellTeacher
             .MaxAssistants(2)
             .AddAssistants("Foxo").Probability(0.5f);
 
+        [SerializeField]
+        internal SoundObject
+            hello, regenDagger, screamsInAgony;
+        [SerializeField] internal Sprite[] binders;
+
         public override void Initialize()
         {
             ReplacementMusic = CarnellPlugin.bcarnelAssets.Get<string>("SchoolHouseCarnell");
@@ -45,10 +50,6 @@ namespace BCarnellTeacher
                 slapSpeedScale += 15f; //15.65f;
                 baseSpeed += 12.5f;
             }
-            AddLoseSound(CarnellPlugin.bcarnelAssets.Get<SoundObject>("BCarnell/Lose/Bomb"), 500);
-            AddLoseSound(CarnellPlugin.bcarnelAssets.Get<SoundObject>("BCarnell/Lose/Screech"), 500);
-            AddLoseSound(CarnellPlugin.bcarnelAssets.Get<SoundObject>("BCarnell/Lose/Standard"), 550);
-            AddLoseSound(CarnellPlugin.bcarnelAssets.Get<SoundObject>("BCarnell/Lose/Yello"), 500);
             // Random events
             /*ReplaceEventText<RulerEvent>(LocalizationManager.Instance.GetLocalizedText("Event_BrokenRuler_BCarnell"));
             ReplaceEventText<PartyEvent>(LocalizationManager.Instance.GetLocalizedText("Event_Party_BCarnell"));*/
@@ -57,7 +58,7 @@ namespace BCarnellTeacher
         protected override void VirtualUpdate()
         {
             base.VirtualUpdate();
-            if (!behaviorStateMachine.currentState.GetType().Equals(typeof(BCarnell_Chase)))
+            if (behaviorStateMachine.CurrentState is not BCarnell_Chase)
                 return;
             /*if ((animator.currentAnimationName == "Slap" || animator.currentAnimationName == "SlapBroken") && animator.currentFrameIndex == 4)
             {
@@ -125,13 +126,13 @@ namespace BCarnellTeacher
         protected override void OnRulerBroken()
         {
             base.OnRulerBroken();
-            AudMan.PlaySingle(CarnellPlugin.bcarnelAssets.Get<SoundObject>("BCarnell/BrokenDagger"));
+            AudMan.PlaySingle(rulerBreak);
             rulerBroken = true;
         }
         protected override void OnRulerRestored()
         {
             base.OnRulerRestored();
-            AudMan.PlaySingle(CarnellPlugin.bcarnelAssets.Get<SoundObject>("BCarnell/RegenDagger"));
+            AudMan.PlaySingle(regenDagger);
             extraAnger -= 2.5f;
             if (extraAnger < 0f)
                 extraAnger = 0f;
@@ -161,21 +162,15 @@ namespace BCarnellTeacher
                 Debug.LogWarning("WTF?! NO DOOR??");
                 return;
             }
-            gameObject.GetComponent<Entity>().Teleport(nearestDoor.aTile.Tile.transform.position);
+            Entity.Teleport(nearestDoor.aTile.Tile.transform.position);
         }
 
-        public override string GetNotebooksText(string amount)
-        {
-            return amount + " Binders";
-        }
-        public override WeightedTeacherNotebook GetTeacherNotebookWeight()
-        {
-            return new WeightedTeacherNotebook(this).Weight(80).Sprite(CarnellPlugin.bcarnelAssets.Get<Sprite[]>("BCarnell/Binders"));
-        }
+        public override string GetNotebooksText(string amount) => amount + " Binders";
+        public override WeightedTeacherNotebook GetTeacherNotebookWeight() => new WeightedTeacherNotebook(this).Weight(80).Sprite(binders);
 
         public void Attract(Vector3 pos)
         {
-            if (!behaviorStateMachine.currentState.GetType().Equals(typeof(BCarnell_Chase)) || looker.PlayerInSight())
+            if (behaviorStateMachine.CurrentState is not BCarnell_Chase || looker.PlayerInSight())
                 return;
             behaviorStateMachine.ChangeNavigationState(new NavigationState_TargetPosition(this, 1, pos));
         }
@@ -231,7 +226,7 @@ namespace BCarnellTeacher
                         if (!loudBugfix) // Don't remove this boolean, the results are very bad.
                         {
                             loudBugfix = true;
-                            CoreGameManager.Instance.audMan.PlaySingle(CarnellPlugin.bcarnelAssets.Get<SoundObject>("BCarnell/FinalFloor"));
+                            CoreGameManager.Instance.audMan.PlaySingle(screamsInAgony);
                         }
                         break;
                     case 6096:

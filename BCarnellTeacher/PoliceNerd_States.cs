@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using MTM101BaldAPI;
+using System.Collections;
 using UnityEngine;
 namespace BCarnellTeacher
 {
@@ -61,7 +62,7 @@ namespace BCarnellTeacher
         {
             foreach (NPC npc in policenerd.ec.Npcs)
             {
-                if (((npc.Disobeying && npc.Navigator?.Entity.Visible == true) || (npc.gameObject?.name?.StartsWith("Mr Robber") == true && npc.spriteRenderer[0].color != Color.clear && npc.spriteRenderer[0].gameObject.activeSelf)) && npc.gameObject != policenerd.gameObject)
+                if (((npc.Disobeying && npc.Navigator?.Entity.Visible == true) || (npc.Character.ToStringExtended() == "MrRobber" && npc.spriteRenderer[0].color != Color.clear && npc.spriteRenderer[0].gameObject.activeSelf)) && npc.gameObject != policenerd.gameObject)
                 {
                     policenerd.looker.Raycast(npc.transform, Mathf.Min((policenerd.transform.position - npc.transform.position).magnitude + npc.Navigator.Velocity.magnitude, policenerd.looker.distance, npc.ec.MaxRaycast), out var targetSighted);
                     if (targetSighted)
@@ -128,6 +129,7 @@ namespace BCarnellTeacher
         protected NavigationState_TargetPosition targetState;
 
         protected NPC targetedNpc;
+        internal NPC Target => targetedNpc;
 
         public PoliceNerd_TargetingNPC(PoliceNerd nerd, NPC targetedNpc)
             : base(nerd)
@@ -157,8 +159,8 @@ namespace BCarnellTeacher
         {
             if (other.transform == targetedNpc?.transform)
             {
-                /*int index = UnityEngine.Random.Range(0, policenerd.ec.offices.Count);
-                targetedNpc.transform.position = policenerd.ec.offices[index].RandomEntitySafeCellNoGarbage().FloorWorldPosition + Vector3.up * 5f;*/
+                /*int index = UnityEngine.Random.Range(0, policenerd.AllOffices.Count);
+                targetedNpc.transform.position = policenerd.AllOffices[index].RandomEntitySafeCellNoGarbage().FloorWorldPosition + Vector3.up * 5f;*/
                 if (targetedNpc.Character != Character.Bully)
                     policenerd.TravelToDetention(targetedNpc.gameObject.GetComponent<Entity>(), isValid);
                 else
@@ -380,7 +382,7 @@ namespace BCarnellTeacher
             : base(npc, priority)
         {
             this.office = office;
-            time = UnityEngine.Random.Range(15, 30);
+            time = UnityEngine.Random.Range(15f, 30f);
         }
 
         public override void Enter()

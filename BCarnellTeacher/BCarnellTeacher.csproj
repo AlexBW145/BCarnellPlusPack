@@ -38,5 +38,6 @@
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="echo F|xcopy /Y &quot;$(ProjectDir)bin\$(Configuration)\net472\$(AssemblyName).dll&quot; &quot;D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\TeacherAPI\$(AssemblyName).dll&quot;" />
 		<Exec Command="echo F|xcopy /Y &quot;$(ProjectDir)bin\$(Configuration)\net472\$(AssemblyName).pdb&quot; &quot;D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\TeacherAPI\$(AssemblyName).pdb&quot;" />
+		<Exec Command="echo D|xcopy /S /Y /F &quot;$(ProjectDir)alexbw145.baldiplus.bcarnellteacher\&quot; &quot;D:\SteamLibrary\steamapps\common\Baldi's Basics Plus\BALDI_Data\StreamingAssets\Modded\alexbw145.baldiplus.bcarnellteacher\&quot;" />
 	</Target>
 </Project>

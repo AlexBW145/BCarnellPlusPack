@@ -35,7 +35,7 @@ namespace BCarnellTeacher
             base.Enter();
             carnell.animator.Play("Wave", 1f);
             carnell.animator.SetDefaultAnimation("Happy", 1f);
-            //carnell.audMan.PlaySingle(carnell.audios.Get<SoundObject>("hellothere"));
+            carnell.AudMan.QueueAudio(carnell.hello);
             carnell.Navigator.SetSpeed(0f);
             ChangeNavigationState(new NavigationState_DoNothing(carnell, 127));
         }
@@ -158,6 +158,75 @@ namespace BCarnellTeacher
             base.Update();
             time -= Time.deltaTime * npc.TimeScale;
             if (time <= 0) carnell.behaviorStateMachine.ChangeState(previousState);
+        }
+    }
+
+    public class BCarnell_Destabilized(BCarnell carnell) : BCarnell_StateBase(carnell)
+    {
+        private float time = 30f;
+        public override void Enter()
+        {
+            base.Enter();
+            carnell.Entity.SetInteractionState(false);
+            carnell.Entity.SetVisible(false);
+            carnell.Entity.SetTrigger(false);
+        }
+
+        public override void Exit()
+        {
+            base.Exit();
+            carnell.Entity.SetInteractionState(true);
+            carnell.Entity.SetVisible(true);
+            carnell.Entity.SetTrigger(true);
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            time -= npc.TimeScale * Time.deltaTime;
+            if (time <= 0f)
+            {
+                if (carnell.ec.Elevators.Count > 0)
+                {
+                    bool noPower = false;
+                    Elevator elevator = null;
+                    IEnumerator WaitForExit()
+                    {
+                        yield return null;
+                        while (elevator.ColliderGroup.HasNPC)
+                            yield return null;
+                        if (elevator.CurrentState != ElevatorState.OpenForExit)
+                            elevator.SetState(carnell.ec.ElevatorManager.GetIntendedElevatorState(elevator));
+                        yield break;
+                    }
+                    foreach (var _elevator in carnell.ec.Elevators)
+                    {
+                        if (_elevator.CurrentState == ElevatorState.NoPower)
+                            noPower = true;
+                        else if (_elevator.CurrentState != ElevatorState.OutOfOrder)
+                        {
+                            elevator = _elevator;
+                            break;
+                        }
+                    }
+                    if (elevator != null)
+                    {
+                        if (elevator.CurrentState != ElevatorState.OpenForExit)
+                            elevator.SetState(ElevatorState.Open);
+                        carnell.Entity.Teleport(elevator.Door.transform.position);
+                        elevator.StartCoroutine(WaitForExit());
+                    }
+                    else if (noPower)
+                    {
+                        time += carnell.Delay;
+                        return;
+                    }
+                    else return;
+                }
+                else
+                    carnell.Entity.Teleport(carnell.ec.spawnPoint);
+                carnell.behaviorStateMachine.ChangeState(new BCarnell_Praise(carnell, new BCarnell_Chase(carnell), carnell.Delay));
+            }
         }
     }
 }
